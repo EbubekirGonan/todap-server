@@ -328,9 +328,16 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
           </div>
           <div class="form-row single">
             <div class="form-group">
-              <label class="form-label">İçerik (HTML) <span style="color:var(--error)">*</span></label>
-              <textarea class="form-textarea tall" id="haber-icerik" placeholder="<p>Haber içeriği...</p>&#10;<h2>Alt Başlık</h2>&#10;<p>Devam...</p>"></textarea>
-              <span class="form-hint">HTML etiketleri kullanabilirsiniz: &lt;p&gt; &lt;h2&gt; &lt;ul&gt; &lt;li&gt; &lt;strong&gt; &lt;em&gt; &lt;blockquote&gt;</span>
+              <label class="form-label">Özet İçerik (HTML)</label>
+              <textarea class="form-textarea tall" id="haber-ozet-icerik" placeholder="&lt;p&gt;Haberin özet içeriği...&lt;/p&gt;"></textarea>
+              <span class="form-hint">Kısa HTML içerik. Etiketler: &lt;p&gt; &lt;h2&gt; &lt;ul&gt; &lt;li&gt; &lt;strong&gt; &lt;em&gt; &lt;blockquote&gt;</span>
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label">Detaylı İçerik (HTML)</label>
+              <textarea class="form-textarea tall" id="haber-detayli-icerik" placeholder="&lt;p&gt;Geniş detaylı içerik... (ilerleyen zamanlarda)&lt;/p&gt;"></textarea>
+              <span class="form-hint">Uzun format için ayrı alan. Şu an boş bırakılabilir.</span>
             </div>
           </div>
           <div class="form-actions">
@@ -636,7 +643,8 @@ function editHaber(id) {
   document.getElementById('haber-ozet').value       = d.ozet || '';
   document.getElementById('haber-tarih').value      = d.tarih || '';
   document.getElementById('haber-gosterim').value   = d.gosterim_tarihi || '';
-  document.getElementById('haber-icerik').value     = d.icerik || '';
+  document.getElementById('haber-ozet-icerik').value  = d.ozet_icerik || '';
+  document.getElementById('haber-detayli-icerik').value = d.detayli_icerik || '';
   showPage('haber-yeni');
 }
 
@@ -646,7 +654,7 @@ function resetHaberForm() {
   document.getElementById('haber-slug').value     = '';
   document.getElementById('haber-slug').disabled  = false;
   document.getElementById('haber-kategori').value = 'Bildiri';
-  ['haber-baslik','haber-ozet','haber-tarih','haber-gosterim','haber-icerik'].forEach(id => {
+  ['haber-baslik','haber-ozet','haber-tarih','haber-gosterim','haber-ozet-icerik','haber-detayli-icerik'].forEach(id => {
     document.getElementById(id).value = '';
   });
 }
@@ -658,16 +666,16 @@ async function saveHaber() {
   const ozet          = document.getElementById('haber-ozet').value.trim();
   const tarih         = document.getElementById('haber-tarih').value.trim();
   const gosterim_tarihi = document.getElementById('haber-gosterim').value.trim();
-  const icerik        = document.getElementById('haber-icerik').value.trim();
+  const ozet_icerik    = document.getElementById('haber-ozet-icerik').value.trim();
+  const detayli_icerik = document.getElementById('haber-detayli-icerik').value.trim();
   const kategoriEl    = document.getElementById('haber-kategori');
   const kategori      = kategoriEl.value;
   const renk          = kategoriEl.selectedOptions[0].dataset.cls || '';
 
   if (!baslik) { showToast('Başlık zorunlu!', 'error'); return; }
   if (!editId && !slug) { showToast('Slug zorunlu!', 'error'); return; }
-  if (!icerik) { showToast('İçerik zorunlu!', 'error'); return; }
 
-  const body = { baslik, ozet, icerik, tarih, gosterim_tarihi, kategori, renk };
+  const body = { baslik, ozet, ozet_icerik, detayli_icerik, tarih, gosterim_tarihi, kategori, renk };
 
   try {
     showLoading('Kaydediliyor...');

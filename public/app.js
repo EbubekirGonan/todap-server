@@ -78,7 +78,7 @@ function renderArticle(d) {
   document.getElementById('a-tag').className = 'at' + (d.renk ? ' ' + d.renk : '');
   document.getElementById('a-title').textContent = d.baslik;
   document.getElementById('a-date').textContent = d.gosterim_tarihi || d.tarih;
-  document.getElementById('a-body').innerHTML = d.icerik;
+  document.getElementById('a-body').innerHTML = d.ozet_icerik || d.detayli_icerik || '';
   go('haber');
 }
 
@@ -236,6 +236,47 @@ function esc(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+// ── Navbar Scroll Gizle/Göster ───────────────────────────────
+(function () {
+  const NAV_HEIGHT  = 56;   // px — nav yüksekliği
+  const THRESHOLD   = 80;   // px — bu kadar aşağı inince saklama başlar
+  const TOLERANCE   = 6;    // px — küçük titremeleri yok say
+
+  let lastY = window.scrollY;
+  let ticking = false;
+
+  function handleScroll() {
+    const nav = document.querySelector('nav');
+    if (!nav) return;
+    const y   = window.scrollY;
+    const diff = y - lastY;
+
+    if (Math.abs(diff) < TOLERANCE) return;
+
+    if (y < THRESHOLD) {
+      // Üstteyiz — her zaman göster
+      nav.classList.remove('nav-hidden');
+    } else if (diff > 0) {
+      // Aşağı kaydırıyor — gizle
+      nav.classList.add('nav-hidden');
+      closeMobileMenu();
+    } else {
+      // Yukarı kaydırıyor — göster
+      nav.classList.remove('nav-hidden');
+    }
+
+    lastY = y;
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(handleScroll);
+      ticking = true;
+    }
+  }, { passive: true });
+})();
 
 // ── Başlat ───────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', initApp);

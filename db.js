@@ -17,7 +17,8 @@ db.exec(`
     slug             TEXT UNIQUE NOT NULL,
     baslik           TEXT NOT NULL,
     ozet             TEXT DEFAULT '',
-    icerik           TEXT DEFAULT '',
+    ozet_icerik      TEXT DEFAULT '',
+    detayli_icerik   TEXT DEFAULT '',
     tarih            TEXT DEFAULT '',
     gosterim_tarihi  TEXT DEFAULT '',
     kategori         TEXT DEFAULT 'Bildiri',
@@ -95,8 +96,8 @@ function seedIfEmpty() {
   if (db.prepare('SELECT COUNT(*) as c FROM haberler').get().c > 0) return;
 
   const insH = db.prepare(`
-    INSERT INTO haberler (slug,baslik,ozet,icerik,tarih,gosterim_tarihi,kategori,renk)
-    VALUES (@slug,@baslik,@ozet,@icerik,@tarih,@gosterim_tarihi,@kategori,@renk)
+    INSERT INTO haberler (slug,baslik,ozet,ozet_icerik,detayli_icerik,tarih,gosterim_tarihi,kategori,renk)
+    VALUES (@slug,@baslik,@ozet,@ozet_icerik,@detayli_icerik,@tarih,@gosterim_tarihi,@kategori,@renk)
   `);
 
   db.transaction(() => {
@@ -104,35 +105,40 @@ function seedIfEmpty() {
       slug: 'yargi-paketi',
       baslik: '11. Yargı Paketi Taslağı, Biz Psikologlar İçin Hangi Anlamlara Geliyor?',
       ozet: 'Bu taslak, psikologların insan haklarına saygı, ayrımcılıktan kaçınma ve zarar vermeme ilkeleriyle doğrudan çelişmektedir.',
-      icerik: `<p>Son günlerde kamuoyuna sızan 11. Yargı Paketi taslağı, mesleğimizi doğrudan ilgilendiren düzenlemeler içermektedir.</p><h2>Temel Sorunlar</h2><p>Bu taslak, psikologların temel mesleki yükümlülükleriyle doğrudan çelişmektedir:</p><ul><li><strong>İnsan haklarına saygı ve savunuculuk</strong></li><li><strong>Ayrımcılıktan kaçınma</strong></li><li><strong>Eşitlik temelinde duyarlılık ve kültürel farkların gözetilmesi</strong></li><li><strong>Zarar vermeme ve özerkliği koruma</strong></li><li><strong>Bilimsel ve güncel bilgi doğrultusunda çalışma</strong></li></ul><h2>TODAP'ın Tutumu</h2><p>Psikologlar olarak danışanlarımızın kimliğini veya ifade özgürlüğünü suç olarak tanımlayan herhangi bir yasal düzenlemeye karşı durmak hem etik hem de mesleki sorumluluğumuzdur.</p><blockquote>Psikoloji pratiği, toplumsal eşitlik ve insan onurundan bağımsız yürütülemez.</blockquote><p><em>— TODAP Yönetim Kurulu</em></p>`,
+      ozet_icerik: `<p>Son günlerde kamuoyuna sızan 11. Yargı Paketi taslağı, mesleğimizi doğrudan ilgilendiren düzenlemeler içermektedir.</p><h2>Temel Sorunlar</h2><p>Bu taslak, psikologların temel mesleki yükümlülükleriyle doğrudan çelişmektedir:</p><ul><li><strong>İnsan haklarına saygı ve savunuculuk</strong></li><li><strong>Ayrımcılıktan kaçınma</strong></li><li><strong>Eşitlik temelinde duyarlılık ve kültürel farkların gözetilmesi</strong></li><li><strong>Zarar vermeme ve özerkliği koruma</strong></li><li><strong>Bilimsel ve güncel bilgi doğrultusunda çalışma</strong></li></ul><h2>TODAP'ın Tutumu</h2><p>Psikologlar olarak danışanlarımızın kimliğini veya ifade özgürlüğünü suç olarak tanımlayan herhangi bir yasal düzenlemeye karşı durmak hem etik hem de mesleki sorumluluğumuzdur.</p><blockquote>Psikoloji pratiği, toplumsal eşitlik ve insan onurundan bağımsız yürütülemez.</blockquote><p><em>— TODAP Yönetim Kurulu</em></p>`,
+      detayli_icerik: '',
       tarih: '2025-12-23', gosterim_tarihi: '23 Aralık 2025', kategori: 'Bildiri', renk: 'r'
     });
     insH.run({
       slug: 'lgbti',
       baslik: 'Son Dönemlerde Artan LGBTİ+ ve Toplumsal Cinsiyet Eşitliğine Karşı Politikalar',
       ozet: '11. Yargı Paketi taslağına göre "doğuşta atanan cinsiyete aykırı" davranışlara üç yıla kadar hapis öngörülüyor.',
-      icerik: `<p>11. Yargı Paketi taslağına göre, "doğuşta atanan cinsiyete aykırı" davranışlarda bulunanlara üç yıla kadar hapis cezası öngörülüyor.</p><h2>Psikoloji Perspektifinden</h2><p>Bu düzenleme, psikoloji pratiğini doğrudan etkilemektedir. Psikologlar olarak danışanlarımızın cinsel yönelimini patolojize etmemek temel etik yükümlülüklerimiz arasındadır.</p><p><em>— TODAP Kadın Komisyonu & Yönetim Kurulu</em></p>`,
+      ozet_icerik: `<p>11. Yargı Paketi taslağına göre, "doğuşta atanan cinsiyete aykırı" davranışlarda bulunanlara üç yıla kadar hapis cezası öngörülüyor.</p><h2>Psikoloji Perspektifinden</h2><p>Bu düzenleme, psikoloji pratiğini doğrudan etkilemektedir. Psikologlar olarak danışanlarımızın cinsel yönelimini patolojize etmemek temel etik yükümlülüklerimiz arasındadır.</p><p><em>— TODAP Kadın Komisyonu & Yönetim Kurulu</em></p>`,
+      detayli_icerik: '',
       tarih: '2025-10-29', gosterim_tarihi: '29 Ekim 2025', kategori: 'Rapor', renk: 'r'
     });
     insH.run({
       slug: 'kuyu',
       baslik: 'Kuyu Tipi Hapishaneler: Tecrit İnsan Haklarını ve Ruh Sağlığını Tehdit Ediyor',
       ozet: 'Hapishanelerde yaşanan hak ihlallerini görünür kılmak, bizim için mesleki ve toplumsal bir sorumluluktur.',
-      icerik: `<p>Uzun süreli tecridin ağır psikolojik sonuçlara yol açtığı araştırmalarla kanıtlanmıştır.</p><h2>Tecridin Etkileri</h2><ul><li>Anksiyete ve depresyonda ciddi artış</li><li>Bilişsel işlevlerde bozulma</li><li>Algı bozuklukları ve halüsinasyonlar</li><li>Post-travmatik stres belirtileri</li></ul><h2>TODAP'ın Talebi</h2><p>Tecrit uygulamalarının derhal sona erdirilmesini talep ediyoruz.</p><p><em>— TODAP Yönetim Kurulu</em></p>`,
+      ozet_icerik: `<p>Uzun süreli tecridin ağır psikolojik sonuçlara yol açtığı araştırmalarla kanıtlanmıştır.</p><h2>Tecridin Etkileri</h2><ul><li>Anksiyete ve depresyonda ciddi artış</li><li>Bilişsel işlevlerde bozulma</li><li>Algı bozuklukları ve halüsinasyonlar</li><li>Post-travmatik stres belirtileri</li></ul><h2>TODAP'ın Talebi</h2><p>Tecrit uygulamalarının derhal sona erdirilmesini talep ediyoruz.</p><p><em>— TODAP Yönetim Kurulu</em></p>`,
+      detayli_icerik: '',
       tarih: '2025-09-07', gosterim_tarihi: '7 Eylül 2025', kategori: 'İnsan Hakları', renk: 'g'
     });
     insH.run({
       slug: 'asli',
       baslik: 'Üyemiz, Dostumuz #AslıAydemireÖzgürlük!',
       ozet: 'LeMan\'a saldıranlar değil, toplumsal dayanışmadan yana bir psikolog, bir feminist, bir Barış Akademisyeni tutuklandı.',
-      icerik: `<p>Aslı Aydemir, hiciv dergisi LeMan'a saldırı düzenleyenler değil, toplumsal dayanışmadan yana duran bir psikolog, feminist ve Barış Akademisyeni olarak tutuklandı.</p><h2>Dayanışma Çağrımız</h2><p>Aslı'nın serbest bırakılması için sesimizi yükseltiyoruz.</p><p><strong>#AslıAydemireÖzgürlük</strong></p><p><em>— TODAP Yönetim Kurulu</em></p>`,
+      ozet_icerik: `<p>Aslı Aydemir, hiciv dergisi LeMan'a saldırı düzenleyenler değil, toplumsal dayanışmadan yana duran bir psikolog, feminist ve Barış Akademisyeni olarak tutuklandı.</p><h2>Dayanışma Çağrımız</h2><p>Aslı'nın serbest bırakılması için sesimizi yükseltiyoruz.</p><p><strong>#AslıAydemireÖzgürlük</strong></p><p><em>— TODAP Yönetim Kurulu</em></p>`,
+      detayli_icerik: '',
       tarih: '2025-07-09', gosterim_tarihi: '9 Temmuz 2025', kategori: 'Dayanışma', renk: ''
     });
     insH.run({
       slug: 'serbest-meslek',
       baslik: 'Yönetmeliğe Karşı Emeğimizi Savunduk, Yürütme Kısmen Durduruldu!',
       ozet: 'Ruh sağlığı emekçileri olarak serbest meslek hakkımızı savunuyoruz!',
-      icerik: `<p>Ruh sağlığı alanında çalışan psikologların serbest meslek hakkını kısıtlayan yönetmelik düzenlemesine karşı açtığımız davada önemli bir adım atıldı.</p><h2>Dava Süreci</h2><p>Mahkeme, yönetmeliğin ilgili maddelerinin yürütmesini kısmen durdurdu.</p><h2>Mücadele Sürüyor</h2><p>Mücadelemiz devam etmektedir.</p><p><em>— TODAP Psikolog Hakları Danışma Birimi</em></p>`,
+      ozet_icerik: `<p>Ruh sağlığı alanında çalışan psikologların serbest meslek hakkını kısıtlayan yönetmelik düzenlenmesine karşı açtığımız davada önemli bir adım atıldı.</p><h2>Dava Süreci</h2><p>Mahkeme, yönetmeliğin ilgili maddelerinin yürütülesini kısmen durdurdu.</p><h2>Mücadele Sürüyor</h2><p>Mücadelemiz devam etmektedir.</p><p><em>— TODAP Psikolog Hakları Danışma Birimi</em></p>`,
+      detayli_icerik: '',
       tarih: '2025-07-03', gosterim_tarihi: '3 Temmuz 2025', kategori: 'Savunuculuk', renk: ''
     });
   })();

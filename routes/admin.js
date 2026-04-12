@@ -41,13 +41,13 @@ router.get('/haberler', auth, (_req, res) => {
 });
 
 router.post('/haberler', auth, (req, res) => {
-  const { slug, baslik, ozet, icerik, tarih, gosterim_tarihi, kategori, renk } = req.body;
+  const { slug, baslik, ozet, ozet_icerik, detayli_icerik, tarih, gosterim_tarihi, kategori, renk } = req.body;
   if (!slug || !baslik) return res.status(400).json({ error: 'slug ve baslik zorunlu.' });
   try {
     const r = db.prepare(`
-      INSERT INTO haberler (slug,baslik,ozet,icerik,tarih,gosterim_tarihi,kategori,renk)
-      VALUES (?,?,?,?,?,?,?,?)
-    `).run(slug, baslik, ozet||'', icerik||'', tarih||'', gosterim_tarihi||'', kategori||'Bildiri', renk||'');
+      INSERT INTO haberler (slug,baslik,ozet,ozet_icerik,detayli_icerik,tarih,gosterim_tarihi,kategori,renk)
+      VALUES (?,?,?,?,?,?,?,?,?)
+    `).run(slug, baslik, ozet||'', ozet_icerik||'', detayli_icerik||'', tarih||'', gosterim_tarihi||'', kategori||'Bildiri', renk||'');
     res.json({ id: r.lastInsertRowid });
   } catch (e) {
     if (e.message.includes('UNIQUE')) return res.status(409).json({ error: 'Bu slug zaten kullanılıyor.' });
@@ -56,11 +56,11 @@ router.post('/haberler', auth, (req, res) => {
 });
 
 router.put('/haberler/:id', auth, (req, res) => {
-  const { baslik, ozet, icerik, tarih, gosterim_tarihi, kategori, renk, aktif } = req.body;
+  const { baslik, ozet, ozet_icerik, detayli_icerik, tarih, gosterim_tarihi, kategori, renk, aktif } = req.body;
   db.prepare(`
-    UPDATE haberler SET baslik=?,ozet=?,icerik=?,tarih=?,gosterim_tarihi=?,kategori=?,renk=?,aktif=?
+    UPDATE haberler SET baslik=?,ozet=?,ozet_icerik=?,detayli_icerik=?,tarih=?,gosterim_tarihi=?,kategori=?,renk=?,aktif=?
     WHERE id=?
-  `).run(baslik, ozet||'', icerik||'', tarih||'', gosterim_tarihi||'', kategori||'Bildiri', renk||'',
+  `).run(baslik, ozet||'', ozet_icerik||'', detayli_icerik||'', tarih||'', gosterim_tarihi||'', kategori||'Bildiri', renk||'',
          aktif !== undefined ? Number(aktif) : 1, req.params.id);
   res.json({ ok: true });
 });
