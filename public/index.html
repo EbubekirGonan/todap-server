@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TODAP — Toplumsal Dayanışma İçin Psikologlar Derneği</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --burgundy:#7a1f2e;--burgundy-deep:#4e1220;--burgundy-light:#f5e8eb;
+  --mustard:#c9872b;--mustard-light:#fdf3e3;
+  --cream:#faf7f2;--warm-white:#fffdf9;
+  --ink:#181210;--ink-muted:#6b5248;--ink-faint:#a8918a;
+  --bg:#faf7f2;--border:rgba(24,18,16,0.10);
+  --fd:'Syne',system-ui,sans-serif;
+  --fs:'Lora',Georgia,serif;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:var(--fs);background:var(--bg);color:var(--ink);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+nav{position:sticky;top:0;z-index:100;background:var(--burgundy-deep);padding:0 2.5rem;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-logo{font-family:var(--fd);font-size:20px;font-weight:800;color:#fff;text-decoration:none;letter-spacing:.02em;cursor:pointer}
+.nav-logo span{color:var(--mustard)}
+.nl{display:flex;gap:2rem;list-style:none}
+.nl a{font-family:var(--fd);font-size:12px;font-weight:400;letter-spacing:.06em;color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s;text-transform:uppercase;cursor:pointer}
+.nl a:hover{color:#fff}
+.nr{display:flex;gap:10px;align-items:center}
+.bn{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:7px 18px;border-radius:2px;text-decoration:none;cursor:pointer;display:inline-block;transition:all .2s}
+.bn-o{border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff}
+.bn-o:hover{background:#fff;color:var(--burgundy-deep)}
+.bn-f{border:1px solid var(--mustard);background:var(--mustard);color:#fff}
+.bn-f:hover{background:#b07020}
+.hero-wrap{background:var(--burgundy);min-height:88vh;display:flex;flex-direction:column;justify-content:flex-end;padding:3rem 2.5rem 3.5rem;position:relative;overflow:hidden}
+.hero-wrap::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(255,255,255,.012) 40px,rgba(255,255,255,.012) 41px),repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(255,255,255,.012) 40px,rgba(255,255,255,.012) 41px);pointer-events:none}
+.hero-wrap::after{content:'';position:absolute;top:0;right:0;width:45%;height:100%;background:var(--burgundy-deep);clip-path:polygon(15% 0,100% 0,100% 100%,0% 100%);opacity:.5}
+.hi{position:relative;z-index:1;max-width:1100px;margin:0 auto;width:100%}
+.ho{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mustard);margin-bottom:2rem;display:flex;align-items:center;gap:1rem}
+.ho::before{content:'';display:inline-block;width:32px;height:2px;background:var(--mustard)}
+h1.hero-h{font-family:var(--fd);font-size:clamp(52px,9vw,120px);font-weight:800;line-height:.92;letter-spacing:-.03em;color:#fff;text-transform:uppercase;margin-bottom:2rem}
+.il{font-family:var(--fs);font-style:italic;font-weight:400;text-transform:none;font-size:.75em;color:rgba(255,255,255,.7);display:block;letter-spacing:-.01em}
+.hb{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:2rem;margin-top:3rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,.15)}
+.hd{font-family:var(--fs);font-size:16px;color:rgba(255,255,255,.65);max-width:460px;line-height:1.65}
+.hbtns{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.bm{font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:13px 28px;border-radius:2px;background:var(--mustard);color:#fff;text-decoration:none;border:none;cursor:pointer;transition:all .2s;display:inline-block}
+.bm:hover{background:#b07020}
+.bgw{font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:13px 28px;border-radius:2px;background:transparent;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.3);cursor:pointer;transition:all .2s;display:inline-block}
+.bgw:hover{background:rgba(255,255,255,.08)}
+.ticker-wrap{background:var(--mustard);overflow:hidden;white-space:nowrap;padding:9px 0}
+.ticker-inner{display:inline-block;animation:ticker 38s linear infinite}
+.ticker-inner span{font-family:var(--fd);font-size:12px;font-weight:400;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-right:3rem}
+.ticker-inner span strong{color:#fff;font-weight:700}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+section{padding:5rem 2.5rem}
+.cnt{max-width:1100px;margin:0 auto}
+.sl{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mustard);display:block;margin-bottom:.75rem}
+h2.dp{font-family:var(--fd);font-size:clamp(30px,4vw,46px);font-weight:800;letter-spacing:-.025em;line-height:1.1;color:var(--ink);text-transform:uppercase}
+h2.dp em{font-family:var(--fs);font-style:italic;font-weight:400;text-transform:none;color:var(--burgundy);font-size:.9em}
+.st{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2.5rem}
+.rm{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--burgundy);text-decoration:none;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+.rm::after{content:'→'}
+.rm:hover{text-decoration:underline}
+.nf{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--ink);border-radius:10px;overflow:hidden;margin-bottom:2px}
+.nfl{padding:2.5rem;border-right:1px solid rgba(255,255,255,.08)}
+.nfr{padding:2.5rem;background:rgba(255,255,255,.04)}
+.nt{display:inline-block;font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:2px;background:var(--mustard);color:#fff;margin-bottom:1rem}
+.nt.r{background:var(--burgundy)}
+.nt.g{background:#3a6b35}
+.nd{font-family:var(--fd);font-size:11px;letter-spacing:.05em;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:.75rem}
+.nfl h3,.nfr h3{font-family:var(--fd);font-weight:700;line-height:1.2;color:#fff;margin-bottom:1rem}
+.nfl h3{font-size:22px}
+.nfr h3{font-size:18px}
+.nfl p,.nfr p{font-size:14px;color:rgba(255,255,255,.55);line-height:1.7}
+.nfr p{font-size:13px;color:rgba(255,255,255,.5)}
+.rmw{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mustard);text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-top:1.25rem;cursor:pointer}
+.rmw::after{content:'→'}
+.rmw:hover{text-decoration:underline}
+.ns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-top:2px}
+.nsi{background:var(--warm-white);padding:1.75rem;border:1px solid var(--border)}
+.nsi:first-child{border-radius:0 0 0 10px}
+.nsi:last-child{border-radius:0 0 10px 0}
+.nsi:nth-child(2){background:#fdf0e8}
+.nsi h4{font-family:var(--fd);font-size:15px;font-weight:700;line-height:1.3;color:var(--ink);margin-bottom:.5rem}
+.nsi p{font-size:13px;color:var(--ink-muted);line-height:1.5}
+.nd2{font-family:var(--fd);font-size:11px;letter-spacing:.04em;color:var(--ink-faint);margin-bottom:.5rem}
+.bg{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:rgba(122,31,46,.15);border:1px solid rgba(122,31,46,.15);border-radius:10px;overflow:hidden;margin-top:2.5rem}
+.bi{background:var(--warm-white);padding:2.25rem;transition:background .2s}
+.bi:hover{background:var(--burgundy-light)}
+.bn2{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--burgundy);opacity:.5;margin-bottom:.75rem;text-transform:uppercase}
+.bi h3{font-family:var(--fd);font-size:17px;font-weight:700;color:var(--ink);margin-bottom:.5rem}
+.bi p{font-size:14px;color:var(--ink-muted);line-height:1.6}
+.er{display:grid;grid-template-columns:120px 1fr;border-bottom:1px solid var(--border);text-decoration:none;color:inherit;transition:background .2s;cursor:pointer}
+.er:hover{background:var(--mustard-light)}
+.er:first-of-type{border-top:1px solid var(--border)}
+.edb{padding:1.5rem;border-right:1px solid var(--border);text-align:center;display:flex;flex-direction:column;justify-content:center}
+.ed{font-family:var(--fd);font-size:32px;font-weight:800;color:var(--burgundy);line-height:1}
+.em{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-top:4px}
+.eb{padding:1.5rem}
+.ec{font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mustard);margin-bottom:5px}
+.et{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--ink);line-height:1.4}
+.edesc{font-size:13px;color:var(--ink-muted);margin-top:4px;line-height:1.5}
+.sb{background:var(--ink);padding:3.5rem 2.5rem;border-radius:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:2.5rem}
+.sc{text-align:center;padding:1rem;border-right:1px solid rgba(255,255,255,.07)}
+.sc:last-child{border-right:none}
+.sn{font-family:var(--fd);font-size:54px;font-weight:800;color:var(--mustard);display:block;line-height:1}
+.sl2{font-family:var(--fd);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:8px}
+.pr{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:2.5rem}
+.pi{padding:2rem;border:1px solid var(--border);border-radius:8px;text-decoration:none;color:inherit;display:block;transition:all .2s}
+.pi:hover{border-color:var(--burgundy);background:var(--burgundy-light)}
+.pt{font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--burgundy);margin-bottom:.75rem;display:block}
+.pi h3{font-family:var(--fd);font-size:18px;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3}
+.pi p{font-size:14px;color:var(--ink-muted);line-height:1.6}
+.cta{background:var(--burgundy);border-radius:10px;padding:4rem 3rem;display:grid;grid-template-columns:1fr auto;align-items:center;gap:3rem}
+.cta h2{font-family:var(--fd);font-size:clamp(24px,3.5vw,40px);font-weight:800;text-transform:uppercase;color:#fff;line-height:1.1}
+.cta h2 span{display:block;font-family:var(--fs);font-style:italic;font-weight:400;text-transform:none;font-size:.75em;color:rgba(255,255,255,.65);margin-top:4px}
+.cta p{font-size:15px;color:rgba(255,255,255,.6);margin-top:.75rem;line-height:1.6}
+.ctab{display:flex;flex-direction:column;gap:10px;align-items:center}
+.bws{font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:13px 28px;border-radius:2px;background:#fff;color:var(--burgundy);text-decoration:none;display:inline-block;transition:all .2s;white-space:nowrap;cursor:pointer}
+.bws:hover{background:var(--cream)}
+footer{background:var(--ink);padding:3.5rem 2.5rem 2rem}
+.fi{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem}
+.fl{font-family:var(--fd);font-size:24px;font-weight:800;color:#fff;display:block;margin-bottom:.75rem}
+.fl span{color:var(--mustard)}
+.fc h4{font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:1rem}
+.fc ul{list-style:none}
+.fc li{margin-bottom:.5rem}
+.fc a{font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s;cursor:pointer}
+.fc a:hover{color:#fff}
+.fb{max-width:1100px;margin:2.5rem auto 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;font-family:var(--fd);font-size:11px;letter-spacing:.04em;color:rgba(255,255,255,.2)}
+.fa{font-family:var(--fd);font-size:11px;color:rgba(255,255,255,.2);text-decoration:none;transition:color .2s}
+.fa:hover{color:rgba(255,255,255,.5)}
+.pv{display:none}
+.pv.on{display:block}
+.ah{background:var(--burgundy);padding:4rem 2.5rem 3rem}
+.ahi{max-width:760px;margin:0 auto}
+.ab{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5);text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:2rem;transition:color .2s;cursor:pointer}
+.ab:hover{color:#fff}
+.ab::before{content:'←'}
+.at{display:inline-block;font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:2px;background:var(--mustard);color:#fff;margin-bottom:1rem}
+.at.r{background:var(--burgundy)}
+.at.g{background:#3a6b35}
+.ah h1{font-family:var(--fd);font-size:clamp(26px,4vw,44px);font-weight:800;color:#fff;line-height:1.15;margin-bottom:1rem;text-transform:uppercase}
+.adate{font-family:var(--fd);font-size:12px;color:rgba(255,255,255,.4);letter-spacing:.05em;text-transform:uppercase}
+.abody{max-width:760px;margin:0 auto;padding:3.5rem 2.5rem}
+.abody h2{font-family:var(--fd);font-size:22px;font-weight:800;color:var(--ink);margin:2.5rem 0 1rem;text-transform:uppercase}
+.abody h3{font-family:var(--fd);font-size:18px;font-weight:700;color:var(--ink);margin:2rem 0 .75rem}
+.abody p{font-size:16px;color:var(--ink-muted);line-height:1.8;margin-bottom:1.25rem}
+.abody ul,.abody ol{padding-left:1.5rem;margin-bottom:1.25rem}
+.abody li{font-size:15px;color:var(--ink-muted);line-height:1.7;margin-bottom:.4rem}
+.abody strong{color:var(--ink);font-weight:600}
+.abody em{font-style:italic;color:var(--burgundy)}
+.abody blockquote{border-left:3px solid var(--mustard);padding-left:1.25rem;margin:1.5rem 0;font-style:italic;color:var(--ink-muted)}
+.fp{background:var(--warm-white);border-radius:12px;padding:3rem;max-width:680px;margin:0 auto;border:1px solid var(--border)}
+.fp h2{font-family:var(--fd);font-size:28px;font-weight:800;color:var(--ink);margin-bottom:.5rem;text-transform:uppercase}
+.fp .sub{font-size:15px;color:var(--ink-muted);margin-bottom:2.5rem;line-height:1.6}
+.fg{margin-bottom:1.5rem}
+.fg label{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-muted);display:block;margin-bottom:.5rem}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:4px;background:var(--bg);font-family:var(--fs);font-size:15px;color:var(--ink);outline:none;transition:border-color .2s;line-height:1.5}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--burgundy)}
+.fg textarea{min-height:120px;resize:vertical}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.fs2{font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:14px 32px;border-radius:2px;background:var(--burgundy);color:#fff;border:none;cursor:pointer;transition:background .2s;width:100%;margin-top:.5rem}
+.fs2:hover{background:var(--burgundy-deep)}
+.fn{font-size:12px;color:var(--ink-faint);margin-top:1rem;text-align:center;line-height:1.6}
+.sm{display:none;background:#eef7ee;border:1px solid #c3e6c3;border-radius:6px;padding:1.25rem;text-align:center;font-size:15px;color:#2d6a2d;margin-top:1.5rem}
+/* ── Hamburger Butonu (masaüstünde gizli) ── */
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;margin-left:8px;flex-shrink:0}
+.hamburger span{display:block;width:22px;height:2px;background:rgba(255,255,255,.9);border-radius:1px;transition:all .3s}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* ── Mobil menü açılır panel ── */
+.mobile-nav{display:none;position:fixed;top:56px;left:0;right:0;z-index:99;background:var(--burgundy-deep);border-bottom:2px solid rgba(255,255,255,.08);flex-direction:column;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.mobile-nav.open{display:flex}
+.mobile-nav a{font-family:var(--fd);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.75);padding:14px 1.5rem;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer;transition:background .2s;text-decoration:none;display:block}
+.mobile-nav a:last-child{border-bottom:none}
+.mobile-nav a:hover,
+.mobile-nav a:focus{background:rgba(255,255,255,.07);color:#fff;outline:none}
+.mobile-nav a.cta-link{color:var(--mustard);font-weight:700}
+
+/* ── İletişim grid (responsive class) ── */
+.iletisim-grid{max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 260px;gap:3rem;align-items:start}
+
+/* ── 768px: tablet / büyük telefon ── */
+@media(max-width:768px){
+  .nl{display:none}
+  .hamburger{display:flex}
+  nav{padding:0 1.25rem}
+  section{padding:3.5rem 1.25rem}
+  .hero-wrap{padding:2.5rem 1.25rem 3rem}
+  h1.hero-h{font-size:48px}
+  .nf{grid-template-columns:1fr}
+  .nfl{border-right:none;border-bottom:1px solid rgba(255,255,255,.08)}
+  .ns{grid-template-columns:1fr}
+  .bg{grid-template-columns:1fr}
+  .sb{grid-template-columns:1fr 1fr;padding:2rem 1.5rem}
+  .sn{font-size:40px}
+  .pr{grid-template-columns:1fr}
+  .cta{grid-template-columns:1fr;text-align:center;padding:2.5rem 1.5rem}
+  .ctab{align-items:center}
+  .fi{grid-template-columns:1fr 1fr;gap:2rem}
+  .er{grid-template-columns:80px 1fr}
+  .fr2{grid-template-columns:1fr}
+  .fp{padding:2rem 1.5rem}
+  .iletisim-grid{grid-template-columns:1fr;gap:2rem}
+  .ah{padding-left:1.25rem !important;padding-right:1.25rem !important}
+  .ahi{padding:0}
+  .abody{padding-left:1.25rem !important;padding-right:1.25rem !important}
+}
+
+/* ── 480px: küçük telefon ── */
+@media(max-width:480px){
+  h1.hero-h{font-size:38px}
+  .ho{font-size:10px;margin-bottom:1.25rem}
+  .hb{flex-direction:column;align-items:flex-start;gap:1.5rem;margin-top:2rem}
+  .hbtns{flex-direction:column;width:100%}
+  .bm,.bgw{width:100%;text-align:center;display:block}
+  .fi{grid-template-columns:1fr}
+  .sb{padding:1.5rem 1rem}
+  .sn{font-size:32px}
+  .sc{padding:.5rem .25rem}
+  section{padding:2.5rem 1rem}
+  .hero-wrap{padding:2rem 1rem 2.5rem}
+  .ah{padding-left:1rem !important;padding-right:1rem !important}
+  .abody{padding-left:1rem !important;padding-right:1rem !important}
+  .fp{padding:1.5rem 1rem}
+  .bi{padding:1.5rem 1.25rem}
+  .nsi{padding:1.25rem}
+  .cta{padding:2rem 1.25rem}
+  .nfl,.nfr{padding:1.75rem 1.25rem}
+  .nfl h3{font-size:18px}
+  .nfr h3{font-size:16px}
+}
+
+/* ── 360px: en küçük telefon ── */
+@media(max-width:360px){
+  h1.hero-h{font-size:32px}
+  .sn{font-size:28px}
+  nav{padding:0 1rem}
+  section{padding:2rem .875rem}
+  .hero-wrap{padding:1.75rem .875rem 2rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" onclick="goHome()">TOD<span>AP</span></a>
+  <ul class="nl">
+    <li><a onclick="goHome();goToSection('hakkinda-s')">Hakkımızda</a></li>
+    <li><a onclick="goHome();goToSection('birimler')">Birimler</a></li>
+    <li><a onclick="go('haberler')">Haberler</a></li>
+    <li><a onclick="go('etkinlikler')">Etkinlikler</a></li>
+    <li><a onclick="go('iletisim')">İletişim</a></li>
+  </ul>
+  <div class="nr">
+    <a class="bn bn-f" onclick="go('uyelik')">Üye Ol</a>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menü aç/kapat"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-nav" id="mobile-nav">
+  <a onclick="closeMobileMenu();goHome();goToSection('hakkinda-s')">Hakkımızda</a>
+  <a onclick="closeMobileMenu();goHome();goToSection('birimler')">Birimler</a>
+  <a onclick="closeMobileMenu();go('haberler')">Haberler</a>
+  <a onclick="closeMobileMenu();go('etkinlikler')">Etkinlikler</a>
+  <a onclick="closeMobileMenu();go('iletisim')">İletişim</a>
+  <a class="cta-link" onclick="closeMobileMenu();go('uyelik')">Üye Ol →</a>
+</div>
+
+<!-- HOME -->
+<div id="p-home" class="pv on">
+  <div class="hero-wrap">
+    <div class="hi">
+      <div class="ho">Toplumsal Dayanışma İçin Psikologlar Derneği · Türkiye</div>
+      <h1 class="hero-h">Dayanışma<br><span class="il">psikoloji ile başlar</span></h1>
+      <div class="hb">
+        <p class="hd">Emek, eşitlik ve kolektif mücadele temelinde hareket eden psikologların derneği.</p>
+        <div class="hbtns">
+          <a class="bm" onclick="go('uyelik')">Üyelik Başvurusu</a>
+          <a class="bgw" onclick="goHome();goToSection('hakkinda-s')">Kim Olduğumuzu Öğren</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticker-wrap"><div class="ticker-inner" id="ticker-inner"></div></div>
+
+  <section id="haberler">
+    <div class="cnt">
+      <div class="st">
+        <div><span class="sl">Güncel</span><h2 class="dp">Haberler & <em>Açıklamalar</em></h2></div>
+        <a class="rm" onclick="go('haberler')">Tümünü Gör</a>
+      </div>
+      <div class="nf" id="featured-haberler"></div>
+      <div class="ns" id="secondary-haberler"></div>
+    </div>
+  </section>
+
+  <section id="hakkinda-s" style="background:var(--burgundy-light)">
+    <div class="cnt">
+      <span class="sl">Biz Kimiz</span><h2 class="dp">TODAP <em>Hakkında</em></h2>
+      <div style="max-width:780px;margin-top:2rem">
+        <p style="font-size:17px;color:var(--ink-muted);line-height:1.8;margin-bottom:1.5rem">Toplumsal Dayanışma İçin Psikologlar Derneği (TODAP), 2007 yılında kurulmuş; emek, eşitlik ve dayanışma değerleri temelinde hareket eden bir meslek örgütüdür.</p>
+        <p style="font-size:15px;color:var(--ink-muted);line-height:1.8;margin-bottom:1.5rem">Psikoloji pratiğini toplumsal bir sorumluluk olarak ele alıyor; ayrımcılığa, baskıya ve eşitsizliğe karşı duran bir perspektiften mesleki çalışmalar yürütüyoruz.</p>
+        <p style="font-size:15px;color:var(--ink-muted);line-height:1.8">Türkiye'nin dört bir yanından psikologları, psikoloji öğrencilerini ve psikoloji alanında çalışan herkesi derneğimize davet ediyoruz.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="birimler">
+    <div class="cnt">
+      <span class="sl">Yapı</span><h2 class="dp">Birimler & <em>Komisyonlar</em></h2>
+      <div class="bg">
+        <div class="bi"><div class="bn2">Birim 01</div><h3>Psikolog Hakları Danışma Birimi</h3><p>Psikologların mesleki ve hukuki haklarını korumak için danışmanlık ve aktif savunuculuk yürütür.</p></div>
+        <div class="bi"><div class="bn2">Birim 02</div><h3>Kadın Komisyonu</h3><p>Feminist psikoloji perspektifinden toplumsal cinsiyet eşitliği için araştırma ve eylem üretir.</p></div>
+        <div class="bi"><div class="bn2">Birim 03</div><h3>Meslek Yasası Komisyonu</h3><p>Psikologlar için yasal güvence sağlayacak bağımsız meslek yasası çıkarılması için çalışır.</p></div>
+        <div class="bi"><div class="bn2">Birim 04</div><h3>Öğrenci Komisyonu</h3><p>Psikoloji öğrencilerini kolektif öğrenme, dayanışma ve mesleki bilinç etrafında buluşturur.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="etkinlikler" style="background:var(--burgundy-light)">
+    <div class="cnt">
+      <div class="st">
+        <div><span class="sl">Takvim</span><h2 class="dp">Etkinlikler & <em>Duyurular</em></h2></div>
+        <a class="rm" onclick="go('etkinlikler')">Tümü</a>
+      </div>
+      <div id="etkinlik-featured"></div>
+    </div>
+  </section>
+
+  <section style="padding-top:2rem;padding-bottom:4rem">
+    <div class="cnt">
+      <div class="sb">
+        <div class="sc"><span class="sn">2007</span><div class="sl2">Kuruluş yılı</div></div>
+        <div class="sc"><span class="sn">4</span><div class="sl2">Aktif komisyon</div></div>
+        <div class="sc"><span class="sn">2</span><div class="sl2">Süreli yayın</div></div>
+        <div class="sc"><span class="sn">100+</span><div class="sl2">Etkinlik</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="yayinlar" style="padding-top:2rem">
+    <div class="cnt">
+      <span class="sl">Bilgi Üretimi</span><h2 class="dp">Yayınlar & <em>Kaynaklar</em></h2>
+      <div class="pr">
+        <a class="pi" href="http://elestirelpsikolojibulteni.todap.org/" target="_blank" rel="noopener"><span class="pt">Süreli Yayın</span><h3>Eleştirel Psikoloji Bülteni</h3><p>Psikoloji pratiğine eleştirel bakış.</p></a>
+        <a class="pi" href="http://psikolojivetoplum.todap.org/" target="_blank" rel="noopener"><span class="pt">Süreli Yayın</span><h3>Psikoloji ve Toplum Bülteni</h3><p>Psikoloji ile toplumsal meseleler arasındaki ilişkiyi araştıran yayınımız.</p></a>
+        <a class="pi" href="https://todap.org/images/raporlar_brosurler/psikologlar_icin_lgbtilerle_calisma_kilavuzu_TODAP.pdf" target="_blank" rel="noopener"><span class="pt">Kılavuz · PDF</span><h3>LGBTİ+'larla Çalışma Kılavuzu</h3><p>Psikologlar için kapsamlı uygulama rehberi. Ücretsiz indir.</p></a>
+        <a class="pi" href="https://todap.org/images/raporlar_brosurler/MeslekYasasiDosyasi.pdf" target="_blank" rel="noopener"><span class="pt">Rapor · PDF</span><h3>Meslek Yasası Önerisi Dosyası</h3><p>TODAP'ın bağımsız meslek yasası önerisi ve detaylı gerekçe raporu.</p></a>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:3rem">
+    <div class="cnt">
+      <div class="cta">
+        <div><h2>Birlikte daha güçlüyüz<span>Toplumcu psikoloji için seninle.</span></h2><p>Üye ol, toplantılara katıl, yayınlarımıza katkı ver.</p></div>
+        <div class="ctab"><a class="bws" onclick="go('uyelik')">Üyelik Başvurusu</a><a class="bgw" onclick="go('iletisim')" style="margin-top:0">İletişime Geç</a></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- HABER DETAY -->
+<div id="p-haber" class="pv">
+  <div class="ah"><div class="ahi">
+    <a class="ab" onclick="go('haberler')">Haberlere Dön</a>
+    <div id="a-tag" class="at r"></div>
+    <h1 id="a-title"></h1>
+    <div id="a-date" class="adate"></div>
+  </div></div>
+  <div class="abody" id="a-body"></div>
+  <section style="padding-top:1rem;padding-bottom:3rem"><div class="cnt" style="border-top:1px solid var(--border);padding-top:2rem;display:flex;gap:1rem;flex-wrap:wrap">
+    <a class="bm" onclick="go('haberler')">← Tüm Haberler</a>
+    <a class="bgw" onclick="goHome()" style="color:var(--ink);border-color:var(--border)">Ana Sayfa</a>
+  </div></section>
+</div>
+
+<!-- ETKİNLİK DETAY -->
+<div id="p-etkinlik" class="pv">
+  <div class="ah"><div class="ahi">
+    <a class="ab" onclick="go('etkinlikler')">Etkinliklere Dön</a>
+    <div id="e-tag" class="at"></div>
+    <h1 id="e-title"></h1>
+    <div id="e-date" class="adate"></div>
+  </div></div>
+  <div class="abody" id="e-body"></div>
+  <section style="padding-top:1rem;padding-bottom:3rem"><div class="cnt" style="border-top:1px solid var(--border);padding-top:2rem;display:flex;gap:1rem;flex-wrap:wrap">
+    <a class="bm" onclick="go('uyelik')">Kayıt / Üyelik</a>
+    <a class="bgw" onclick="go('iletisim')" style="color:var(--ink);border-color:var(--border)">Bilgi Al</a>
+  </div></section>
+</div>
+
+<!-- TÜM HABERLER -->
+<div id="p-haberler" class="pv">
+  <div class="ah" style="min-height:auto;padding:3rem 2.5rem 2.5rem"><div class="ahi">
+    <a class="ab" onclick="goHome()">Ana Sayfaya Dön</a>
+    <h1 style="font-family:var(--fd);font-size:clamp(32px,5vw,54px);font-weight:800;color:#fff;text-transform:uppercase;margin-top:1.5rem">Tüm <span style="font-family:var(--fs);font-style:italic;font-weight:400;text-transform:none;font-size:.8em;color:rgba(255,255,255,.7)">Haberler</span></h1>
+  </div></div>
+  <section><div class="cnt" id="haberler-list"></div></section>
+</div>
+
+<!-- TÜM ETKİNLİKLER -->
+<div id="p-etkinlikler" class="pv">
+  <div class="ah" style="min-height:auto;padding:3rem 2.5rem 2.5rem"><div class="ahi">
+    <a class="ab" onclick="goHome()">Ana Sayfaya Dön</a>
+    <h1 style="font-family:var(--fd);font-size:clamp(32px,5vw,54px);font-weight:800;color:#fff;text-transform:uppercase;margin-top:1.5rem">Tüm <span style="font-family:var(--fs);font-style:italic;font-weight:400;text-transform:none;font-size:.8em;color:rgba(255,255,255,.7)">Etkinlikler</span></h1>
+  </div></div>
+  <section><div class="cnt" id="etkinlik-list"></div></section>
+</div>
+
+<!-- ÜYELİK -->
+<div id="p-uyelik" class="pv">
+  <div class="ah" style="min-height:auto;padding:3rem 2.5rem 2.5rem"><div style="max-width:680px;margin:0 auto">
+    <a class="ab" onclick="goHome()">Ana Sayfaya Dön</a>
+    <h1 style="font-family:var(--fd);font-size:clamp(32px,5vw,54px);font-weight:800;color:#fff;text-transform:uppercase;margin-top:1.5rem;line-height:1.05">Üyelik<br><span style="font-family:var(--fs);font-style:italic;font-weight:400;text-transform:none;font-size:.7em;color:rgba(255,255,255,.65)">Dayanışmaya katıl</span></h1>
+  </div></div>
+  <section><div class="fp">
+    <h2>Başvuru Formu</h2>
+    <p class="sub">TODAP üyesi olmak için aşağıdaki formu doldurun.</p>
+    <form data-action="/api/uyelik" onsubmit="formOK(event,'u-ok')">
+      <div class="fr2">
+        <div class="fg"><label>Ad</label><input type="text" name="ad" required placeholder="Adınız"/></div>
+        <div class="fg"><label>Soyad</label><input type="text" name="soyad" required placeholder="Soyadınız"/></div>
+      </div>
+      <div class="fg"><label>E-posta</label><input type="email" name="eposta" required placeholder="ornek@mail.com"/></div>
+      <div class="fg"><label>Telefon</label><input type="tel" name="telefon" placeholder="0555 000 00 00"/></div>
+      <div class="fg"><label>Meslek / Unvan</label>
+        <select name="meslek" required>
+          <option value="">Seçiniz</option>
+          <option>Psikolog</option><option>Klinik Psikolog</option>
+          <option>Psikoloji Öğrencisi</option><option>Akademisyen</option><option>Diğer</option>
+        </select>
+      </div>
+      <div class="fr2">
+        <div class="fg"><label>Çalışma Alanı</label><input type="text" name="alan" placeholder="Klinik, eğitim..."/></div>
+        <div class="fg"><label>Şehir</label><input type="text" name="sehir" required placeholder="İstanbul"/></div>
+      </div>
+      <div class="fg"><label>Neden üye olmak istiyorsunuz?</label><textarea name="neden" placeholder="Kısaca belirtiniz..."></textarea></div>
+      <button type="submit" class="fs2">Başvuruyu Gönder</button>
+      <p class="fn">Başvurular TODAP Yönetim Kurulu tarafından değerlendirilir. Bilgileriniz üçüncü taraflarla paylaşılmaz.</p>
+    </form>
+    <div id="u-ok" class="sm">✓ Başvurunuz alındı. En kısa sürede sizinle iletişime geçeceğiz.</div>
+  </div></section>
+</div>
+
+<!-- İLETİŞİM -->
+<div id="p-iletisim" class="pv">
+  <div class="ah" style="min-height:auto;padding:3rem 2.5rem 2.5rem"><div style="max-width:680px;margin:0 auto">
+    <a class="ab" onclick="goHome()">Ana Sayfaya Dön</a>
+    <h1 style="font-family:var(--fd);font-size:clamp(32px,5vw,54px);font-weight:800;color:#fff;text-transform:uppercase;margin-top:1.5rem;line-height:1.05">İletişim<br><span style="font-family:var(--fs);font-style:italic;font-weight:400;text-transform:none;font-size:.7em;color:rgba(255,255,255,.65)">Bize ulaşın</span></h1>
+  </div></div>
+  <section><div class="iletisim-grid">
+    <div class="fp" style="margin:0">
+      <h2>Mesaj Gönder</h2>
+      <p class="sub">Sorularınız, önerileriniz veya basın talepleri için.</p>
+      <form data-action="/api/iletisim" onsubmit="formOK(event,'i-ok')">
+        <div class="fr2">
+          <div class="fg"><label>Ad Soyad</label><input type="text" name="isim" required placeholder="Adınız Soyadınız"/></div>
+          <div class="fg"><label>E-posta</label><input type="email" name="eposta" required placeholder="ornek@mail.com"/></div>
+        </div>
+        <div class="fg"><label>Konu</label>
+          <select name="konu">
+            <option>Genel Bilgi</option><option>Basın & Medya</option>
+            <option>Üyelik</option><option>Etik Başvuru</option>
+            <option>Hukuki Danışma</option><option>Diğer</option>
+          </select>
+        </div>
+        <div class="fg"><label>Mesajınız</label><textarea name="mesaj" required placeholder="Mesajınızı buraya yazın..." style="min-height:150px"></textarea></div>
+        <button type="submit" class="fs2">Gönder</button>
+      </form>
+      <div id="i-ok" class="sm">✓ Mesajınız iletildi. En kısa sürede yanıt vereceğiz.</div>
+    </div>
+    <div style="padding-top:1rem">
+      <div style="margin-bottom:2rem"><div style="font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:.5rem">E-posta</div><a href="mailto:iletisim@todap.org" style="font-size:15px;color:var(--burgundy);text-decoration:none">iletisim@todap.org</a></div>
+      <div style="margin-bottom:2rem"><div style="font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:.5rem">Sosyal Medya</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <a href="https://twitter.com/todapder" target="_blank" rel="noopener" style="font-size:14px;color:var(--ink-muted);text-decoration:none">Twitter · @todapder</a>
+          <a href="https://facebook.com/todap" target="_blank" rel="noopener" style="font-size:14px;color:var(--ink-muted);text-decoration:none">Facebook · TODAP</a>
+        </div>
+      </div>
+    </div>
+  </div></section>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fi">
+    <div><span class="fl">TOD<span>AP</span></span><p style="font-size:13px;color:rgba(255,255,255,.38);line-height:1.6;font-family:var(--fs)">Toplumsal Dayanışma İçin Psikologlar Derneği.<br>Emek, eşitlik ve dayanışma değerleriyle<br>Türkiye'de faaliyet gösteriyoruz.</p></div>
+    <div class="fc"><h4>Kurumsal</h4><ul>
+      <li><a onclick="goHome();goToSection('hakkinda-s')">TODAP Kimdir</a></li>
+      <li><a href="https://todap.org/Tuzuk.aspx" target="_blank" rel="noopener">Tüzük</a></li>
+      <li><a href="https://todap.org/etik_kurullar.aspx" target="_blank" rel="noopener">Etik Kurullar</a></li>
+    </ul></div>
+    <div class="fc"><h4>Birimler</h4><ul>
+      <li><a onclick="goHome();goToSection('birimler')">Psikolog Hakları</a></li>
+      <li><a onclick="goHome();goToSection('birimler')">Kadın Komisyonu</a></li>
+      <li><a onclick="goHome();goToSection('birimler')">Meslek Yasası</a></li>
+      <li><a onclick="goHome();goToSection('birimler')">Öğrenci Komisyonu</a></li>
+    </ul></div>
+    <div class="fc"><h4>Bağlantı</h4><ul>
+      <li><a onclick="go('iletisim')">iletisim@todap.org</a></li>
+      <li><a href="https://twitter.com/todapder" target="_blank" rel="noopener">@todapder</a></li>
+      <li><a onclick="go('uyelik')">Üyelik Başvurusu</a></li>
+      <li><a onclick="go('iletisim')">İletişim Formu</a></li>
+    </ul></div>
+  </div>
+  <div class="fb">
+    <span>© 2025 TODAP — Toplumsal Dayanışma İçin Psikologlar Derneği</span>
+    <a class="fa" href="/admin">Yönetici Paneli</a>
+  </div>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

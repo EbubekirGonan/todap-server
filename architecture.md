@@ -1,0 +1,248 @@
+# TODAP Sunucu — Mimari Belgesi
+
+> Bu belge projenin tam mimarisini tanımlar. Her geliştirme öncesinde bu dosyaya bakılmalıdır.
+
+---
+
+## Genel Bakış
+
+| Özellik       | Değer                                              |
+|---------------|----------------------------------------------------|
+| Proje         | TODAP — Toplumsal Dayanışma İçin Psikologlar Derneği |
+| Stack         | Node.js · Express · better-sqlite3 · vanilla JS    |
+| Veritabanı    | SQLite (`data/todap.db`)                           |
+| Port (varsayılan) | `3001` (`.env` ile değiştirilebilir)           |
+| Başlatma      | `npm start` (prod) · `npm run dev` (watch modu)    |
+
+---
+
+## Klasör / Dosya Yapısı
+
+```
+todap-server/
+├── server.js              # Express app giriş noktası
+├── db.js                  # SQLite bağlantısı, tablo tanımları, seed verisi
+├── package.json           # Bağımlılıklar ve npm scriptleri
+├── .env                   # Ortam değişkenleri (git'e dahil değil)
+├── .env.example           # .env şablonu
+├── .copilotignore         # Copilot'ın taramasına gerek olmayan dosyalar
+├── architecture.md        # Bu dosya — proje mimarisi
+├── progress.md            # Geliştirme kayıtları
+│
+├── data/
+│   └── todap.db           # SQLite veritabanı dosyası (git'e dahil değil)
+│
+├── middleware/
+│   └── auth.js            # Admin oturum guard'ı (requireAdmin)
+│
+├── routes/
+│   ├── api.js             # Halka açık API endpoint'leri
+│   └── admin.js           # Admin CRUD endpoint'leri (auth gerektirir)
+│
+├── scripts/
+│   └── hash-password.js   # Admin şifresi bcrypt hash üreticisi
+│
+└── public/                # Statik dosyalar — Express tarafından servis edilir
+    ├── index.html         # Ana SPA (tüm frontend sayfaları tek dosyada)
+    ├── app.js             # Frontend JS — API çağrıları, sayfa yönlendirme
+    ├── shared.css         # Ortak CSS (admin hariç sayfalar için)
+    └── admin/
+        └── index.html     # Admin paneli SPA (ayrı CSS ve JS içerir)
+```
+
+---
+
+## Veritabanı Şeması
+
+### `haberler`
+| Sütun             | Tip     | Açıklama                          |
+|-------------------|---------|-----------------------------------|
+| id                | INTEGER | PK, AUTOINCREMENT                 |
+| slug              | TEXT    | UNIQUE, URL kimliği               |
+| baslik            | TEXT    | Başlık                            |
+| ozet              | TEXT    | Kısa özet (liste görünümü için)   |
+| icerik            | TEXT    | HTML içerik (detay sayfası)       |
+| tarih             | TEXT    | ISO tarih (YYYY-MM-DD) — sıralama |
+| gosterim_tarihi   | TEXT    | Görsel tarih metni                |
+| kategori          | TEXT    | Bildiri / Rapor / vb.             |
+| renk              | TEXT    | `r`=kırmızı, `g`=yeşil, ``=varsayılan |
+| aktif             | INTEGER | 1=yayında, 0=gizli               |
+| olusturuldu       | TEXT    | datetime('now')                   |
+
+### `etkinlikler`
+| Sütun             | Tip     | Açıklama                          |
+|-------------------|---------|-----------------------------------|
+| id                | INTEGER | PK, AUTOINCREMENT                 |
+| slug              | TEXT    | UNIQUE                            |
+| baslik            | TEXT    |                                   |
+| ozet              | TEXT    |                                   |
+| icerik            | TEXT    | HTML                              |
+| tarih             | TEXT    | ISO tarih — sıralama için         |
+| gosterim_tarihi   | TEXT    |                                   |
+| gun               | TEXT    | Gün numarası (örn. "12")          |
+| ay                | TEXT    | Ay kısaltması (örn. "Ara")        |
+| kategori          | TEXT    |                                   |
+| aktif             | INTEGER |                                   |
+| olusturuldu       | TEXT    |                                   |
+
+### `birimler`
+| Sütun  | Tip     |
+|--------|---------|
+| id     | INTEGER |
+| no     | TEXT    | Birim numarası (örn. "01")
+| baslik | TEXT    |
+| ozet   | TEXT    |
+| icerik | TEXT    | HTML
+| aktif  | INTEGER |
+| sira   | INTEGER | Sıralama
+
+### `yayinlar`
+| Sütun  | Tip  |
+|--------|------|
+| id     | INTEGER |
+| baslik | TEXT |
+| ozet   | TEXT |
+| tur    | TEXT | "Süreli Yayın", "Kılavuz · PDF", vb.
+| url    | TEXT |
+| aktif  | INTEGER |
+
+### `ticker_items`
+| Sütun  | Tip  |
+|--------|------|
+| id     | INTEGER |
+| etiket | TEXT |
+| metin  | TEXT |
+| sira   | INTEGER |
+
+### `mesajlar` (İletişim formu)
+| Sütun       | Tip  |
+|-------------|------|
+| id          | INTEGER |
+| isim        | TEXT |
+| eposta      | TEXT |
+| konu        | TEXT |
+| mesaj       | TEXT |
+| olusturuldu | TEXT |
+
+### `basvurular` (Üyelik formu)
+| Sütun       | Tip  |
+|-------------|------|
+| id          | INTEGER |
+| ad          | TEXT |
+| soyad       | TEXT |
+| eposta      | TEXT |
+| telefon     | TEXT |
+| meslek      | TEXT |
+| alan        | TEXT |
+| sehir       | TEXT |
+| neden       | TEXT |
+| olusturuldu | TEXT |
+
+---
+
+## API Endpoint'leri
+
+### Halka Açık (`/api/*` — `routes/api.js`)
+
+| Method | Endpoint               | Açıklama                      |
+|--------|------------------------|-------------------------------|
+| GET    | `/api/haberler`        | Aktif haberler (tarih DESC)   |
+| GET    | `/api/haberler/:slug`  | Tekil haber                   |
+| GET    | `/api/etkinlikler`     | Aktif etkinlikler             |
+| GET    | `/api/etkinlikler/:slug` | Tekil etkinlik              |
+| GET    | `/api/birimler`        | Birimler (sira ASC)           |
+| GET    | `/api/yayinlar`        | Yayınlar                      |
+| GET    | `/api/ticker`          | Ticker öğeleri                |
+| POST   | `/api/iletisim`        | İletişim formu gönder         |
+| POST   | `/api/uyelik`          | Üyelik başvurusu gönder       |
+
+### Admin (`/api/admin/*` — `routes/admin.js`) — Oturum Gerektirir
+
+| Method | Endpoint                    | Açıklama                       |
+|--------|-----------------------------|--------------------------------|
+| POST   | `/api/admin/login`          | Giriş (session oluşturur)      |
+| POST   | `/api/admin/logout`         | Çıkış                          |
+| GET    | `/api/admin/me`             | Oturum kontrolü                |
+| GET/POST/PUT/DELETE | `/api/admin/haberler[/:id]` | Haber CRUD       |
+| GET/POST/PUT/DELETE | `/api/admin/etkinlikler[/:id]` | Etkinlik CRUD   |
+| GET/POST/PUT/DELETE | `/api/admin/birimler[/:id]` | Birim CRUD       |
+| GET/POST/PUT/DELETE | `/api/admin/yayinlar[/:id]` | Yayın CRUD       |
+| GET/POST/PUT/DELETE | `/api/admin/ticker[/:id]`  | Ticker CRUD       |
+| GET    | `/api/admin/mesajlar`       | İletişim mesajları             |
+| GET    | `/api/admin/basvurular`     | Üyelik başvuruları             |
+
+---
+
+## Frontend Mimarisi (`public/`)
+
+### `index.html` — Ana SPA
+- **Tüm sayfalar tek HTML dosyasında**, `.pv` class'lı div'ler ile gizlenir/gösterilir
+- Aktif sayfa `.on` class'ı ile görünür olur
+- Sayfalar: `p-home`, `p-haber`, `p-etkinlik`, `p-haberler`, `p-etkinlikler`, `p-uyelik`, `p-iletisim`
+- **İnline CSS** — `shared.css` kullanmaz, kendi `<style>` bloğu vardır
+
+### `app.js` — Frontend Mantığı
+- `initApp()` — tüm API'lerden veri çeker, bileşenleri oluşturur
+- `go(page)` — sayfa geçişi (`.pv` class'larını toggle eder)
+- `goHome()` — ana sayfaya dön
+- `goToSection(id)` — sayfa içi kaydırma
+- `toggleMobileMenu()` / `closeMobileMenu()` — mobil hamburger menü
+- `article(slug)` / `etkinlik(slug)` — detay sayfası açma
+- `buildTicker()`, `buildFeaturedHaberler()`, `buildFeaturedEtkinlikler()` — bileşen render
+- `buildHaberlerList()`, `buildEtkinliklerList()` — liste sayfaları
+- `formOK(event, successId)` — form POST + başarı gösterimi
+- `esc(str)` — XSS önleme (HTML kaçış)
+
+### `shared.css` — Ortak Stiller
+- Admin olmayan sayfalar tarafından kullanılır
+- Bileşenler: nav, ticker, page-hero, main, cards, forms, footer
+- Responsive: 768px, 480px, 360px breakpoint'leri
+
+### `admin/index.html` — Admin SPA
+- Kendi inline CSS ve JS'i var, `shared.css` kullanmaz
+- Login ekranı (`#login-screen`) ve uygulama (`#app`) aynı dosyada
+- Sidebar navigasyon, sayfalar: dashboard, haberler, etkinlikler, birimler, yayınlar, ticker, mesajlar, basvurular
+
+---
+
+## Güvenlik
+
+- Admin şifresi `.env` içinde **bcrypt hash** olarak saklanır (`ADMIN_PASSWORD_HASH`)
+- Oturum yönetimi `express-session` ile yapılır
+- Tüm admin route'ları `middleware/auth.js` (requireAdmin) ile korunur
+- Form girişleri `String(...).slice(0, N)` ile boyut sınırlıdır
+- Frontend'de `esc()` fonksiyonu XSS'e karşı HTML escape uygular
+- Session cookie: `httpOnly: true`, production'da `secure: true`
+
+---
+
+## Ortam Değişkenleri (`.env`)
+
+```env
+PORT=3001
+SESSION_SECRET=<rastgele uzun string>
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD_HASH=<npm run hash ile üret>
+```
+
+---
+
+## Seed Verisi
+
+`db.js` içindeki `seedIfEmpty()` fonksiyonu, `haberler` tablosu boşsa otomatik örnek veri ekler:
+- 5 haber (Yargı paketi, LGBTİ+, Kuyu hapishaneler, Aslı Aydemir, Serbest meslek)
+- 3 etkinlik (Eleştirel Psikoloji Dersliği, 1 Mayıs, Sempozyum)
+- 4 birim
+- 2 yayın + 2 PDF kılavuz
+
+---
+
+## Bağımlılıklar
+
+| Paket            | Versiyon | Kullanım                              |
+|------------------|----------|---------------------------------------|
+| express          | ^4.18.2  | HTTP sunucusu, routing                |
+| better-sqlite3   | ^9.4.3   | SQLite veritabanı (senkron API)       |
+| bcryptjs         | ^2.4.3   | Admin şifre hash/verify               |
+| express-session  | ^1.17.3  | Oturum yönetimi                       |
+| dotenv           | ^16.4.5  | `.env` dosyasını yükler               |

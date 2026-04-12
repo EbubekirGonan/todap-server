@@ -1,0 +1,15 @@
+# Bu dosya Copilot'ın otomatik kod tamamlama bağlamına
+# dahil etmemesi gereken klasör ve dosyaları tanımlar.
+# (Büyük, üretilen veya dinamik içerikler)
+
+# Bağımlılıklar
+node_modules/
+
+# Veritabanı ve çalışma zamanı verisi
+data/
+
+# Kilit dosyası
+package-lock.json
+
+# Ortam ve gizli bilgiler
+.env
