@@ -39,7 +39,179 @@ function go(page) {
   document.querySelectorAll('.pv').forEach(p => p.classList.remove('on'));
   const t = document.getElementById('p-' + page);
   if (t) { t.classList.add('on'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  loadSabitSayfa(page);
+  if (page === 'faaliyet-listesi') loadFaaliyetler();
+  if (page === 'faaliyet-detay') window.scrollTo({ top: 0, behavior: 'instant' });
+  if (page === 'basinda-todap') loadBasindaTodap();
+  if (page === 'videolar') loadVideolar();
+  if (page === 'video-detay') window.scrollTo({ top: 0, behavior: 'instant' });
 }
+
+// ── Sabit Sayfa Yükle ────────────────────────────────────────
+const SABIT_SAYFA_MAP = {
+  'todap-kimdir':            'hakkimizda',
+  'tuzuk':                   'tuzuk',
+  'psikolog-haklari-birimi': 'psikolog-haklari-birimi',
+  'kadin-komisyonu':         'kadin-komisyonu',
+  'meslek-yasasi-komisyonu': 'meslek-yasasi-komisyonu',
+  'ogrenci-komisyonu':       'ogrenci-komisyonu',
+  'etik-kurullar':           'etik-kurullar',
+};
+const sabitSayfaCache = {};
+
+function loadSabitSayfa(page) {
+  const kategori = SABIT_SAYFA_MAP[page];
+  if (!kategori) return;
+  const bodyEl = document.getElementById('ss-body-' + page);
+  if (!bodyEl) return;
+  if (sabitSayfaCache[kategori]) {
+    bodyEl.innerHTML = sabitSayfaCache[kategori];
+    return;
+  }
+  fetch('/api/sabit-sayfalar/' + encodeURIComponent(kategori))
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      if (!d) return;
+      sabitSayfaCache[kategori] = d.icerik;
+      bodyEl.innerHTML = d.icerik;
+    })
+    .catch(() => {});
+}
+
+// ── Faaliyet Listesi Yükle ────────────────────────────────────
+let faaliyetlerLoaded = false;
+let faaliyetListesi = [];
+function loadFaaliyetler() {
+  const listEl = document.getElementById('faaliyet-list-body');
+  if (!listEl || faaliyetlerLoaded) return;
+  fetch('/api/faaliyetler')
+    .then(r => r.ok ? r.json() : [])
+    .then(list => {
+      faaliyetlerLoaded = true;
+      list.sort((a, b) => (b.crdate || '').localeCompare(a.crdate || ''));
+      faaliyetListesi = list;
+      if (!list.length) {
+        listEl.innerHTML = '<p style="color:var(--ink-muted)">Henüz faaliyet eklenmemiş.</p>';
+        return;
+      }
+      listEl.innerHTML = list.map(f => `
+        <div style="border-bottom:1px solid var(--border);padding:1.5rem 0">
+          <div style="font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--burgundy);margin-bottom:.4rem">${fmtDate(f.crdate)}</div>
+          <h3 style="font-family:var(--fd);font-size:18px;font-weight:700;color:var(--ink);margin-bottom:.6rem;line-height:1.3">${esc(f.baslik)}</h3>
+          ${f.ozet ? `<p style="font-size:15px;color:var(--ink-muted);line-height:1.7;margin-bottom:.75rem">${esc(f.ozet)}</p>` : ''}
+          ${f.icerik ? `
+          <button onclick="openFaaliyet(${f.id})"
+            style="background:none;border:none;cursor:pointer;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--burgundy);padding:0;letter-spacing:.03em">
+            Devamını Oku ▸
+          </button>` : ''}
+        </div>`).join('');
+    })
+    .catch(() => {});
+}
+function openFaaliyet(id) {
+  const f = faaliyetListesi.find(x => x.id === id);
+  if (!f) return;
+  document.getElementById('fd-baslik').textContent = f.baslik;
+  document.getElementById('fd-meta').textContent   = fmtDate(f.crdate) || '';
+  document.getElementById('fd-icerik').innerHTML   = f.icerik || '<p>İçerik bulunmuyor.</p>';
+  go('faaliyet-detay');
+}
+
+// ── Basında Todap Yükle ────────────────────────────────
+let basindaLoaded = false;
+function loadBasindaTodap() {
+  const listEl = document.getElementById('basinda-list-body');
+  if (!listEl || basindaLoaded) return;
+  fetch('/api/basinda-todap')
+    .then(r => r.ok ? r.json() : [])
+    .then(list => {
+      basindaLoaded = true;
+      list.sort((a, b) => (b.crdate || '').localeCompare(a.crdate || ''));
+      if (!list.length) {
+        listEl.innerHTML = '<p style="color:var(--ink-muted)">Henüz haber eklenmemiş.</p>';
+        return;
+      }
+      listEl.innerHTML = list.map(item => `
+        <div style="border-bottom:1px solid var(--border);padding:1.5rem 0;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
+          <div style="flex:1">
+            <div style="font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--burgundy);margin-bottom:.35rem">${fmtDate(item.crdate)}</div>
+            <div style="font-family:var(--fd);font-size:17px;font-weight:700;color:var(--ink);margin-bottom:.3rem;line-height:1.3">${esc(item.baslik)}</div>
+            ${item.adres_ismi ? `<div style="font-size:13px;color:var(--ink-faint)">${esc(item.adres_ismi)}</div>` : ''}
+          </div>
+          ${item.baglanti_adresi ? `
+          <a href="${esc(item.baglanti_adresi)}" target="_blank" rel="noopener noreferrer"
+            style="flex-shrink:0;background:none;border:1px solid var(--burgundy);border-radius:4px;padding:.35rem .85rem;font-family:var(--fd);font-size:12px;font-weight:700;color:var(--burgundy);text-decoration:none;white-space:nowrap">
+            Habere Git →
+          </a>` : ''}
+        </div>`).join('');
+    })
+    .catch(() => {});
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Videolar ──────────────────────────────────────────────────
+let videolarLoaded = false;
+let videoListesi = [];
+
+function getYoutubeId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+function getYoutubeEmbed(url) {
+  const id = getYoutubeId(url);
+  return id ? `https://www.youtube.com/embed/${id}` : url;
+}
+function getYoutubeThumbnail(url) {
+  const id = getYoutubeId(url);
+  return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : '';
+}
+
+function loadVideolar() {
+  const listEl = document.getElementById('video-list-body');
+  if (!listEl || videolarLoaded) return;
+  fetch('/api/videos')
+    .then(r => r.ok ? r.json() : [])
+    .then(list => {
+      videolarLoaded = true;
+      videoListesi = list;
+      if (!list.length) {
+        listEl.innerHTML = '<p style="color:var(--ink-muted)">Henüz video eklenmemiş.</p>';
+        return;
+      }
+      listEl.innerHTML = list.map(v => {
+        const thumb = v.thumbnail_url || getYoutubeThumbnail(v.video_url);
+        const ozet  = v.aciklama ? (v.aciklama.length > 120 ? v.aciklama.slice(0, 120) + '...' : v.aciklama) : '';
+        return `
+        <div onclick="openVideo(${v.id})" style="display:flex;gap:1rem;align-items:flex-start;padding:1.25rem 0;border-bottom:1px solid var(--border);cursor:pointer">
+          ${thumb ? `<img src="${esc(thumb)}" alt="" style="width:120px;height:68px;object-fit:cover;border-radius:5px;flex-shrink:0;background:#eee">` : `<div style="width:120px;height:68px;background:var(--border);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px">▶</div>`}
+          <div style="flex:1;min-width:0">
+            <div style="font-family:var(--fd);font-size:15px;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:.3rem">${esc(v.baslik)}</div>
+            ${ozet ? `<div style="font-size:13px;color:var(--ink-muted);line-height:1.5;margin-bottom:.3rem">${esc(ozet)}</div>` : ''}
+            <div style="font-size:11px;font-family:var(--fd);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--burgundy)">${fmtDate(v.yayinlanma_tarihi)}</div>
+          </div>
+        </div>`;
+      }).join('');
+    })
+    .catch(() => {});
+}
+
+function openVideo(id) {
+  const v = videoListesi.find(x => x.id === id);
+  if (!v) return;
+  document.getElementById('vd-baslik').textContent   = v.baslik;
+  document.getElementById('vd-tarih').textContent    = fmtDate(v.yayinlanma_tarihi) || '';
+  document.getElementById('vd-aciklama').textContent = v.aciklama || '';
+  document.getElementById('vd-iframe').src           = getYoutubeEmbed(v.video_url);
+  go('video-detay');
+}
+
+function fmtDate(s) {
+  if (!s) return '';
+  const m = String(s).match(/(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : String(s);
+}
+
 function goHome() { go('home'); }
 function goToSection(id) {
   setTimeout(() => {
@@ -63,6 +235,33 @@ function closeMobileMenu() {
   if (btn) btn.classList.remove('open');
 }
 
+// ── Nav Dropdown (hover + 200ms gecikme) ────────────────────
+(function () {
+  const CLOSE_DELAY = 200;
+  const timers = new WeakMap();
+
+  function openDropdown(li) {
+    const t = timers.get(li);
+    if (t) { clearTimeout(t); timers.delete(li); }
+    li.classList.add('open');
+  }
+
+  function scheduleClose(li) {
+    const t = setTimeout(() => {
+      li.classList.remove('open');
+      timers.delete(li);
+    }, CLOSE_DELAY);
+    timers.set(li, t);
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.nav-dropdown').forEach(li => {
+      li.addEventListener('mouseenter', () => openDropdown(li));
+      li.addEventListener('mouseleave', () => scheduleClose(li));
+    });
+  });
+})();
+
 // ── Haber Detay ──────────────────────────────────────────────
 function article(slug) {
   const d = haberMap[slug];
@@ -77,7 +276,7 @@ function renderArticle(d) {
   document.getElementById('a-tag').textContent = d.kategori;
   document.getElementById('a-tag').className = 'at' + (d.renk ? ' ' + d.renk : '');
   document.getElementById('a-title').textContent = d.baslik;
-  document.getElementById('a-date').textContent = d.gosterim_tarihi || d.tarih;
+  document.getElementById('a-date').textContent = d.gosterim_tarihi || fmtDate(d.tarih);
   document.getElementById('a-body').innerHTML = d.ozet_icerik || d.detayli_icerik || '';
   go('haber');
 }
@@ -95,7 +294,7 @@ function etkinlik(slug) {
 function renderEtkinlik(d) {
   document.getElementById('e-tag').textContent = d.kategori;
   document.getElementById('e-title').textContent = d.baslik;
-  document.getElementById('e-date').textContent = d.gosterim_tarihi || d.tarih;
+  document.getElementById('e-date').textContent = d.gosterim_tarihi || fmtDate(d.tarih);
   document.getElementById('e-body').innerHTML = d.icerik;
   go('etkinlik');
 }
@@ -123,14 +322,14 @@ function buildFeaturedHaberler() {
   nf.innerHTML = [
     main ? `<div class="nfl">
       <span class="nt${main.renk ? ' '+main.renk : ''}">${esc(main.kategori)}</span>
-      <div class="nd">${esc(main.gosterim_tarihi || main.tarih)}</div>
+      <div class="nd">${esc(main.gosterim_tarihi || fmtDate(main.tarih))}</div>
       <h3>${esc(main.baslik)}</h3>
       <p>${esc(main.ozet)}</p>
       <a class="rmw" onclick="article('${esc(main.slug)}')">Devamını Oku</a>
     </div>` : '',
     right ? `<div class="nfr">
       <span class="nt${right.renk ? ' '+right.renk : ''}">${esc(right.kategori)}</span>
-      <div class="nd">${esc(right.gosterim_tarihi || right.tarih)}</div>
+      <div class="nd">${esc(right.gosterim_tarihi || fmtDate(right.tarih))}</div>
       <h3>${esc(right.baslik)}</h3>
       <p>${esc(right.ozet)}</p>
       <a class="rmw" onclick="article('${esc(right.slug)}')">Oku</a>
@@ -141,7 +340,7 @@ function buildFeaturedHaberler() {
     ns.innerHTML = h.slice(2, 5).map(h => `
       <div class="nsi">
         <span class="nt${h.renk ? ' '+h.renk : ''}" style="font-family:var(--fd)">${esc(h.kategori)}</span>
-        <div class="nd2">${esc(h.gosterim_tarihi || h.tarih)}</div>
+        <div class="nd2">${esc(h.gosterim_tarihi || fmtDate(h.tarih))}</div>
         <h4>${esc(h.baslik)}</h4>
         <p>${esc(h.ozet)}</p>
         <a class="rm" onclick="article('${esc(h.slug)}')" style="margin-top:.75rem;display:inline-flex">Oku</a>
@@ -175,7 +374,7 @@ function buildHaberlerList() {
   hl.innerHTML = DATA.haberler.map(h => `
     <div style="border-bottom:1px solid var(--border);padding:1.5rem 0;cursor:pointer" onclick="article('${esc(h.slug)}')">
       <span class="nt${h.renk ? ' '+h.renk : ''}" style="font-family:var(--fd)">${esc(h.kategori)}</span>
-      <div style="font-family:var(--fd);font-size:11px;letter-spacing:.04em;color:var(--ink-faint);margin:.5rem 0">${esc(h.gosterim_tarihi||h.tarih)}</div>
+      <div style="font-family:var(--fd);font-size:11px;letter-spacing:.04em;color:var(--ink-faint);margin:.5rem 0">${esc(h.gosterim_tarihi||fmtDate(h.tarih))}</div>
       <h3 style="font-family:var(--fd);font-size:18px;font-weight:700;color:var(--ink);margin-bottom:.5rem">${esc(h.baslik)}</h3>
       <p style="font-size:14px;color:var(--ink-muted);margin-bottom:.75rem">${esc(h.ozet)}</p>
       <a class="rm" onclick="event.stopPropagation();article('${esc(h.slug)}')">Oku</a>

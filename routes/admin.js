@@ -189,4 +189,125 @@ router.get('/basvurular', auth, (_req, res) => {
   res.json(db.prepare('SELECT * FROM basvurular ORDER BY olusturuldu DESC').all());
 });
 
+// ── Sabit Sayfalar CRUD ────────────────────────────────
+router.get('/sabit-sayfalar', auth, (_req, res) => {
+  res.json(db.prepare('SELECT * FROM sabit_sayfalar ORDER BY id ASC').all());
+});
+
+router.put('/sabit-sayfalar/:kategori', auth, (req, res) => {
+  const { baslik, icerik } = req.body;
+  if (!baslik || !icerik) return res.status(400).json({ error: 'baslik ve icerik zorunlu.' });
+  const existing = db.prepare('SELECT id FROM sabit_sayfalar WHERE kategori=?').get(req.params.kategori);
+  if (!existing) return res.status(404).json({ error: 'Sayfa bulunamadı.' });
+  db.prepare('UPDATE sabit_sayfalar SET baslik=?,icerik=?,guncelleme=datetime(\'now\') WHERE kategori=?')
+    .run(baslik, icerik, req.params.kategori);
+  res.json({ ok: true });
+});
+
+router.post('/sabit-sayfalar', auth, (req, res) => {
+  const { kategori, baslik, icerik } = req.body;
+  if (!kategori || !baslik || !icerik) return res.status(400).json({ error: 'kategori, baslik ve icerik zorunlu.' });
+  try {
+    const r = db.prepare('INSERT INTO sabit_sayfalar (kategori,baslik,icerik) VALUES (?,?,?)')
+      .run(kategori, baslik, icerik);
+    res.json({ id: r.lastInsertRowid });
+  } catch (e) {
+    if (e.message.includes('UNIQUE')) return res.status(409).json({ error: 'Bu kategori zaten mevcut.' });
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ── Faaliyetler CRUD ─────────────────────────────────────────
+router.get('/faaliyetler', auth, (_req, res) => {
+  res.json(db.prepare('SELECT * FROM faaliyetler ORDER BY crdate DESC').all());
+});
+
+router.post('/faaliyetler', auth, (req, res) => {
+  const { baslik, ozet, icerik, crdate } = req.body;
+  if (!baslik) return res.status(400).json({ error: 'baslik zorunlu.' });
+  const r = db.prepare('INSERT INTO faaliyetler (baslik,ozet,icerik,crdate) VALUES (?,?,?,?)')
+    .run(String(baslik).slice(0,500), String(ozet||'').slice(0,1000), String(icerik||''), String(crdate||new Date().toISOString().slice(0,10)));
+  res.json({ id: r.lastInsertRowid });
+});
+
+router.put('/faaliyetler/:id', auth, (req, res) => {
+  const { baslik, ozet, icerik, crdate } = req.body;
+  if (!baslik) return res.status(400).json({ error: 'baslik zorunlu.' });
+  db.prepare('UPDATE faaliyetler SET baslik=?,ozet=?,icerik=?,crdate=?,guncelleme=datetime(\'now\') WHERE id=?')
+    .run(String(baslik).slice(0,500), String(ozet||'').slice(0,1000), String(icerik||''), String(crdate||''), req.params.id);
+  res.json({ ok: true });
+});
+
+router.delete('/faaliyetler/:id', auth, (req, res) => {
+  db.prepare('DELETE FROM faaliyetler WHERE id=?').run(req.params.id);
+  res.json({ ok: true });
+});
+
+// ── Basında Todap CRUD ────────────────────────────────────────
+router.get('/basinda-todap', auth, (_req, res) => {
+  res.json(db.prepare('SELECT * FROM basinda_todap ORDER BY crdate DESC').all());
+});
+
+router.post('/basinda-todap', auth, (req, res) => {
+  const { baslik, adres_ismi, baglanti_adresi, crdate } = req.body;
+  if (!baslik) return res.status(400).json({ error: 'baslik zorunlu.' });
+  const r = db.prepare('INSERT INTO basinda_todap (baslik,adres_ismi,baglanti_adresi,crdate) VALUES (?,?,?,?)')
+    .run(String(baslik).slice(0, 500), String(adres_ismi || ''), String(baglanti_adresi || ''), String(crdate || new Date().toISOString().slice(0, 10)));
+  res.json({ id: r.lastInsertRowid });
+});
+
+router.put('/basinda-todap/:id', auth, (req, res) => {
+  const { baslik, adres_ismi, baglanti_adresi, crdate } = req.body;
+  if (!baslik) return res.status(400).json({ error: 'baslik zorunlu.' });
+  db.prepare("UPDATE basinda_todap SET baslik=?,adres_ismi=?,baglanti_adresi=?,crdate=?,guncelleme=datetime('now') WHERE id=?")
+    .run(String(baslik).slice(0, 500), String(adres_ismi || ''), String(baglanti_adresi || ''), String(crdate || ''), req.params.id);
+  res.json({ ok: true });
+});
+
+router.delete('/basinda-todap/:id', auth, (req, res) => {
+  db.prepare('DELETE FROM basinda_todap WHERE id=?').run(req.params.id);
+  res.json({ ok: true });
+});
+
+// ── Videos CRUD ─────────────────────────────────────────
+router.get('/videos', auth, (_req, res) => {
+  res.json(db.prepare('SELECT * FROM videos ORDER BY yayinlanma_tarihi DESC').all());
+});
+
+router.post('/videos', auth, (req, res) => {
+  const { baslik, aciklama, video_url, thumbnail_url, yayinlanma_tarihi, aktif } = req.body;
+  if (!baslik) return res.status(400).json({ error: 'baslik zorunlu.' });
+  const r = db.prepare('INSERT INTO videos (baslik,aciklama,video_url,thumbnail_url,yayinlanma_tarihi,aktif) VALUES (?,?,?,?,?,?)')
+    .run(
+      String(baslik).slice(0, 500),
+      String(aciklama || ''),
+      String(video_url || ''),
+      String(thumbnail_url || ''),
+      String(yayinlanma_tarihi || new Date().toISOString().slice(0, 10)),
+      aktif === false || aktif === 0 ? 0 : 1
+    );
+  res.json({ id: r.lastInsertRowid });
+});
+
+router.put('/videos/:id', auth, (req, res) => {
+  const { baslik, aciklama, video_url, thumbnail_url, yayinlanma_tarihi, aktif } = req.body;
+  if (!baslik) return res.status(400).json({ error: 'baslik zorunlu.' });
+  db.prepare("UPDATE videos SET baslik=?,aciklama=?,video_url=?,thumbnail_url=?,yayinlanma_tarihi=?,aktif=?,guncelleme_tarihi=datetime('now') WHERE id=?")
+    .run(
+      String(baslik).slice(0, 500),
+      String(aciklama || ''),
+      String(video_url || ''),
+      String(thumbnail_url || ''),
+      String(yayinlanma_tarihi || ''),
+      aktif === false || aktif === 0 ? 0 : 1,
+      req.params.id
+    );
+  res.json({ ok: true });
+});
+
+router.delete('/videos/:id', auth, (req, res) => {
+  db.prepare('DELETE FROM videos WHERE id=?').run(req.params.id);
+  res.json({ ok: true });
+});
+
 module.exports = router;

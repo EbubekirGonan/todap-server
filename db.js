@@ -89,7 +89,49 @@ db.exec(`
     neden       TEXT,
     olusturuldu TEXT DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS sabit_sayfalar (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    kategori    TEXT UNIQUE NOT NULL,
+    baslik      TEXT NOT NULL,
+    icerik      TEXT NOT NULL,
+    guncelleme  TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS faaliyetler (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    baslik      TEXT NOT NULL,
+    ozet        TEXT DEFAULT '',
+    icerik      TEXT DEFAULT '',
+    crdate      TEXT DEFAULT (datetime('now')),
+    guncelleme  TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS basinda_todap (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    baslik          TEXT NOT NULL,
+    adres_ismi      TEXT DEFAULT '',
+    baglanti_adresi TEXT DEFAULT '',
+    crdate          TEXT DEFAULT (datetime('now')),
+    guncelleme      TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS videos (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    baslik           TEXT NOT NULL,
+    aciklama         TEXT DEFAULT '',
+    video_url        TEXT DEFAULT '',
+    thumbnail_url    TEXT DEFAULT '',
+    yayinlanma_tarihi TEXT DEFAULT (date('now')),
+    aktif            INTEGER DEFAULT 1,
+    olusturma_tarihi TEXT DEFAULT (datetime('now')),
+    guncelleme_tarihi TEXT DEFAULT (datetime('now'))
+  );
 `);
+
+// ── Migrations ───────────────────────────────────────────────
+try { db.prepare('ALTER TABLE faaliyetler ADD COLUMN ozet TEXT DEFAULT \'\'').run(); } catch (_) {}
+
 
 // ── Seed ────────────────────────────────────────────────────
 function seedIfEmpty() {
@@ -197,6 +239,25 @@ function seedIfEmpty() {
 
   console.log('✓ Veritabanı oluşturuldu ve seed data yüklendi.');
 }
+
+// ── sabit_sayfalar seed ──────────────────────────────────
+(function seedSabitSayfalar() {
+  if (db.prepare('SELECT COUNT(*) as c FROM sabit_sayfalar').get().c > 0) return;
+
+  db.prepare(`
+    INSERT INTO sabit_sayfalar (kategori, baslik, icerik) VALUES (?, ?, ?)
+  `).run(
+    'hakkimizda',
+    'Toplumsal Dayanışma için Psikologlar Derneği (TODAP) Kimdir?',
+    `<p>Derneğin amacı, psikologların ve psikoloji öğrencilerinin eşitlikçi, özgürlükçü ve kardeşlikten yana bir toplumsal dayanışma ekseninde mesleki örgütlenmesini sağlayarak, psikoloji teori ve pratiğinin eleştirisi ve yeniden üretimi yönünde çalışmalar yapmaktır. TODAP, emekten yana ve toplumcu bir eksende bir araya gelen, çalışan, işsiz ve öğrenci psikologları çatısı altında toplamayı hedefler. Her türlü ayrımcılığa, baskı ve sömürüe karşı ezilenlerden yana ve insan hakları temelinde faaliyet gösterir.</p>
+<p>TODAP'ın emek eksenli çalışmaları, psikologların çoğunluğunun üretim ilişkileri içerisindeki konumlarından kaynaklanan deneyimlerini betimlemek, yorumlamak, görünür kılmak üzerine kuruludur. Psikologların çoğunluğu ücretsiz çalışan konumundadır ve güvencesiz çalışma koşulları ve işsizlikle gün geçtikce daha fazla terbiye edilmektedir. TODAP'ın emek eksenli çalışmaların temeli, bu durumun idrak edilmesine ve güvencesiz ve esnek çalışma koşullarına karşı mücadele etmek üzerine temellendirilmiştir.</p>
+<p>Psikoloji tarihine bakıldığında, psikolojinin, içinde ortaya çıktığı tarihsel koşullara ve güç ilişkilerine sıkı sıkıya bağlı olduğu ve ideolojik varsayımlar üzerine kurulduğu görülür. TODAP'ın ikinci ekseni psikoloji bilgisinin ve pratiğinin eleştirisini üretmeye odaklanır ve bunu disiplinlerarası bir yaklaşımla yapar.</p>
+<p>TODAP, herkes için yaşanabilir bir dünya ve bütünlüklü bir meslek bilgi ve icrası için toplumsal dayanışmayı olmazsa olmaz bir koşul olarak tanımlar. Psikologların toplumun ezilenlerıyle dayanışma içine girerken amaçladıkları, sadece dar anlamıyla toplumsal dayanışma değil, aynı zamanda dönüşen ve dönüştüren bir meslek inşa etmektir. TODAP, psikososyal refahın en temel taşı olan insan hakları mücadelelerini kayıtsız şartsız destekler.</p>
+<p>Bu üç eksene ek olarak dernek, psikologların ve psikoloji öğrencilerinin öğrenim görürken veya alanda çalışırken karşılaştıkları hak ihlalleriyle, psikologların ve psikolojinin sebep olduğu hak ihlallerini ve eşitsizlikleri gündeme taşır. Lisans eğitiminin psikolog ünvanıyla istihdam edilmek için yeterli ve nitelikli hale getirilmesi için çalışır ve alanda çalışmak için gerekli kılınan eğitimlerin herkes için erişilebilir olması için çabalar. Bunların yanı sıra, bir sağlık hakkı olarak tanıdığı psikolojik hizmetin eşit, ücretsiz ve anadilde verilmesi için mücadele eder. TODAP bu görüşler ışığında kazanılmış hakları korur, onlara gelebilecek saldırılara karşı mücadele eder, bu hakların ve henüz kazanılmamış olanların savunuculuğunu yapar.</p>`
+  );
+
+  console.log('✓ sabit_sayfalar seed yüklendi.');
+})()
 
 seedIfEmpty();
 

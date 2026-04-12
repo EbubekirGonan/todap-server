@@ -56,6 +56,103 @@
 
 ---
 
+## [2026-04-13] — Dördüncü Oturum: Videolar Modülü + doLogin Düzeltmesi + Logo + Tam Görsel Yeniden Tasarım
+
+### 1. Videolar Modülü
+
+#### `db.js`
+- `videos` tablosu eklendi: `id`, `baslik`, `aciklama`, `video_url`, `thumbnail_url`, `yayinlanma_tarihi`, `aktif`, `olusturma_tarihi`, `guncelleme_tarihi`
+
+#### `routes/admin.js`
+- `/api/admin/videos` için tam CRUD endpoint'leri eklendi (GET, POST, PUT, DELETE)
+
+#### `routes/api.js`
+- `/api/videos` halka açık GET endpoint'i eklendi
+
+#### `public/app.js`
+- `getYoutubeId(url)` — YouTube URL'den video ID çıkarır
+- `getYoutubeEmbed(url)` — embed URL döndürür
+- `getYoutubeThumbnail(url)` — thumbnail URL döndürür
+- `loadVideolar()` — API'den videoları çeker ve listeleri oluşturur
+- `openVideo(url)` — modal iframe'de video açar
+
+#### `public/admin/index.html`
+- Sidebar'a "Videolar" nav öğesi eklendi
+- Video yönetim arayüzü (liste, form, CRUD butonları) eklendi
+
+---
+
+### 2. `doLogin` ReferenceError Düzeltmesi (`public/admin/index.html`)
+
+**Kök neden:** `saveBasinda` fonksiyonundan sonra 3 adet saçak satır (`showToast('Hata...')`, `}`, `}`) tüm `<script>` bloğunun parse edilmesini engelliyordu.
+
+**Yapılan düzeltmeler:**
+- 3 saçak satır kaldırıldı
+- `onclick="doLogin()"` → `document.getElementById('login-btn').addEventListener('click', doLogin)` olarak değiştirildi
+- `onkeydown=` inline handler → `addEventListener('keydown', ...)` olarak değiştirildi
+
+---
+
+### 3. Navbar Logo Değişikliği
+
+**Önceki durum:** Navbar'da `TOD<span>AP</span>` metni
+
+**Yapılan değişiklikler (`public/index.html` ve `public/shared.css`):**
+- `.nav-logo` içindeki metin kaldırıldı, yerine `<img src="/logo.png" alt="TODAP">` konuldu
+- `.nav-logo img` CSS kuralı eklendi: `height:32px; width:auto; display:block`
+
+---
+
+### 4. Tam Görsel Yeniden Tasarım (Bordo/Hardal → Beyaz/Pastel)
+
+#### Renk Sistemi Değişikliği
+| Eski | Yeni |
+|------|------|
+| `#7a1f2e` (bordo) | `#4f7d96` (pastel mavi-gri) |
+| `#c9872b` (hardal) | `#8fb8cc` (açık mavi) |
+| Koyu nav/footer | Beyaz nav, açık gri footer |
+| Beyaz metin | Koyu mürekkep metin (`#111827`) |
+| Koyu hero arka planı | Açık degrade hero |
+
+#### Font Sistemi Değişikliği
+| Eski | Yeni |
+|------|------|
+| Syne (başlık) | Plus Jakarta Sans (başlık) |
+| Lora (metin) | Inter (metin) |
+
+#### `public/shared.css`
+- En üste `@import` eklendi: Plus Jakarta Sans + Inter (Google Fonts)
+- Yeni `:root` değişkenleri: `--accent:#8fb8cc`, `--accent-deep:#4f7d96`, `--accent-light:#eef6fa`, `--bg:#ffffff`, `--ink:#111827`
+- Geriye dönük uyumluluk takma adları: `--burgundy`, `--mustard`, `--cream`, `--warm-white` → pastel değerlere işaret ediyor
+- Nav: beyaz + `border-bottom` (eski: koyu bordo)
+- Footer: `var(--surface)` açık gri (eski: siyah)
+- Kartlar: `border-radius:8px`, beyaz + yumuşak gölge, hover vurgu kenarlığı
+
+#### `public/index.html` (inline CSS tamamı yeniden yazıldı)
+- `<link>` etiketi: Syne/Lora → Plus Jakarta Sans + Inter
+- Hero: açık degrade arka plan (eski: koyu bordo)
+- Navbar: beyaz + kenarlık (eski: koyu bordo sabit)
+- Ticker: `--accent-light` arka plan + koyu metin (eski: hardal + beyaz)
+- Footer: açık gri (eski: siyah)
+- Mobil nav: beyaz (eski: koyu bordo)
+- Dropdown menüler: beyaz + kutu gölgesi (eski: koyu bordo)
+
+#### `public/admin/index.html` (inline CSS tamamı yeniden yazıldı)
+- `<link>` etiketi: Syne/Lora → Plus Jakarta Sans + Inter
+- Yeni `:root`: `--bg:#f5f8fb`, `--surface:#ffffff`, `--border:#dbe5ee`, `--text:#111827`
+- Login logosu: CSS `background:url('/logo.png') no-repeat left center/contain` + `color:transparent; font-size:0`
+- Sidebar logosu: aynı CSS trick ile logo.png gösterimi
+- Login kutusu: beyaz kart + gölge (eski: koyu)
+- Sidebar: beyaz, açık kenarlıklar, pastel aktif durum
+- Quill editör: açık tema (eski: koyu)
+- Tüm buton, modal, form, istatistik kartları güncellendi
+
+### Doğrulama
+- `get_errors` → 3 dosyada da hata yok
+- `grep` → Syne, Lora, `#7a1f2e`, `#c9872b` hiçbir dosyada yok
+
+---
+
 ## [2026-04-12] — İkinci Oturum: Hero Metni + Navbar + GitHub
 
 ### Yapılan Değişiklikler

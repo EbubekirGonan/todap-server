@@ -55,19 +55,22 @@ todap-server/
 ## Veritabanı Şeması
 
 ### `haberler`
-| Sütun             | Tip     | Açıklama                          |
-|-------------------|---------|-----------------------------------|
-| id                | INTEGER | PK, AUTOINCREMENT                 |
-| slug              | TEXT    | UNIQUE, URL kimliği               |
-| baslik            | TEXT    | Başlık                            |
-| ozet              | TEXT    | Kısa özet (liste görünümü için)   |
-| icerik            | TEXT    | HTML içerik (detay sayfası)       |
-| tarih             | TEXT    | ISO tarih (YYYY-MM-DD) — sıralama |
-| gosterim_tarihi   | TEXT    | Görsel tarih metni                |
-| kategori          | TEXT    | Bildiri / Rapor / vb.             |
-| renk              | TEXT    | `r`=kırmızı, `g`=yeşil, ``=varsayılan |
-| aktif             | INTEGER | 1=yayında, 0=gizli               |
-| olusturuldu       | TEXT    | datetime('now')                   |
+| Sütun             | Tip     | Açıklama                                  |
+|-------------------|---------|-------------------------------------------|
+| id                | INTEGER | PK, AUTOINCREMENT                         |
+| slug              | TEXT    | UNIQUE, URL kimliği                       |
+| baslik            | TEXT    | Başlık                                    |
+| ozet              | TEXT    | Kısa ozet (liste görünümü için)           |
+| ozet_icerik       | TEXT    | Özet HTML içerik (liste/önizleme)         |
+| detayli_icerik    | TEXT    | Tam HTML içerik (detay sayfası)           |
+| tarih             | TEXT    | ISO tarih (YYYY-MM-DD) — sıralama         |
+| gosterim_tarihi   | TEXT    | Görsel tarih metni                        |
+| kategori          | TEXT    | Bildiri / Rapor / vb.                     |
+| renk              | TEXT    | `r`=kırmızı, `g`=yeşil, ``=varsayılan    |
+| aktif             | INTEGER | 1=yayında, 0=gizli                        |
+| olusturuldu       | TEXT    | datetime('now')                           |
+
+> **Not:** `icerik` sütunu `ozet_icerik` + `detayli_icerik` olarak ayrıldı (Üçüncü Oturum).
 
 ### `etkinlikler`
 | Sütun             | Tip     | Açıklama                          |
@@ -138,6 +141,48 @@ todap-server/
 | neden       | TEXT |
 | olusturuldu | TEXT |
 
+### `sabit_sayfalar`
+| Sütun      | Tip  | Açıklama                             |
+|------------|------|--------------------------------------|
+| id         | INTEGER | PK, AUTOINCREMENT               |
+| kategori   | TEXT    | UNIQUE, sayfa tanımlayıcı       |
+| baslik     | TEXT    | Sayfa başlığı                   |
+| icerik     | TEXT    | HTML içerik                     |
+| guncelleme | TEXT    | datetime('now')                 |
+
+### `faaliyetler`
+| Sütun      | Tip  |
+|------------|------|
+| id         | INTEGER |
+| baslik     | TEXT |
+| ozet       | TEXT |
+| icerik     | TEXT |
+| crdate     | TEXT |
+| guncelleme | TEXT |
+
+### `basinda_todap`
+| Sütun           | Tip  | Açıklama                   |
+|-----------------|------|----------------------------|
+| id              | INTEGER | PK, AUTOINCREMENT      |
+| baslik          | TEXT    | Haber başlığı          |
+| adres_ismi      | TEXT    | Yayın adı / kurum adı  |
+| baglanti_adresi | TEXT    | Dış URL                |
+| crdate          | TEXT    | datetime('now')        |
+| guncelleme      | TEXT    | datetime('now')        |
+
+### `videos`
+| Sütun              | Tip     | Açıklama                      |
+|--------------------|---------|-------------------------------|
+| id                 | INTEGER | PK, AUTOINCREMENT             |
+| baslik             | TEXT    | Video başlığı                 |
+| aciklama           | TEXT    | Kısa açıklama                 |
+| video_url          | TEXT    | YouTube veya tam video URL    |
+| thumbnail_url      | TEXT    | Kapak görseli URL             |
+| yayinlanma_tarihi  | TEXT    | Yayın tarihi (date('now'))    |
+| aktif              | INTEGER | 1=yayında, 0=gizli            |
+| olusturma_tarihi   | TEXT    | datetime('now')               |
+| guncelleme_tarihi  | TEXT    | datetime('now')               |
+
 ---
 
 ## API Endpoint'leri
@@ -153,6 +198,7 @@ todap-server/
 | GET    | `/api/birimler`        | Birimler (sira ASC)           |
 | GET    | `/api/yayinlar`        | Yayınlar                      |
 | GET    | `/api/ticker`          | Ticker öğeleri                |
+| GET    | `/api/videos`          | Aktif videolar                |
 | POST   | `/api/iletisim`        | İletişim formu gönder         |
 | POST   | `/api/uyelik`          | Üyelik başvurusu gönder       |
 
@@ -168,6 +214,8 @@ todap-server/
 | GET/POST/PUT/DELETE | `/api/admin/birimler[/:id]` | Birim CRUD       |
 | GET/POST/PUT/DELETE | `/api/admin/yayinlar[/:id]` | Yayın CRUD       |
 | GET/POST/PUT/DELETE | `/api/admin/ticker[/:id]`  | Ticker CRUD       |
+| GET/POST/PUT/DELETE | `/api/admin/basinda-todap[/:id]` | Basında TODAP CRUD |
+| GET/POST/PUT/DELETE | `/api/admin/videos[/:id]`   | Video CRUD             |
 | GET    | `/api/admin/mesajlar`       | İletişim mesajları             |
 | GET    | `/api/admin/basvurular`     | Üyelik başvuruları             |
 
@@ -201,7 +249,34 @@ todap-server/
 ### `admin/index.html` — Admin SPA
 - Kendi inline CSS ve JS'i var, `shared.css` kullanmaz
 - Login ekranı (`#login-screen`) ve uygulama (`#app`) aynı dosyada
-- Sidebar navigasyon, sayfalar: dashboard, haberler, etkinlikler, birimler, yayınlar, ticker, mesajlar, basvurular
+- Sidebar navigasyon, sayfalar: dashboard, haberler, etkinlikler, birimler, yayınlar, ticker, videolar, mesajlar, basvurular
+- Logo gösterimi: `TOD<span>AP</span>` HTML metni CSS ile gizlenir (`font-size:0; color:transparent`), yerine `background:url('/logo.png')` gösterilir
+
+---
+
+## Tasarım Sistemi
+
+### Renk Değişkenleri (`--` CSS custom properties)
+| Değişken         | Değer       | Açıklama                          |
+|------------------|-------------|-----------------------------------|
+| `--accent`       | `#8fb8cc`   | Birincil vurgu rengi              |
+| `--accent-deep`  | `#4f7d96`   | Koyu vurgu (butonlar, aktif)      |
+| `--accent-light` | `#eef6fa`   | Pastel arka plan                  |
+| `--bg`           | `#ffffff`   | Sayfa arka planı                  |
+| `--surface`      | `#f8fafc`   | Kart/panel arka planı             |
+| `--border`       | `#dbe5ee`   | Kenarlık rengi                    |
+| `--ink`          | `#111827`   | Ana metin rengi                   |
+| `--burgundy`     | alias → `--accent-deep` | Geriye dönük uyumluluk |
+| `--mustard`      | alias → `--accent-deep` | Geriye dönük uyumluluk |
+| `--cream`        | `#f8fafc`   | Geriye dönük uyumluluk            |
+
+### Font Sistemi
+| Kullanım    | Font                | Kaynak        |
+|-------------|---------------------|---------------|
+| Başlıklar   | Plus Jakarta Sans   | Google Fonts  |
+| Gövde metni | Inter               | Google Fonts  |
+
+> Önceki fontlar (Syne, Lora) tamamen kaldırılmıştır.
 
 ---
 

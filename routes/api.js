@@ -68,4 +68,30 @@ router.post('/uyelik', (req, res) => {
   res.json({ ok: true });
 });
 
+// ── Sabit Sayfalar ──────────────────────────────────────
+router.get('/sabit-sayfalar/:kategori', (req, res) => {
+  const row = db.prepare('SELECT * FROM sabit_sayfalar WHERE kategori=?').get(req.params.kategori);
+  if (!row) return res.status(404).json({ error: 'Bulunamı dı' });
+  res.json(row);
+});
+
+// ── Faaliyetler ──────────────────────────────────────────────
+router.get('/faaliyetler', (_req, res) => {
+  res.json(db.prepare('SELECT * FROM faaliyetler ORDER BY crdate DESC').all());
+});
+
+// ── Basında Todap ─────────────────────────────────────────────
+router.get('/basinda-todap', (_req, res) => {
+  res.json(db.prepare('SELECT * FROM basinda_todap ORDER BY crdate DESC').all());
+});
+// ── Videolar ────────────────────────────────────────────
+router.get('/videos', (_req, res) => {
+  res.json(db.prepare('SELECT * FROM videos WHERE aktif=1 ORDER BY yayinlanma_tarihi DESC').all());
+});
+
+router.get('/videos/:id', (req, res) => {
+  const row = db.prepare('SELECT * FROM videos WHERE id=? AND aktif=1').get(req.params.id);
+  if (!row) return res.status(404).json({ error: 'Bulunamadı.' });
+  res.json(row);
+});
 module.exports = router;

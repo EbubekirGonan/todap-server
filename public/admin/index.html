@@ -5,47 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>TODAP — Yönetici Paneli</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0f0d0c;--surface:#1a1614;--surface2:#231f1d;--surface3:#2d2825;
-  --border:#3a3330;--border2:#4a4340;
-  --burgundy:#7a1f2e;--burgundy-bright:#a02840;
-  --mustard:#c9872b;--mustard-dim:#8a5c1a;
-  --cream:#faf7f2;--text:#e8e0d8;--text-muted:#9a8f86;--text-faint:#5a504a;
-  --success:#3a6b35;--success-bg:#1a2e18;
-  --error:#8b2020;--error-bg:#2e1515;
-  --fd:'Syne',system-ui,sans-serif;
+  --accent:#8fb8cc;--accent-deep:#4f7d96;--accent-light:#eef6fa;
+  --bg:#f5f8fb;--surface:#ffffff;--surface2:#f8fbfd;--surface3:#edf3f7;
+  --border:#dbe5ee;--border2:#c8d7e3;
+  --burgundy:var(--accent-deep);--burgundy-bright:#3f6880;
+  --mustard:var(--accent-deep);--mustard-dim:#3f6880;
+  --cream:#111827;--text:#111827;--text-muted:#4b5563;--text-faint:#94a3b8;
+  --success:#16a34a;--success-bg:#f0fdf4;
+  --error:#dc2626;--error-bg:#fef2f2;
+  --fd:'Plus Jakarta Sans',system-ui,sans-serif;
 }
 html{scroll-behavior:smooth}
 body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
 
 /* LOGIN */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem}
-.login-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:3rem;width:100%;max-width:400px}
-.login-logo{font-size:28px;font-weight:800;color:var(--cream);margin-bottom:4px}
-.login-logo span{color:var(--mustard)}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:2rem;background:linear-gradient(180deg,#f3f8fc,#ffffff)}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:3rem;width:100%;max-width:400px;box-shadow:0 12px 28px rgba(17,24,39,.08)}
+.login-logo{height:34px;width:150px;background:url('/logo.png') no-repeat left center/contain;color:transparent;font-size:0;line-height:0;margin-bottom:10px}
+.login-logo span{display:none}
 .login-sub{font-size:12px;color:var(--text-faint);letter-spacing:.06em;text-transform:uppercase;margin-bottom:2.5rem}
 .login-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:6px}
-.login-input{width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--cream);font-family:var(--fd);font-size:14px;outline:none;transition:border-color .2s;margin-bottom:1.25rem}
+.login-input{width:100%;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--fd);font-size:14px;outline:none;transition:border-color .2s;margin-bottom:1.25rem}
 .login-input:focus{border-color:var(--mustard)}
-.login-btn{width:100%;padding:12px;background:var(--burgundy);color:var(--cream);font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:none;border-radius:6px;cursor:pointer;transition:background .2s}
+.login-btn{width:100%;padding:12px;background:var(--burgundy);color:#fff;font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:none;border-radius:8px;cursor:pointer;transition:background .2s}
 .login-btn:hover{background:var(--burgundy-bright)}
-.login-error{background:var(--error-bg);border:1px solid var(--error);border-radius:6px;padding:10px 14px;font-size:13px;color:#e57373;margin-top:1rem;display:none}
+.login-error{background:var(--error-bg);border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#b91c1c;margin-top:1rem;display:none}
 
 /* LAYOUT */
 #app{display:none;min-height:100vh}
 .sidebar{position:fixed;top:0;left:0;bottom:0;width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:10}
 .sidebar-logo{padding:1.5rem 1.75rem;border-bottom:1px solid var(--border)}
-.sidebar-logo-text{font-size:20px;font-weight:800;color:var(--cream)}
-.sidebar-logo-text span{color:var(--mustard)}
-.sidebar-logo-sub{font-size:10px;color:var(--text-faint);letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+.sidebar-logo-text{height:28px;width:125px;background:url('/logo.png') no-repeat left center/contain;color:transparent;font-size:0;line-height:0}
+.sidebar-logo-text span{display:none}
+.sidebar-logo-sub{font-size:10px;color:var(--text-faint);letter-spacing:.07em;text-transform:uppercase;margin-top:6px}
 .sidebar-nav{padding:1rem 0;flex:1;overflow-y:auto}
 .nav-section{padding:.5rem 1.75rem .25rem;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint)}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 1.75rem;cursor:pointer;transition:all .15s;color:var(--text-muted);font-size:13px;font-weight:600;letter-spacing:.02em;border-left:2px solid transparent;text-decoration:none}
 .nav-item:hover{color:var(--text);background:var(--surface2)}
-.nav-item.active{color:var(--mustard);background:var(--surface2);border-left-color:var(--mustard)}
+.nav-item.active{color:var(--mustard);background:var(--accent-light);border-left-color:var(--mustard)}
 .sidebar-footer{padding:1.25rem 1.75rem;border-top:1px solid var(--border)}
 .sidebar-footer a{font-size:12px;color:var(--text-faint);text-decoration:none;display:block;margin-bottom:6px;transition:color .2s;cursor:pointer}
 .sidebar-footer a:hover{color:var(--text)}
@@ -53,33 +57,33 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
 
 .main{margin-left:240px;min-height:100vh;display:flex;flex-direction:column}
 .topbar{padding:1.25rem 2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);position:sticky;top:0;z-index:5}
-.topbar-title{font-size:16px;font-weight:700;color:var(--cream)}
+.topbar-title{font-size:16px;font-weight:700;color:var(--text)}
 .topbar-actions{display:flex;gap:10px;align-items:center}
 .content{padding:2rem;flex:1}
 
 /* BUTTONS */
-.btn{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:8px 18px;border-radius:5px;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:6px}
-.btn-primary{background:var(--burgundy);color:var(--cream)}
+.btn{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:8px 18px;border-radius:8px;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--burgundy);color:#fff}
 .btn-primary:hover{background:var(--burgundy-bright)}
-.btn-secondary{background:var(--surface3);color:var(--text);border:1px solid var(--border)}
-.btn-secondary:hover{background:var(--surface2);border-color:var(--border2)}
-.btn-danger{background:var(--error);color:var(--cream)}
-.btn-danger:hover{background:#a02020}
+.btn-secondary{background:#fff;color:var(--text);border:1px solid var(--border2)}
+.btn-secondary:hover{background:var(--surface2);border-color:var(--mustard)}
+.btn-danger{background:var(--error);color:#fff}
+.btn-danger:hover{background:#b91c1c}
 .btn-mustard{background:var(--mustard);color:#fff}
-.btn-mustard:hover{background:#b07020}
+.btn-mustard:hover{background:var(--mustard-dim)}
 .btn-sm{padding:5px 12px;font-size:11px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 
 /* STATS */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem;box-shadow:0 2px 8px rgba(17,24,39,.04)}
 .stat-card-num{font-size:36px;font-weight:800;color:var(--mustard);line-height:1}
 .stat-card-label{font-size:11px;color:var(--text-faint);letter-spacing:.06em;text-transform:uppercase;margin-top:6px}
 .stat-card-sub{font-size:12px;color:var(--text-muted);margin-top:4px}
 
 /* WIDGETS */
 .recent-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-.widget{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.widget{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem;box-shadow:0 2px 8px rgba(17,24,39,.04)}
 .widget-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between}
 .widget-item{padding:.75rem 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
 .widget-item:last-child{border-bottom:none;padding-bottom:0}
@@ -88,31 +92,31 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
 .widget-item-actions{display:flex;gap:6px;flex-shrink:0}
 
 /* TAGS */
-.tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:3px}
-.tag-red{background:rgba(122,31,46,.3);color:#e57373;border:1px solid rgba(122,31,46,.4)}
-.tag-mustard{background:rgba(201,135,43,.2);color:var(--mustard);border:1px solid rgba(201,135,43,.3)}
-.tag-green{background:rgba(58,107,53,.3);color:#81c784;border:1px solid rgba(58,107,53,.4)}
+.tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px}
+.tag-red{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.tag-mustard{background:var(--accent-light);color:var(--mustard);border:1px solid #d6e7f0}
+.tag-green{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
 
 /* LIST VIEW */
 .list-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;gap:1rem}
-.list-table{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;width:100%}
+.list-table{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;width:100%;box-shadow:0 2px 8px rgba(17,24,39,.04)}
 .list-table table{width:100%;border-collapse:collapse}
 .list-table th{padding:.75rem 1.25rem;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);text-align:left;border-bottom:1px solid var(--border);background:var(--surface2)}
 .list-table td{padding:1rem 1.25rem;border-bottom:1px solid var(--border);color:var(--text);font-size:13px;vertical-align:top}
 .list-table tr:last-child td{border-bottom:none}
 .list-table tr:hover td{background:var(--surface2)}
-.list-table .td-title{font-weight:600;color:var(--cream);max-width:320px;line-height:1.4}
+.list-table .td-title{font-weight:600;color:var(--text);max-width:320px;line-height:1.4}
 .list-table .td-date{color:var(--text-faint);white-space:nowrap;font-size:12px}
 .list-table .td-actions{white-space:nowrap;display:flex;gap:6px}
 
 /* FORM */
-.form-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:2rem;max-width:900px}
+.form-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:2rem;max-width:900px;box-shadow:0 2px 8px rgba(17,24,39,.04)}
 .form-section-title{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
 .form-row.single{grid-template-columns:1fr}
 .form-group{display:flex;flex-direction:column;gap:6px}
 .form-label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted)}
-.form-input,.form-select,.form-textarea{padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--cream);font-family:var(--fd);font-size:13px;outline:none;transition:border-color .2s;width:100%}
+.form-input,.form-select,.form-textarea{padding:10px 14px;background:#fff;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--fd);font-size:13px;outline:none;transition:border-color .2s;width:100%}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--mustard)}
 .form-textarea{min-height:200px;resize:vertical;font-size:14px;line-height:1.7}
 .form-textarea.tall{min-height:360px}
@@ -120,21 +124,21 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
 .form-actions{display:flex;gap:10px;align-items:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
 
 /* TOAST */
-.toast{position:fixed;bottom:2rem;right:2rem;padding:14px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:1000;transform:translateY(100px);opacity:0;transition:all .3s;max-width:340px}
+.toast{position:fixed;bottom:2rem;right:2rem;padding:14px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:1000;transform:translateY(100px);opacity:0;transition:all .3s;max-width:340px;box-shadow:0 10px 30px rgba(17,24,39,.18)}
 .toast.show{transform:translateY(0);opacity:1}
-.toast-success{background:var(--success-bg);border:1px solid var(--success);color:#a5d6a7}
-.toast-error{background:var(--error-bg);border:1px solid var(--error);color:#ef9a9a}
+.toast-success{background:var(--success-bg);border:1px solid #86efac;color:#166534}
+.toast-error{background:var(--error-bg);border:1px solid #fecaca;color:#b91c1c}
 
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:center;justify-content:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay{position:fixed;inset:0;background:rgba(17,24,39,.35);z-index:100;display:flex;align-items:center;justify-content:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity .2s}
 .modal-overlay.show{opacity:1;pointer-events:all}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2rem;max-width:480px;width:100%}
-.modal-title{font-size:16px;font-weight:700;color:var(--cream);margin-bottom:.5rem}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2rem;max-width:480px;width:100%;box-shadow:0 20px 36px rgba(17,24,39,.18)}
+.modal-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:.5rem}
 .modal-body{font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:1.5rem}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end}
 
 /* LOADING */
-.loading-overlay{position:fixed;inset:0;background:rgba(15,13,12,.85);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.loading-overlay{position:fixed;inset:0;background:rgba(245,248,251,.86);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;opacity:0;pointer-events:none;transition:opacity .2s}
 .loading-overlay.show{opacity:1;pointer-events:all}
 .loading-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--mustard);border-radius:50%;animation:spin .8s linear infinite}
 .loading-text{font-size:13px;color:var(--text-muted)}
@@ -142,21 +146,21 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
 
 /* EMPTY */
 .empty-state{text-align:center;padding:4rem 2rem;color:var(--text-faint)}
-.empty-state-icon{font-size:48px;margin-bottom:1rem;opacity:.4}
+.empty-state-icon{font-size:48px;margin-bottom:1rem;opacity:.5}
 .empty-state-text{font-size:14px;margin-bottom:1.5rem}
 
 /* TICKER */
-.ticker-item{display:flex;gap:8px;align-items:center;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;margin-bottom:6px}
-.ticker-item input{flex:1;padding:6px 10px;background:var(--surface3);border:1px solid var(--border);border-radius:4px;color:var(--cream);font-family:var(--fd);font-size:13px;outline:none}
+.ticker-item{display:flex;gap:8px;align-items:center;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px}
+.ticker-item input{flex:1;padding:6px 10px;background:#fff;border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--fd);font-size:13px;outline:none}
 .ticker-item input:focus{border-color:var(--mustard)}
 
 /* DEPLOY BAR */
 .deploy-bar{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
 .deploy-info{display:flex;align-items:center;gap:10px}
-.deploy-dot{width:8px;height:8px;border-radius:50%;background:#81c784;animation:pulse 2s infinite}
+.deploy-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .deploy-text{font-size:12px;color:var(--text-muted)}
-.deploy-text strong{color:var(--cream)}
+.deploy-text strong{color:var(--text)}
 
 /* PAGES */
 .page{display:none}
@@ -167,6 +171,38 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
 .inbox-meta{font-size:11px;color:var(--text-faint);margin-bottom:.5rem;display:flex;gap:1rem;flex-wrap:wrap}
 .inbox-meta strong{color:var(--text-muted)}
 .inbox-body{font-size:13px;color:var(--text);line-height:1.6;white-space:pre-wrap}
+
+/* Quill Editor (light theme) */
+.ql-toolbar.ql-snow{background:#fff;border:1px solid var(--border)!important;border-radius:8px 8px 0 0;padding:8px}
+.ql-container.ql-snow{background:#fff;border:1px solid var(--border)!important;border-top:none!important;border-radius:0 0 8px 8px;color:var(--text);font-size:14px}
+.ql-editor{min-height:180px;color:var(--text);line-height:1.75;font-family:var(--fd)}
+.quill-tall .ql-editor{min-height:300px}
+.ql-toolbar.ql-snow .ql-stroke{stroke:var(--text-muted)}
+.ql-toolbar.ql-snow .ql-fill{fill:var(--text-muted)}
+.ql-toolbar.ql-snow .ql-picker{color:var(--text-muted)}
+.ql-toolbar.ql-snow button:hover .ql-stroke,.ql-toolbar.ql-snow button.ql-active .ql-stroke{stroke:var(--text)}
+.ql-toolbar.ql-snow button:hover .ql-fill,.ql-toolbar.ql-snow button.ql-active .ql-fill{fill:var(--text)}
+.ql-toolbar.ql-snow .ql-picker-label{color:var(--text-muted);border-color:var(--border)!important}
+.ql-toolbar.ql-snow .ql-picker-label:hover,.ql-toolbar.ql-snow .ql-picker-label.ql-active{color:var(--text)}
+.ql-snow .ql-picker-options{background:#fff!important;border:1px solid var(--border)!important}
+.ql-snow .ql-picker-options .ql-picker-item{color:var(--text)}
+.ql-snow .ql-picker-options .ql-picker-item:hover{color:var(--mustard)}
+.ql-editor.ql-blank::before{color:var(--text-faint);font-style:normal;font-size:13px}
+.ql-snow a{color:var(--mustard)}
+.ql-editor h2{font-size:1.3em;font-weight:700;color:var(--text);margin:.75rem 0 .4rem}
+.ql-editor h3{font-size:1.1em;font-weight:700;color:var(--text);margin:.6rem 0 .3rem}
+.ql-editor p{margin-bottom:.4rem}
+.ql-editor ul,.ql-editor ol{margin:.25rem 0 .5rem;padding-left:1.5rem}
+.ql-editor blockquote{border-left:3px solid var(--mustard);padding-left:1rem;color:var(--text-muted);margin:.5rem 0}
+.ql-snow .ql-tooltip{background:#fff!important;border:1px solid var(--border)!important;color:var(--text)!important;box-shadow:none!important;z-index:9999}
+.ql-snow .ql-tooltip input[type=text]{background:#fff!important;color:var(--text)!important;border:1px solid var(--border)!important}
+.ql-color-picker .ql-picker-options,.ql-background-picker .ql-picker-options{padding:4px;width:172px!important}
+.ql-color-picker .ql-picker-item,.ql-background-picker .ql-picker-item{width:20px!important;height:20px!important;border-radius:3px;margin:1px;border:1px solid transparent}
+.ql-color-picker .ql-picker-item:hover,.ql-background-picker .ql-picker-item:hover{border-color:var(--text)!important}
+.ql-toolbar.ql-snow .ql-color-picker .ql-stroke,.ql-toolbar.ql-snow .ql-background-picker .ql-stroke{stroke:var(--text-muted)}
+.ql-toolbar.ql-snow .ql-color-picker:hover .ql-stroke,.ql-toolbar.ql-snow .ql-background-picker:hover .ql-stroke{stroke:var(--text)}
+.ql-snow .ql-tooltip a.ql-action::after{color:var(--mustard)}
+.ql-snow .ql-tooltip a.ql-remove::before{color:var(--text-muted)}
 </style>
 </head>
 <body>
@@ -179,8 +215,8 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
     <label class="login-label">Kullanıcı Adı</label>
     <input class="login-input" type="text" id="login-user" placeholder="admin" autocomplete="username"/>
     <label class="login-label">Şifre</label>
-    <input class="login-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
-    <button class="login-btn" onclick="doLogin()">Giriş Yap</button>
+    <input class="login-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
+    <button class="login-btn" id="login-btn">Giriş Yap</button>
     <div class="login-error" id="login-error"></div>
   </div>
 </div>
@@ -210,6 +246,22 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
       <div class="nav-item" id="nav-ticker" onclick="showPage('ticker')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
         Duyuru Bandı
+      </div>
+      <div class="nav-item" id="nav-sabit" onclick="showPage('sabit-sayfalar')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Sabit Sayfalar
+      </div>
+      <div class="nav-item" id="nav-faaliyetler" onclick="showPage('faaliyetler')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Faaliyet Listesi
+      </div>
+      <div class="nav-item" id="nav-basinda" onclick="showPage('basinda-todap')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2zm0 0L4 13"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg>
+        Basında Todap
+      </div>
+      <div class="nav-item" id="nav-videolar" onclick="showPage('videolar')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        Videolar
       </div>
       <div class="nav-section" style="margin-top:.5rem">Gelen Kutusu</div>
       <div class="nav-item" id="nav-mesajlar" onclick="showPage('mesajlar')">
@@ -319,7 +371,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Tarih (YYYY-MM-DD)</label>
-              <input class="form-input" type="date" id="haber-tarih"/>
+              <input class="form-input" type="text" id="haber-tarih" placeholder="GG/AA/YYYY"/>
             </div>
             <div class="form-group">
               <label class="form-label">Görüntüleme Tarihi</label>
@@ -328,15 +380,15 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
           </div>
           <div class="form-row single">
             <div class="form-group">
-              <label class="form-label">Özet İçerik (HTML)</label>
-              <textarea class="form-textarea tall" id="haber-ozet-icerik" placeholder="&lt;p&gt;Haberin özet içeriği...&lt;/p&gt;"></textarea>
-              <span class="form-hint">Kısa HTML içerik. Etiketler: &lt;p&gt; &lt;h2&gt; &lt;ul&gt; &lt;li&gt; &lt;strong&gt; &lt;em&gt; &lt;blockquote&gt;</span>
+              <label class="form-label">Özet İçerik</label>
+              <div id="editor-haber-ozet-icerik" class="quill-tall"></div>
+              <span class="form-hint">Kısa içerik. Haberler listesinde görünür.</span>
             </div>
           </div>
           <div class="form-row single">
             <div class="form-group">
-              <label class="form-label">Detaylı İçerik (HTML)</label>
-              <textarea class="form-textarea tall" id="haber-detayli-icerik" placeholder="&lt;p&gt;Geniş detaylı içerik... (ilerleyen zamanlarda)&lt;/p&gt;"></textarea>
+              <label class="form-label">Detaylı İçerik</label>
+              <div id="editor-haber-detayli-icerik" class="quill-tall"></div>
               <span class="form-hint">Uzun format için ayrı alan. Şu an boş bırakılabilir.</span>
             </div>
           </div>
@@ -408,7 +460,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Tarih (YYYY-MM-DD)</label>
-              <input class="form-input" type="date" id="etkinlik-tarih"/>
+              <input class="form-input" type="text" id="etkinlik-tarih" placeholder="GG/AA/YYYY"/>
             </div>
             <div class="form-group">
               <label class="form-label">Görüntüleme Tarihi</label>
@@ -417,8 +469,8 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
           </div>
           <div class="form-row single">
             <div class="form-group">
-              <label class="form-label">İçerik (HTML)</label>
-              <textarea class="form-textarea tall" id="etkinlik-icerik" placeholder="<p>Etkinlik detayları...</p>"></textarea>
+              <label class="form-label">İçerik</label>
+              <div id="editor-etkinlik-icerik" class="quill-tall"></div>
             </div>
           </div>
           <div class="form-actions">
@@ -438,6 +490,140 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
           <div id="ticker-editor"></div>
           <div style="margin-top:1rem">
             <button class="btn btn-mustard" onclick="saveAllTicker()">Tümünü Kaydet</button>
+          </div>
+        </div>
+      </div>
+
+      </div>
+
+      <!-- SABİT SAYFALAR -->
+      <div class="page" id="page-sabit-sayfalar">
+        <div style="max-width:720px">
+          <div style="margin-bottom:1.5rem;font-size:12px;color:var(--text-muted)">Statik sayfa içeriklerini düzenleyin. HTML desteklenir.</div>
+          <div id="sabit-sayfa-list"></div>
+        </div>
+      </div>
+
+      <!-- FAALİYETLER -->
+      <div class="page" id="page-faaliyetler">
+        <div style="max-width:720px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+            <div id="faaliyet-count" style="font-size:12px;color:var(--text-muted)"></div>
+            <button class="btn btn-primary" onclick="showPage('faaliyet-yeni');resetFaaliyetForm()">+ Yeni Faaliyet</button>
+          </div>
+          <div id="faaliyet-list"></div>
+        </div>
+      </div>
+
+      <!-- FALİYET FORM -->
+      <div class="page" id="page-faaliyet-yeni">
+        <div style="max-width:680px">
+          <div id="faaliyet-form-title" style="font-family:var(--fd);font-size:18px;font-weight:700;color:var(--cream);margin-bottom:1.5rem">Yeni Faaliyet Ekle</div>
+          <input type="hidden" id="faaliyet-edit-id">
+          <div class="form-group">
+            <label class="form-label">Başlık</label>
+            <input class="form-input" id="faaliyet-baslik" placeholder="Faaliyet başlığı">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Özet İçerik</label>
+            <textarea class="form-textarea" id="faaliyet-ozet" rows="3" placeholder="Kısa özet (listede görünecek)"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tarih (crdate)</label>
+            <input class="form-input" id="faaliyet-crdate" type="text" placeholder="GG/AA/YYYY">
+          </div>
+          <div class="form-group">
+            <label class="form-label">İçerik</label>
+            <div id="editor-faaliyet-icerik" class="quill-tall"></div>
+          </div>
+          <div style="display:flex;gap:.75rem;margin-top:1rem">
+            <button class="btn btn-primary" onclick="saveFaaliyet()">Kaydet</button>
+            <button class="btn btn-secondary" onclick="showPage('faaliyetler')">İptal</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MESAJLAR -->
+      <!-- BASINDA TODAP -->
+      <div class="page" id="page-basinda-todap">
+        <div style="max-width:720px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+            <div id="basinda-count" style="font-size:12px;color:var(--text-muted)"></div>
+            <button class="btn btn-primary" onclick="showPage('basinda-yeni');resetBasindaForm()">+ Yeni Haber Ekle</button>
+          </div>
+          <div id="basinda-list"></div>
+        </div>
+      </div>
+
+      <!-- BASINDA TODAP FORM -->
+      <div class="page" id="page-basinda-yeni">
+        <div style="max-width:680px">
+          <div id="basinda-form-title" style="font-family:var(--fd);font-size:18px;font-weight:700;color:var(--cream);margin-bottom:1.5rem">Yeni Haber Ekle</div>
+          <input type="hidden" id="basinda-edit-id">
+          <div class="form-group">
+            <label class="form-label">Başlık</label>
+            <input class="form-input" id="basinda-baslik" placeholder="Haber başlığı">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adres İsmi (yayın organı)</label>
+            <input class="form-input" id="basinda-adres-ismi" placeholder="örn. Bianet, Cumhuriyet...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bağlantı Adresi (URL)</label>
+            <input class="form-input" id="basinda-baglanti" type="url" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tarih</label>
+            <input class="form-input" id="basinda-crdate" type="text" placeholder="GG/AA/YYYY">
+          </div>
+          <div style="display:flex;gap:.75rem;margin-top:1rem">
+            <button class="btn btn-primary" onclick="saveBasinda()">Kaydet</button>
+            <button class="btn btn-secondary" onclick="showPage('basinda-todap')">İptal</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VİDEOLAR -->
+      <div class="page" id="page-videolar">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+          <div style="font-size:12px;color:var(--text-muted)" id="video-count"></div>
+          <button class="btn btn-primary" onclick="showPage('video-yeni');resetVideoForm()">+ Yeni Video Ekle</button>
+        </div>
+        <div id="video-list"></div>
+      </div>
+
+      <!-- VİDEO FORM -->
+      <div class="page" id="page-video-yeni">
+        <div style="max-width:680px">
+          <div id="video-form-title" style="font-family:var(--fd);font-size:18px;font-weight:700;color:var(--cream);margin-bottom:1.5rem">Yeni Video Ekle</div>
+          <input type="hidden" id="video-edit-id">
+          <div class="form-group">
+            <label class="form-label">Başlık</label>
+            <input class="form-input" id="video-baslik" placeholder="Video başlığı">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Açıklama</label>
+            <textarea class="form-input" id="video-aciklama" rows="4" placeholder="Video açıklaması"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">YouTube URL</label>
+            <input class="form-input" id="video-url" type="url" placeholder="https://youtube.com/watch?v=..." oninput="onVideoUrlInput(this.value)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Thumbnail URL <span style="font-size:11px;color:var(--text-muted)">(YouTube'dan otomatik doldurulur, değiştirebilirsiniz)</span></label>
+            <input class="form-input" id="video-thumbnail" type="url" placeholder="https://img.youtube.com/vi/.../mqdefault.jpg">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Yayın Tarihi</label>
+            <input class="form-input" id="video-tarih" type="text" placeholder="GG/AA/YYYY">
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;gap:.75rem">
+            <label class="form-label" style="margin:0">Yayında</label>
+            <input type="checkbox" id="video-aktif" style="width:16px;height:16px;cursor:pointer" checked>
+          </div>
+          <div style="display:flex;gap:.75rem;margin-top:1rem">
+            <button class="btn btn-primary" onclick="saveVideo()">Kaydet</button>
+            <button class="btn btn-secondary" onclick="showPage('videolar')">İptal</button>
           </div>
         </div>
       </div>
@@ -484,8 +670,43 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
 let haberler = [];
 let etkinlikler = [];
 let tickerItems = [];
+let faaliyetler = [];
+let basinda = [];
+let videos  = [];
+
+// ── Quill Editor Helpers ───────────────────────────────────
+const quills = {};
+const QUILL_TOOLBAR = [
+  [{ header: [2, 3, false] }],
+  ['bold', 'italic'],
+  [{ color: [] }, { background: [] }],
+  [{ list: 'ordered' }, { list: 'bullet' }],
+  ['blockquote', 'link'],
+  ['clean']
+];
+function initQuill(id) {
+  if (quills[id]) return quills[id];
+  const el = document.getElementById(id);
+  if (!el) return null;
+  const q = new Quill('#' + id, { theme: 'snow', modules: { toolbar: QUILL_TOOLBAR } });
+  quills[id] = q;
+  return q;
+}
+function setQuillContent(id, html) {
+  const q = quills[id];
+  if (q) q.root.innerHTML = html || '';
+}
+function getQuillHTML(id) {
+  const q = quills[id];
+  if (!q) return '';
+  const h = q.root.innerHTML;
+  return (h === '<p><br></p>' || h === '') ? '' : h;
+}
 
 // ── Auth ─────────────────────────────────────────────────────
+document.getElementById('login-btn').addEventListener('click', doLogin);
+document.getElementById('login-pass').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+
 async function doLogin() {
   const username = document.getElementById('login-user').value.trim();
   const password = document.getElementById('login-pass').value;
@@ -529,22 +750,33 @@ async function doLogout() {
 async function init() {
   showLoading('Veriler yükleniyor...');
   try {
-    const [h, e, t, m, b] = await Promise.all([
+    const [h, e, t, m, b, ss, fl, bs, vs] = await Promise.all([
       fetch('/api/admin/haberler').then(r => r.json()),
       fetch('/api/admin/etkinlikler').then(r => r.json()),
       fetch('/api/admin/ticker').then(r => r.json()),
       fetch('/api/admin/mesajlar').then(r => r.json()),
       fetch('/api/admin/basvurular').then(r => r.json()),
+      fetch('/api/admin/sabit-sayfalar').then(r => r.json()),
+      fetch('/api/admin/faaliyetler').then(r => r.json()),
+      fetch('/api/admin/basinda-todap').then(r => r.json()),
+      fetch('/api/admin/videos').then(r => r.json()),
     ]);
     haberler    = h;
     etkinlikler = e;
     tickerItems = t;
+    faaliyetler = fl;
+    basinda     = bs;
+    videos      = vs;
     renderDashboard(h, e, m, b);
     renderHaberTable();
     renderEtkinlikTable();
     renderTickerEditor();
     renderMesajlar(m);
     renderBasvurular(b);
+    renderSabitSayfalar(ss);
+    renderFaaliyetTable();
+    renderBasindaTable();
+    renderVideoTable();
     hideLoading();
   } catch (err) {
     hideLoading();
@@ -573,10 +805,21 @@ function showPage(name) {
   const titles = {
     'dashboard': 'Dashboard', 'haberler': 'Haberler', 'haber-yeni': 'Haber Ekle / Düzenle',
     'etkinlikler': 'Etkinlikler', 'etkinlik-yeni': 'Etkinlik Ekle / Düzenle',
-    'ticker': 'Duyuru Bandı', 'mesajlar': 'Mesajlar', 'basvurular': 'Üyelik Başvuruları'
+    'ticker': 'Duyuru Bandı', 'mesajlar': 'Mesajlar', 'basvurular': 'Üyelik Başvuruları',
+    'sabit-sayfalar': 'Sabit Sayfalar',
+    'faaliyetler': 'Faaliyet Listesi',
+    'faaliyet-yeni': 'Faaliyet Ekle / Düzenle',
+    'basinda-todap': 'Basında Todap',
+    'basinda-yeni': 'Haber Ekle / Düzenle',
+    'videolar': 'Videolar',
+    'video-yeni': 'Video Ekle / Düzenle'
   };
   document.getElementById('topbar-title').textContent = titles[name] || name;
   document.getElementById('topbar-actions').innerHTML = '';
+  // init rich-text editors lazily
+  if (name === 'haber-yeni') { initQuill('editor-haber-ozet-icerik'); initQuill('editor-haber-detayli-icerik'); }
+  if (name === 'etkinlik-yeni') initQuill('editor-etkinlik-icerik');
+  if (name === 'faaliyet-yeni') initQuill('editor-faaliyet-icerik');
 }
 
 // ── Dashboard ────────────────────────────────────────────────
@@ -613,6 +856,7 @@ function renderDashboard(h, e, m, b) {
 
 // ── Haberler ─────────────────────────────────────────────────
 function renderHaberTable() {
+  haberler.sort((a, b) => (b.tarih || '').localeCompare(a.tarih || ''));
   document.getElementById('haber-count').textContent = `${haberler.length} haber`;
   const tbody = document.getElementById('haber-tbody');
   if (!haberler.length) {
@@ -641,22 +885,28 @@ function editHaber(id) {
   document.getElementById('haber-kategori').value   = d.kategori;
   document.getElementById('haber-baslik').value     = d.baslik;
   document.getElementById('haber-ozet').value       = d.ozet || '';
-  document.getElementById('haber-tarih').value      = d.tarih || '';
+  document.getElementById('haber-tarih').value      = isoToDMY(d.tarih);
   document.getElementById('haber-gosterim').value   = d.gosterim_tarihi || '';
-  document.getElementById('haber-ozet-icerik').value  = d.ozet_icerik || '';
-  document.getElementById('haber-detayli-icerik').value = d.detayli_icerik || '';
   showPage('haber-yeni');
+  setQuillContent('editor-haber-ozet-icerik', d.ozet_icerik || '');
+  setQuillContent('editor-haber-detayli-icerik', d.detayli_icerik || '');
 }
 
 function resetHaberForm() {
+  const _today = new Date();
+  const _todayISO = _today.toISOString().slice(0,10);
+  const _months = ['Ocak','şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  const _todayTR = `${_today.getDate()} ${_months[_today.getMonth()]} ${_today.getFullYear()}`;
   document.getElementById('haber-form-title').textContent = 'Yeni Haber Ekle';
   document.getElementById('haber-edit-id').value  = '';
   document.getElementById('haber-slug').value     = '';
   document.getElementById('haber-slug').disabled  = false;
   document.getElementById('haber-kategori').value = 'Bildiri';
-  ['haber-baslik','haber-ozet','haber-tarih','haber-gosterim','haber-ozet-icerik','haber-detayli-icerik'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
+  ['haber-baslik','haber-ozet'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('haber-tarih').value    = todayDMY();
+  document.getElementById('haber-gosterim').value = _todayTR;
+  setQuillContent('editor-haber-ozet-icerik', '');
+  setQuillContent('editor-haber-detayli-icerik', '');
 }
 
 async function saveHaber() {
@@ -664,10 +914,10 @@ async function saveHaber() {
   const slug          = document.getElementById('haber-slug').value.trim();
   const baslik        = document.getElementById('haber-baslik').value.trim();
   const ozet          = document.getElementById('haber-ozet').value.trim();
-  const tarih         = document.getElementById('haber-tarih').value.trim();
+  const tarih         = dmyToISO(document.getElementById('haber-tarih').value.trim());
   const gosterim_tarihi = document.getElementById('haber-gosterim').value.trim();
-  const ozet_icerik    = document.getElementById('haber-ozet-icerik').value.trim();
-  const detayli_icerik = document.getElementById('haber-detayli-icerik').value.trim();
+  const ozet_icerik    = getQuillHTML('editor-haber-ozet-icerik');
+  const detayli_icerik = getQuillHTML('editor-haber-detayli-icerik');
   const kategoriEl    = document.getElementById('haber-kategori');
   const kategori      = kategoriEl.value;
   const renk          = kategoriEl.selectedOptions[0].dataset.cls || '';
@@ -701,6 +951,7 @@ async function saveHaber() {
 
 // ── Etkinlikler ───────────────────────────────────────────────
 function renderEtkinlikTable() {
+  etkinlikler.sort((a, b) => (b.tarih || '').localeCompare(a.tarih || ''));
   document.getElementById('etkinlik-count').textContent = `${etkinlikler.length} etkinlik`;
   const tbody = document.getElementById('etkinlik-tbody');
   if (!etkinlikler.length) {
@@ -731,21 +982,26 @@ function editEtkinlik(id) {
   document.getElementById('etkinlik-ozet').value       = d.ozet || '';
   document.getElementById('etkinlik-gun').value        = d.gun || '—';
   document.getElementById('etkinlik-ay').value         = d.ay || '';
-  document.getElementById('etkinlik-tarih').value      = d.tarih || '';
+  document.getElementById('etkinlik-tarih').value      = isoToDMY(d.tarih);
   document.getElementById('etkinlik-gosterim').value   = d.gosterim_tarihi || '';
-  document.getElementById('etkinlik-icerik').value     = d.icerik || '';
   showPage('etkinlik-yeni');
+  setQuillContent('editor-etkinlik-icerik', d.icerik || '');
 }
 
 function resetEtkinlikForm() {
+  const _today = new Date();
+  const _months = ['Ocak','şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
   document.getElementById('etkinlik-form-title').textContent = 'Yeni Etkinlik Ekle';
   document.getElementById('etkinlik-edit-id').value   = '';
   document.getElementById('etkinlik-slug').value      = '';
   document.getElementById('etkinlik-slug').disabled   = false;
   document.getElementById('etkinlik-kategori').value  = 'Eğitim Programı';
-  ['etkinlik-baslik','etkinlik-ozet','etkinlik-gun','etkinlik-ay','etkinlik-tarih','etkinlik-gosterim','etkinlik-icerik'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
+  ['etkinlik-baslik','etkinlik-ozet'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('etkinlik-gun').value       = String(_today.getDate());
+  document.getElementById('etkinlik-ay').value        = _months[_today.getMonth()];
+  document.getElementById('etkinlik-tarih').value     = todayDMY();
+  document.getElementById('etkinlik-gosterim').value  = `${_today.getDate()} ${_months[_today.getMonth()]} ${_today.getFullYear()}`;
+  setQuillContent('editor-etkinlik-icerik', '');
 }
 
 async function saveEtkinlik() {
@@ -755,9 +1011,9 @@ async function saveEtkinlik() {
   const ozet      = document.getElementById('etkinlik-ozet').value.trim();
   const gun       = document.getElementById('etkinlik-gun').value.trim();
   const ay        = document.getElementById('etkinlik-ay').value.trim();
-  const tarih     = document.getElementById('etkinlik-tarih').value.trim();
+  const tarih     = dmyToISO(document.getElementById('etkinlik-tarih').value.trim());
   const gosterim_tarihi = document.getElementById('etkinlik-gosterim').value.trim();
-  const icerik    = document.getElementById('etkinlik-icerik').value.trim();
+  const icerik    = getQuillHTML('editor-etkinlik-icerik');
   const kategori  = document.getElementById('etkinlik-kategori').value;
 
   if (!baslik) { showToast('Başlık zorunlu!', 'error'); return; }
@@ -821,6 +1077,274 @@ async function saveAllTicker() {
   showToast('✓ Duyuru bandı güncellendi!', 'success');
 }
 
+// ── Faaliyetler ───────────────────────────────────────────────
+function renderFaaliyetTable() {
+  faaliyetler.sort((a, b) => (b.crdate || '').localeCompare(a.crdate || ''));
+  document.getElementById('faaliyet-count').textContent = `${faaliyetler.length} faaliyet`;
+  const el = document.getElementById('faaliyet-list');
+  if (!faaliyetler.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">Henüz faaliyet eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'faaliyet-yeni\');resetFaaliyetForm()">İlk Faaliyeti Ekle</button></div>';
+    return;
+  }
+  el.innerHTML = `<table class="table"><thead><tr><th>Başlık</th><th>Özet</th><th>Tarih</th><th></th></tr></thead><tbody>${
+    faaliyetler.map(f => `<tr>
+      <td class="td-title">${esc(f.baslik)}</td>
+      <td style="font-size:12px;color:var(--text-muted);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(f.ozet||'')}</td>
+      <td class="td-date">${esc(f.crdate)}</td>
+      <td class="td-actions">
+        <button class="btn btn-secondary btn-sm" onclick="editFaaliyet(${f.id})">Düzenle</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDelete('faaliyet',${f.id},'${esc(f.baslik)}')">Sil</button>
+      </td>
+    </tr>`).join('')
+  }</tbody></table>`;
+}
+
+function editFaaliyet(id) {
+  const f = faaliyetler.find(x => x.id === id);
+  if (!f) return;
+  document.getElementById('faaliyet-form-title').textContent = 'Faaliyeti Düzenle';
+  document.getElementById('faaliyet-edit-id').value  = id;
+  document.getElementById('faaliyet-baslik').value   = f.baslik;
+  document.getElementById('faaliyet-ozet').value     = f.ozet || '';
+  document.getElementById('faaliyet-crdate').value   = isoToDMY(f.crdate);
+  showPage('faaliyet-yeni');
+  setQuillContent('editor-faaliyet-icerik', f.icerik || '');
+}
+
+function resetFaaliyetForm() {
+  document.getElementById('faaliyet-form-title').textContent = 'Yeni Faaliyet Ekle';
+  document.getElementById('faaliyet-edit-id').value  = '';
+  document.getElementById('faaliyet-baslik').value   = '';
+  document.getElementById('faaliyet-ozet').value     = '';
+  document.getElementById('faaliyet-crdate').value   = todayDMY();
+  setQuillContent('editor-faaliyet-icerik', '');
+}
+
+async function saveFaaliyet() {
+  const editId = document.getElementById('faaliyet-edit-id').value;
+  const baslik = document.getElementById('faaliyet-baslik').value.trim();
+  const ozet   = document.getElementById('faaliyet-ozet').value.trim();
+  const crdate = dmyToISO(document.getElementById('faaliyet-crdate').value.trim());
+  const icerik = getQuillHTML('editor-faaliyet-icerik');
+  if (!baslik) { showToast('Başlık zorunlu!', 'error'); return; }
+  try {
+    showLoading('Kaydediliyor...');
+    if (editId) {
+      await apiFetch(`/api/admin/faaliyetler/${editId}`, 'PUT', { baslik, ozet, icerik, crdate });
+    } else {
+      await apiFetch('/api/admin/faaliyetler', 'POST', { baslik, ozet, icerik, crdate });
+    }
+    faaliyetler = await fetch('/api/admin/faaliyetler').then(r => r.json());
+    renderFaaliyetTable();
+    hideLoading();
+    showToast('✓ Faaliyet kaydedildi!', 'success');
+    showPage('faaliyetler');
+  } catch (e) {
+    hideLoading();
+    showToast('Hata: ' + e.message, 'error');
+  }
+}
+
+// ── Basında Todap ─────────────────────────────────────────────
+function renderBasindaTable() {
+  basinda.sort((a, b) => (b.crdate || '').localeCompare(a.crdate || ''));
+  document.getElementById('basinda-count').textContent = `${basinda.length} haber`;
+  const el = document.getElementById('basinda-list');
+  if (!basinda.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📰</div><div class="empty-state-text">Henüz haber eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'basinda-yeni\');resetBasindaForm()">İlk Haberi Ekle</button></div>';
+    return;
+  }
+  el.innerHTML = `<table class="table"><thead><tr><th>Başlık</th><th>Kaynak</th><th>Bağlantı</th><th>Tarih</th><th></th></tr></thead><tbody>${
+    basinda.map(item => `<tr>
+      <td class="td-title">${esc(item.baslik)}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${esc(item.adres_ismi || '')}</td>
+      <td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.baglanti_adresi ? `<a href="${esc(item.baglanti_adresi)}" target="_blank" rel="noopener noreferrer" style="color:var(--mustard)">${esc(item.baglanti_adresi)}</a>` : ''}</td>
+      <td class="td-date">${fmtDate(item.crdate)}</td>
+      <td class="td-actions">
+        <button class="btn btn-secondary btn-sm" onclick="editBasinda(${item.id})">Düzenle</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDelete('basinda',${item.id},'${esc(item.baslik)}')">Sil</button>
+      </td>
+    </tr>`).join('')
+  }</tbody></table>`;
+}
+
+function editBasinda(id) {
+  const item = basinda.find(x => x.id === id);
+  if (!item) return;
+  document.getElementById('basinda-form-title').textContent = 'Haberi Düzenle';
+  document.getElementById('basinda-edit-id').value    = id;
+  document.getElementById('basinda-baslik').value     = item.baslik;
+  document.getElementById('basinda-adres-ismi').value = item.adres_ismi || '';
+  document.getElementById('basinda-baglanti').value   = item.baglanti_adresi || '';
+  document.getElementById('basinda-crdate').value     = isoToDMY(item.crdate);
+  showPage('basinda-yeni');
+}
+
+function resetBasindaForm() {
+  document.getElementById('basinda-form-title').textContent = 'Yeni Haber Ekle';
+  document.getElementById('basinda-edit-id').value    = '';
+  document.getElementById('basinda-baslik').value     = '';
+  document.getElementById('basinda-adres-ismi').value = '';
+  document.getElementById('basinda-baglanti').value   = '';
+  document.getElementById('basinda-crdate').value     = todayDMY();
+}
+
+async function saveBasinda() {
+  const editId         = document.getElementById('basinda-edit-id').value;
+  const baslik         = document.getElementById('basinda-baslik').value.trim();
+  const adres_ismi     = document.getElementById('basinda-adres-ismi').value.trim();
+  const baglanti_adresi = document.getElementById('basinda-baglanti').value.trim();
+  const crdate         = dmyToISO(document.getElementById('basinda-crdate').value.trim());
+  if (!baslik) { showToast('Başlık zorunlu!', 'error'); return; }
+  try {
+    showLoading('Kaydediliyor...');
+    if (editId) {
+      await apiFetch(`/api/admin/basinda-todap/${editId}`, 'PUT', { baslik, adres_ismi, baglanti_adresi, crdate });
+    } else {
+      await apiFetch('/api/admin/basinda-todap', 'POST', { baslik, adres_ismi, baglanti_adresi, crdate });
+    }
+    basinda = await fetch('/api/admin/basinda-todap').then(r => r.json());
+    renderBasindaTable();
+    hideLoading();
+    showToast('✓ Kaydedildi!', 'success');
+    showPage('basinda-todap');
+  } catch (e) {
+    hideLoading();
+    showToast('Hata: ' + e.message, 'error');
+  }
+}
+
+// ── Videolar ─────────────────────────────────────────────────
+function adminGetYoutubeId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+function onVideoUrlInput(val) {
+  const id = adminGetYoutubeId(val);
+  const thumbEl = document.getElementById('video-thumbnail');
+  if (id && !thumbEl.value) {
+    thumbEl.value = `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+  }
+}
+function renderVideoTable() {
+  document.getElementById('video-count').textContent = `${videos.length} video`;
+  const el = document.getElementById('video-list');
+  if (!videos.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎬</div><div class="empty-state-text">Henüz video eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'video-yeni\');resetVideoForm()">İlk Videoyu Ekle</button></div>';
+    return;
+  }
+  el.innerHTML = `<table class="table"><thead><tr><th>Başlık</th><th>Tarih</th><th>Aktif</th><th></th></tr></thead><tbody>${
+    videos.map(v => `<tr>
+      <td class="td-title">${esc(v.baslik)}</td>
+      <td class="td-date">${fmtDate(v.yayinlanma_tarihi)}</td>
+      <td style="font-size:12px">${v.aktif ? '✓' : '—'}</td>
+      <td class="td-actions">
+        <button class="btn btn-secondary btn-sm" onclick="editVideo(${v.id})">Düzenle</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDelete('video',${v.id},'${esc(v.baslik)}')">Sil</button>
+      </td>
+    </tr>`).join('')
+  }</tbody></table>`;
+}
+function editVideo(id) {
+  const v = videos.find(x => x.id === id);
+  if (!v) return;
+  document.getElementById('video-form-title').textContent = 'Videoyu Düzenle';
+  document.getElementById('video-edit-id').value          = id;
+  document.getElementById('video-baslik').value           = v.baslik;
+  document.getElementById('video-aciklama').value         = v.aciklama || '';
+  document.getElementById('video-url').value              = v.video_url || '';
+  document.getElementById('video-thumbnail').value        = v.thumbnail_url || '';
+  document.getElementById('video-tarih').value            = isoToDMY(v.yayinlanma_tarihi);
+  document.getElementById('video-aktif').checked          = !!v.aktif;
+  showPage('video-yeni');
+}
+function resetVideoForm() {
+  document.getElementById('video-form-title').textContent = 'Yeni Video Ekle';
+  document.getElementById('video-edit-id').value          = '';
+  document.getElementById('video-baslik').value           = '';
+  document.getElementById('video-aciklama').value         = '';
+  document.getElementById('video-url').value              = '';
+  document.getElementById('video-thumbnail').value        = '';
+  document.getElementById('video-tarih').value            = todayDMY();
+  document.getElementById('video-aktif').checked          = true;
+}
+async function saveVideo() {
+  const baslik            = document.getElementById('video-baslik').value.trim();
+  const aciklama          = document.getElementById('video-aciklama').value.trim();
+  const video_url         = document.getElementById('video-url').value.trim();
+  const thumbnail_url     = document.getElementById('video-thumbnail').value.trim();
+  const yayinlanma_tarihi = dmyToISO(document.getElementById('video-tarih').value.trim());
+  const aktif             = document.getElementById('video-aktif').checked ? 1 : 0;
+  const editId            = document.getElementById('video-edit-id').value;
+  if (!baslik) { showToast('Başlık zorunludur.', 'error'); return; }
+  try {
+    showLoading('Kaydediliyor...');
+    const body = { baslik, aciklama, video_url, thumbnail_url, yayinlanma_tarihi, aktif };
+    if (editId) {
+      await apiFetch(`/api/admin/videos/${editId}`, 'PUT', body);
+    } else {
+      await apiFetch('/api/admin/videos', 'POST', body);
+    }
+    videos = await fetch('/api/admin/videos').then(r => r.json());
+    renderVideoTable();
+    hideLoading();
+    showToast('✓ Kaydedildi!', 'success');
+    showPage('videolar');
+  } catch (e) {
+    hideLoading();
+    showToast('Hata: ' + e.message, 'error');
+  }
+}
+
+// ── Sabit Sayfalar ────────────────────────────────────────────
+function renderSabitSayfalar(list) {
+  const el = document.getElementById('sabit-sayfa-list');
+  if (!el) return;
+  if (!list || !list.length) {
+    el.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:1rem 0">Kayıtlı sayfa yok.</div>';
+    return;
+  }
+  Object.keys(quills).forEach(k => { if (k.startsWith('editor-ss-')) delete quills[k]; });
+  el.innerHTML = list.map(s => `
+    <div class="fp" style="margin-bottom:1.5rem" id="ssblock-${s.id}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <div>
+          <span style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--cream)">${esc(s.baslik)}</span>
+          <span style="font-size:11px;color:var(--text-muted);margin-left:.75rem">kategori: <code style="background:var(--surface3);padding:1px 6px;border-radius:3px">${esc(s.kategori)}</code></span>
+        </div>
+        <span style="font-size:11px;color:var(--text-faint)">Son güncelleme: ${esc(s.guncelleme||'—')}</span>
+      </div>
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label class="form-label">Başlık</label>
+        <input class="form-input" id="ss-baslik-${s.id}" value="${esc(s.baslik)}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">İçerik</label>
+        <div id="editor-ss-${s.id}" class="quill-tall"></div>
+      </div>
+      <div style="margin-top:.75rem">
+        <button class="btn btn-mustard" onclick="saveSabitSayfa('${esc(s.kategori)}',${s.id})">Kaydet</button>
+      </div>
+    </div>`).join('');
+  list.forEach(s => {
+    initQuill('editor-ss-' + s.id);
+    setQuillContent('editor-ss-' + s.id, s.icerik || '');
+  });
+}
+
+async function saveSabitSayfa(kategori, id) {
+  const baslik = document.getElementById('ss-baslik-' + id).value.trim();
+  const icerik = getQuillHTML('editor-ss-' + id);
+  if (!baslik) { showToast('Başlık boş olamaz.', 'error'); return; }
+  const r = await apiFetch(`/api/admin/sabit-sayfalar/${encodeURIComponent(kategori)}`, 'PUT', { baslik, icerik });
+  if (r && r.ok) {
+    showToast('✓ Sayfa güncellendi!', 'success');
+    const fresh = await fetch('/api/admin/sabit-sayfalar').then(r => r.json());
+    renderSabitSayfalar(fresh);
+  }
+}
+
 // ── Mesajlar & Başvurular ─────────────────────────────────────
 function renderMesajlar(m) {
   document.getElementById('mesaj-count').textContent = `${m.length} mesaj`;
@@ -863,13 +1387,22 @@ function confirmDelete(type, id, title) {
     closeModal();
     try {
       showLoading('Siliniyor...');
-      await apiFetch(`/api/admin/${type === 'haber' ? 'haberler' : 'etkinlikler'}/${id}`, 'DELETE');
+      await apiFetch(`/api/admin/${type === 'haber' ? 'haberler' : type === 'etkinlik' ? 'etkinlikler' : type === 'faaliyet' ? 'faaliyetler' : type === 'video' ? 'videos' : 'basinda-todap'}/${id}`, 'DELETE');
       if (type === 'haber') {
         haberler = await fetch('/api/admin/haberler').then(r => r.json());
         renderHaberTable();
-      } else {
+      } else if (type === 'etkinlik') {
         etkinlikler = await fetch('/api/admin/etkinlikler').then(r => r.json());
         renderEtkinlikTable();
+      } else if (type === 'faaliyet') {
+        faaliyetler = await fetch('/api/admin/faaliyetler').then(r => r.json());
+        renderFaaliyetTable();
+      } else if (type === 'video') {
+        videos = await fetch('/api/admin/videos').then(r => r.json());
+        renderVideoTable();
+      } else {
+        basinda = await fetch('/api/admin/basinda-todap').then(r => r.json());
+        renderBasindaTable();
       }
       hideLoading();
       showToast('Silindi.', 'success');
@@ -917,6 +1450,25 @@ function esc(str) {
   return String(str)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function fmtDate(s) {
+  if (!s) return '';
+  const m = String(s).match(/(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : String(s);
+}
+function isoToDMY(s) {
+  if (!s) return '';
+  const m = String(s).match(/(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : String(s);
+}
+function dmyToISO(s) {
+  if (!s) return '';
+  const m = String(s).match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  return m ? `${m[3]}-${m[2]}-${m[1]}` : String(s);
+}
+function todayDMY() {
+  const d = new Date();
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
 }
 </script>
 </body>
