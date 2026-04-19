@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TODAP — Hero</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --clay:    #C94F2B;
+      --clay-lt: #FAECE7;
+      --clay-dk: #7A2E14;
+      --ink:     #1A1714;
+      --ink-2:   #3D3733;
+      --ink-3:   #7A726B;
+      --paper:   #FAF8F5;
+      --paper-2: #F0EDE8;
+      --line:    rgba(26,23,20,0.12);
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Dekoratif arka plan deseni */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 72% 18%, rgba(201,79,43,0.06) 0%, transparent 55%),
+        radial-gradient(circle at 15% 80%, rgba(201,79,43,0.04) 0%, transparent 45%);
+      pointer-events: none;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: relative;
+      z-index: 10;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      color: var(--clay);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      color: var(--ink-3);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+
+    .nav-cta {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--clay) !important;
+      border: 1px solid currentColor;
+      border-radius: 40px;
+      padding: 7px 18px;
+      transition: background 0.15s, color 0.15s !important;
+    }
+    .nav-cta:hover {
+      background: var(--clay) !important;
+      color: #fff !important;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .hero-body {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 0;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 40px;
+      align-items: center;
+    }
+
+    /* Sol blok */
+    .hero-left {
+      padding: 64px 72px 64px 0;
+      border-right: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--clay);
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.1s forwards;
+    }
+
+    .eyebrow-line {
+      width: 32px;
+      height: 1px;
+      background: var(--clay);
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(48px, 6vw, 80px);
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.2s forwards;
+    }
+
+    h1 .accent {
+      color: var(--clay);
+      font-style: italic;
+    }
+
+    h1 .underline-word {
+      position: relative;
+      display: inline-block;
+    }
+
+    h1 .underline-word::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--clay);
+      border-radius: 2px;
+      transform: scaleX(0);
+      transform-origin: left;
+      animation: lineGrow 0.6s 0.9s forwards;
+    }
+
+    @keyframes lineGrow {
+      to { transform: scaleX(1); }
+    }
+
+    .hero-desc {
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--ink-2);
+      max-width: 500px;
+      margin-bottom: 44px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.35s forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.45s forwards;
+    }
+
+    .btn-fill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--clay);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 14px 28px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-fill:hover { background: var(--clay-dk); transform: translateY(-1px); }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--ink-2);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      padding: 14px 0;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .btn-ghost:hover { color: var(--ink); }
+
+    .arrow {
+      display: inline-block;
+      transition: transform 0.15s;
+    }
+    .btn-fill:hover .arrow,
+    .btn-ghost:hover .arrow {
+      transform: translate(3px, -2px);
+    }
+
+    /* Sağ blok */
+    .hero-right {
+      padding: 64px 0 64px 56px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .info-card {
+      background: var(--paper-2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 22px 24px;
+      opacity: 0;
+      animation: fadeUp 0.6s forwards;
+    }
+
+    .info-card:nth-child(1) { animation-delay: 0.5s; }
+    .info-card:nth-child(2) { animation-delay: 0.62s; }
+    .info-card:nth-child(3) { animation-delay: 0.74s; }
+
+    .card-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 10px;
+    }
+
+    .card-mission {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.45;
+      color: var(--ink);
+    }
+
+    .card-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-n {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--clay);
+      line-height: 1;
+    }
+
+    .stat-l {
+      font-size: 12px;
+      color: var(--ink-3);
+      line-height: 1.35;
+    }
+
+    .card-live {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3B6D11;
+      flex-shrink: 0;
+      margin-top: 5px;
+      box-shadow: 0 0 0 0 rgba(59,109,17,0.4);
+      animation: ripple 2s infinite;
+    }
+
+    @keyframes ripple {
+      0%  { box-shadow: 0 0 0 0   rgba(59,109,17,0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(59,109,17,0); }
+      100%{ box-shadow: 0 0 0 0   rgba(59,109,17,0); }
+    }
+
+    .live-text {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--ink-2);
+    }
+
+    .live-text strong {
+      color: var(--ink);
+      font-weight: 500;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* ── BOTTOM BAR ── */
+    .hero-bar {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--line);
+      opacity: 0;
+      animation: fadeUp 0.5s 0.9s forwards;
+    }
+
+    .hero-bar-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .bar-pillars {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .pillar-tag {
+      font-size: 12px;
+      color: var(--ink-3);
+      padding: 6px 16px;
+      border-right: 1px solid var(--line);
+    }
+    .pillar-tag:first-child { padding-left: 0; }
+    .pillar-tag:last-child { border-right: none; }
+
+    .bar-copy {
+      font-size: 12px;
+      color: var(--ink-3);
+    }
+
+    /* ── ANİMASYONLAR ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .nav-inner { padding: 20px 24px; }
+      .nav-links { display: none; }
+
+      .hero-body {
+        grid-template-columns: 1fr;
+        padding: 0 24px;
+      }
+
+      .hero-left {
+        padding: 48px 0 40px;
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .hero-right {
+        padding: 40px 0 48px;
+      }
+
+      .hero-bar-inner {
+        padding: 16px 24px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .bar-pillars { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<section class="hero">
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">TO<span>DAP</span></a>
+      <ul class="nav-links">
+        <li><a href="#">TODAP Hakkında</a></li>
+        <li><a href="#">Birim / Komisyonlar</a></li>
+        <li><a href="#">Yayınlar</a></li>
+        <li><a href="#">Medya</a></li>
+        <li><a href="#" class="nav-cta">Üye Ol</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ANA İÇERİK -->
+  <div class="hero-body">
+
+    <div class="hero-left">
+      <div class="eyebrow">
+        <span class="eyebrow-line"></span>
+        Toplumsal Dayanışma için Psikologlar Derneği
+      </div>
+
+      <h1>
+        Psikoloji<br>
+        <span class="accent">toplumsal</span><br>
+        bir <span class="underline-word">meseledir.</span>
+      </h1>
+
+      <p class="hero-desc">
+        Psikologları dayanışma içinde bir araya getiriyor; meslek haklarını, insan haklarını ve eleştirel psikolojiyi savunuyoruz.
+      </p>
+
+      <div class="hero-actions">
+        <a href="https://todap.org/Uyelik_Formu.aspx" class="btn-fill">
+          Üye Ol <span class="arrow">↗</span>
+        </a>
+        <a href="https://todap.org" class="btn-ghost">
+          Faaliyetlerimizi Keşfet <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+
+      <div class="info-card">
+        <div class="card-label">Misyon</div>
+        <p class="card-mission">
+          Psikologlar için eşit, adil ve güvenli bir meslek ortamı; toplum için daha özgür ve sağlıklı bir yaşam.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <div class="card-label">Dernek Hakkında</div>
+        <div class="card-stats">
+          <div class="stat">
+            <span class="stat-n">4</span>
+            <span class="stat-l">Birim &amp; Komisyon</span>
+          </div>
+          <div class="stat">
+            <span class="stat-n">2</span>
+            <span class="stat-l">Süreli Yayın</span>
+          </div>
+          <div class="stat">
+            <span class="stat-n">10+</span>
+            <span class="stat-l">Yıl Dayanışma</span>
+          </div>
+          <div class="stat">
+            <span class="stat-n">∞</span>
+            <span class="stat-l">Kolektif Emek</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="card-live">
+          <span class="live-dot"></span>
+          <div class="live-text">
+            <strong>Eleştirel Psikoloji Dersliği #3</strong>
+            10 haftalık kolektif öğrenme deneyimi başladı. Okumalar, tartışmalar, atölye uygulamaları.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ALT BAR -->
+  <div class="hero-bar">
+    <div class="hero-bar-inner">
+      <div class="bar-pillars">
+        <span class="pillar-tag">Meslek Hakları</span>
+        <span class="pillar-tag">Kadın Komisyonu</span>
+        <span class="pillar-tag">LGBTİ+ Savunuculuğu</span>
+        <span class="pillar-tag">Eleştirel Psikoloji</span>
+        <span class="pillar-tag">Meslek Yasası</span>
+      </div>
+      <span class="bar-copy">© 2013 – 2025 TODAP</span>
+    </div>
+  </div>
+
+</section>
+
+</body>
+</html>

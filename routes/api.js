@@ -37,7 +37,50 @@ router.get('/yayinlar', (_req, res) => {
 
 // ── Ticker ───────────────────────────────────────────────────
 router.get('/ticker', (_req, res) => {
-  res.json(db.prepare('SELECT * FROM ticker_items ORDER BY sira ASC').all());
+  const rows = db.prepare(`
+    WITH son_haberler AS (
+      SELECT
+        'Haber' AS etiket,
+        baslik AS metin,
+        slug AS slug,
+        'haber' AS tur,
+        CASE
+          WHEN tarih LIKE '____-__-__' THEN tarih || ' 00:00:00'
+          ELSE olusturuldu
+        END AS yayin_tarihi,
+        id AS kaynak_id
+      FROM haberler
+      WHERE aktif = 1
+      ORDER BY datetime(yayin_tarihi) DESC, id DESC
+      LIMIT 5
+    ),
+    son_etkinlikler AS (
+      SELECT
+        'Etkinlik' AS etiket,
+        baslik AS metin,
+        slug AS slug,
+        'etkinlik' AS tur,
+        CASE
+          WHEN tarih LIKE '____-__-__' THEN tarih || ' 00:00:00'
+          ELSE olusturuldu
+        END AS yayin_tarihi,
+        id AS kaynak_id
+      FROM etkinlikler
+      WHERE aktif = 1
+      ORDER BY datetime(yayin_tarihi) DESC, id DESC
+      LIMIT 5
+    )
+    SELECT etiket, metin, slug, tur
+    FROM (
+      SELECT * FROM son_haberler
+      UNION ALL
+      SELECT * FROM son_etkinlikler
+    )
+    ORDER BY datetime(yayin_tarihi) DESC, kaynak_id DESC
+    LIMIT 10
+  `).all();
+
+  res.json(rows);
 });
 
 // ── İletişim Formu ───────────────────────────────────────────

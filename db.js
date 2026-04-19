@@ -23,6 +23,7 @@ db.exec(`
     gosterim_tarihi  TEXT DEFAULT '',
     kategori         TEXT DEFAULT 'Bildiri',
     renk             TEXT DEFAULT '',
+    keywords         TEXT DEFAULT '',
     aktif            INTEGER DEFAULT 1,
     olusturuldu      TEXT DEFAULT (datetime('now'))
   );
@@ -38,27 +39,30 @@ db.exec(`
     gun              TEXT DEFAULT '—',
     ay               TEXT DEFAULT '?',
     kategori         TEXT DEFAULT 'Etkinlik',
+    keywords         TEXT DEFAULT '',
     aktif            INTEGER DEFAULT 1,
     olusturuldu      TEXT DEFAULT (datetime('now'))
   );
 
   CREATE TABLE IF NOT EXISTS birimler (
-    id      INTEGER PRIMARY KEY AUTOINCREMENT,
-    no      TEXT DEFAULT '',
-    baslik  TEXT NOT NULL,
-    ozet    TEXT DEFAULT '',
-    icerik  TEXT DEFAULT '',
-    aktif   INTEGER DEFAULT 1,
-    sira    INTEGER DEFAULT 0
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    no       TEXT DEFAULT '',
+    baslik   TEXT NOT NULL,
+    ozet     TEXT DEFAULT '',
+    icerik   TEXT DEFAULT '',
+    keywords TEXT DEFAULT '',
+    aktif    INTEGER DEFAULT 1,
+    sira     INTEGER DEFAULT 0
   );
 
   CREATE TABLE IF NOT EXISTS yayinlar (
-    id      INTEGER PRIMARY KEY AUTOINCREMENT,
-    baslik  TEXT NOT NULL,
-    ozet    TEXT DEFAULT '',
-    tur     TEXT DEFAULT '',
-    url     TEXT DEFAULT '',
-    aktif   INTEGER DEFAULT 1
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    baslik   TEXT NOT NULL,
+    ozet     TEXT DEFAULT '',
+    tur      TEXT DEFAULT '',
+    url      TEXT DEFAULT '',
+    keywords TEXT DEFAULT '',
+    aktif    INTEGER DEFAULT 1
   );
 
   CREATE TABLE IF NOT EXISTS ticker_items (
@@ -95,6 +99,7 @@ db.exec(`
     kategori    TEXT UNIQUE NOT NULL,
     baslik      TEXT NOT NULL,
     icerik      TEXT NOT NULL,
+    keywords    TEXT DEFAULT '',
     guncelleme  TEXT DEFAULT (datetime('now'))
   );
 
@@ -103,6 +108,7 @@ db.exec(`
     baslik      TEXT NOT NULL,
     ozet        TEXT DEFAULT '',
     icerik      TEXT DEFAULT '',
+    keywords    TEXT DEFAULT '',
     crdate      TEXT DEFAULT (datetime('now')),
     guncelleme  TEXT DEFAULT (datetime('now'))
   );
@@ -112,6 +118,7 @@ db.exec(`
     baslik          TEXT NOT NULL,
     adres_ismi      TEXT DEFAULT '',
     baglanti_adresi TEXT DEFAULT '',
+    keywords        TEXT DEFAULT '',
     crdate          TEXT DEFAULT (datetime('now')),
     guncelleme      TEXT DEFAULT (datetime('now'))
   );
@@ -123,6 +130,7 @@ db.exec(`
     video_url        TEXT DEFAULT '',
     thumbnail_url    TEXT DEFAULT '',
     yayinlanma_tarihi TEXT DEFAULT (date('now')),
+    keywords         TEXT DEFAULT '',
     aktif            INTEGER DEFAULT 1,
     olusturma_tarihi TEXT DEFAULT (datetime('now')),
     guncelleme_tarihi TEXT DEFAULT (datetime('now'))
@@ -131,7 +139,14 @@ db.exec(`
 
 // ── Migrations ───────────────────────────────────────────────
 try { db.prepare('ALTER TABLE faaliyetler ADD COLUMN ozet TEXT DEFAULT \'\'').run(); } catch (_) {}
-
+try { db.prepare('ALTER TABLE haberler ADD COLUMN keywords TEXT DEFAULT \'\'').run(); } catch (_) {}
+try { db.prepare('ALTER TABLE etkinlikler ADD COLUMN keywords TEXT DEFAULT \'\'').run(); } catch (_) {}
+try { db.prepare('ALTER TABLE birimler ADD COLUMN keywords TEXT DEFAULT \'\'').run(); } catch (_) {}
+try { db.prepare('ALTER TABLE yayinlar ADD COLUMN keywords TEXT DEFAULT \'\'').run(); } catch (_) {}
+try { db.prepare('ALTER TABLE sabit_sayfalar ADD COLUMN keywords TEXT DEFAULT \'\'').run(); } catch (_) {}
+try { db.prepare('ALTER TABLE faaliyetler ADD COLUMN keywords TEXT DEFAULT \'\'').run(); } catch (_) {}
+try { db.prepare('ALTER TABLE basinda_todap ADD COLUMN keywords TEXT DEFAULT \'\'').run(); } catch (_) {}
+try { db.prepare('ALTER TABLE videos ADD COLUMN keywords TEXT DEFAULT \'\'').run(); } catch (_) {}
 
 // ── Seed ────────────────────────────────────────────────────
 function seedIfEmpty() {

@@ -1,69 +1,106 @@
 /* ═══════════════════════════════════════════════════════════════
    TODAP Design Tokens
    ───────────────────────────────────────────────────────────────
-   Sitenin tüm görsel kararları bu dosyada tutulur.
-   Sadece bu dosyadaki değerleri değiştirerek tüm sitenin
-   görünümünü anında güncellemek mümkündür.
-
-   Yükleme sırası: tokens.css → shared.css / index.html <style>
+   RENK PALETİ (SADECE VERİLEN HEX KODLAR - varyantlar minimal):
+   - Beyaz (#FFFFFF) - Ana zemin, kartlar, içerik alanları
+   - Yeşil (#009736) - Navbar, butonlar, linkler, vurgular (2. renk)
+   - Kırmızı (#EE2A35) - Ticker, aktif durumlar, uyarılar (3. renk)
+   - Siyah (#000000) - Yazılar (metin, başlık) (4. renk)
    ═══════════════════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 :root {
 
-  /* ── 1. RENKLER ──────────────────────────────────────────────── */
+  /* ── 1. RENKLER (VERİLEN HEX KODLAR) ──────────────────────────── */
 
-  /* Ana vurgu */
-  --color-primary:        #8fb8cc;   /* buton, link, vurgu */
-  --color-primary-dark:   #4f7d96;   /* hover, aktif durum */
-  --color-primary-light:  #eef3f8;   /* arka plan hafif tonu */
+  /* Beyaz - ANA RENK (en çok kullanılan) */
+  --color-white:        #FFFFFF;
+  
+  /* Yeşil - 2. RENK (navbar, buton, link) */
+  --color-green:        #009736;
+  
+  /* Kırmızı - 3. RENK (ticker, uyarı, aktif) */
+  --color-red:          rgb(238, 42, 53);
+  
+  /* Siyah - 4. RENK (sadece yazılar) */
+  --color-black:        #000000;
 
-  /* İkincil vurgu */
-  --color-accent:         #8fb8cc;   /* ikincil vurgu (primary ile aynı, bağımsız değiştirilebilir) */
-  --color-accent-light:   #eef3f8;
+  /* ── VARYANTLAR (minimal, sadece gerekli olanlar) ─────────────── */
+  --color-green-dark:   #007a2b;    /* hover için */
+  --color-red-dark:     rgb(196, 30, 40);    /* hover için */
+  --color-green-light:  #e6f4e9;    /* hafif arka plan */
+  --color-red-light:    #e6f4e9;    /* hafif arka plan */
+  
+  --color-white-off:    #FAFAFA;    /* alternatif zemin */
+  --color-gray-light:   #666666;    /* muted yazılar */
+  --color-gray-lighter: #999999;    /* faint yazılar */
 
-  /* Zemin */
-  --color-bg:             #ffffff;   /* sayfa zemini */
-  --color-bg-alt:         #f5f8fb;   /* alternatif section zemini */
-  --color-surface:        #fafbfc;   /* kart, form, modal zemini */
+  /* ── TOKEN EŞLEMELERİ ─────────────────────────────────────────── */
+  
+  /* Ana vurgu - YEŞİL */
+  --color-primary:        var(--color-green);
+  --color-primary-dark:   var(--color-green-dark);
+  --color-primary-light:  var(--color-green-light);
+  
+  /* İkincil vurgu - KIRMIZI */
+  --color-accent:         var(--color-red);
+  --color-accent-dark:    var(--color-red-dark);
+  --color-accent-light:   var(--color-red-light);
 
-  /* Kenarlık */
-  --color-border:         rgba(17, 24, 39, 0.09);
-  --color-border-strong:  rgba(17, 24, 39, 0.16);
+  /* Zeminler - BEYAZ ağırlıklı */
+  --color-bg:             var(--color-white);
+  --color-bg-alt:         var(--color-white-off);
+  --color-surface:        var(--color-white);
 
-  /* Yazı */
-  --color-text-primary:   #111827;   /* ana başlık ve gövde */
-  --color-text-secondary: #4b5563;   /* muted / açıklama */
-  --color-text-faint:     #9ca3af;   /* placeholder, meta, etiket */
+  /* Kenarlıklar - SİYAH'ın şeffaf varyantları */
+  --color-border:         rgba(0, 0, 0, 0.09);
+  --color-border-strong:  rgba(0, 0, 0, 0.16);
 
-  /* Nav */
-  --color-nav-bg:         #ffffff;
-  --color-nav-text:       #4b5563;
+  /* Yazı renkleri - SİYAH */
+  --color-text-primary:   var(--color-black);
+  --color-text-secondary: var(--color-gray-light);
+  --color-text-faint:     var(--color-gray-lighter);
 
-  /* Footer */
-  --color-footer-bg:      #f5f8fb;
-  --color-footer-text:    #4b5563;
+  /* Navbar - YEŞİL */
+  --color-nav-bg:         var(--color-green);
+  --color-nav-text:       rgba(255, 255, 255, 0.9);
+  --color-nav-text-hover: var(--color-white);
 
+  /* Footer - BEYAZ */
+  --color-footer-bg:      var(--color-white-off);
+  --color-footer-text:    var(--color-gray-light);
+
+  /* Ticker - KIRMIZI */
+  --color-ticker-bg:      var(--color-red);
+  --color-ticker-text:    rgba(255, 255, 255, 0.9);
+
+  /* Geriye dönük uyumluluk alias'ları */
+  --burgundy:       var(--color-green);
+  --burgundy-deep:  var(--color-green-dark);
+  --burgundy-light: var(--color-green-light);
+  --mustard:        var(--color-red);
+  --mustard-light:  var(--color-red-light);
+  --accent:         var(--color-green);
+  --accent-deep:    var(--color-green-dark);
+  --accent-light:   var(--color-green-light);
 
   /* ── 2. TİPOGRAFİ ───────────────────────────────────────────── */
 
-  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;  /* başlık */
-  --font-body:    'Inter', system-ui, sans-serif;               /* gövde */
-  --font-mono:    'JetBrains Mono', 'Courier New', monospace;  /* kod */
-
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
 
   /* ── 3. YAZI BÜYÜKLÜKLERİ ──────────────────────────────────── */
 
-  --text-xs:   11px;  /* meta, etiket, nav link */
-  --text-sm:   13px;  /* küçük gövde, kart metni */
-  --text-base: 16px;  /* ana gövde */
-  --text-md:   18px;  /* büyük gövde, kart başlığı */
-  --text-lg:   22px;  /* bölüm başlığı küçük */
-  --text-xl:   28px;  /* bölüm başlığı orta */
-  --text-2xl:  36px;  /* büyük sayı / istatistik */
-  --text-3xl:  48px;  /* hero / büyük display */
-
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 16px;
+  --text-md:   18px;
+  --text-lg:   22px;
+  --text-xl:   28px;
+  --text-2xl:  36px;
+  --text-3xl:  48px;
 
   /* ── 4. YAZI AĞIRLIKLARI ────────────────────────────────────── */
 
@@ -72,7 +109,6 @@
   --weight-medium:  500;
   --weight-bold:    700;
   --weight-black:   800;
-
 
   /* ── 5. BOŞLUK ve LAYOUT ────────────────────────────────────── */
 
@@ -88,12 +124,11 @@
   --radius-lg:   12px;
   --radius-full: 9999px;
 
-
   /* ── 6. GÖLGE ve EFEKTLER ───────────────────────────────────── */
 
-  --shadow-sm:  0 1px 4px rgba(17, 24, 39, 0.05);
-  --shadow-md:  0 4px 16px rgba(17, 24, 39, 0.08);
-  --shadow-lg:  0 10px 28px rgba(17, 24, 39, 0.12);
+  --shadow-sm:  0 1px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md:  0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg:  0 10px 28px rgba(0, 0, 0, 0.12);
 
   --transition-fast: 0.15s ease;
   --transition-base: 0.25s ease;
