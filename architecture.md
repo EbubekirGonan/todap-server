@@ -236,6 +236,9 @@ todap-server/
 - `goToSection(id)` — sayfa içi kaydırma
 - `toggleMobileMenu()` / `closeMobileMenu()` — mobil hamburger menü
 - `article(slug)` / `etkinlik(slug)` — detay sayfası açma
+- `buildHeroLive()` — hero alanında haber+etkinlik arasında en güncel içeriği gösterir
+    - Seçim kuralı: önce `tarih`, eşitlikte `olusturuldu`, sonra `id`
+    - Amaç: hero-live alanında "son tarihli" gönderiyi deterministik biçimde göstermek
 - `buildTicker()`, `buildFeaturedHaberler()`, `buildFeaturedEtkinlikler()` — bileşen render
 - `buildHaberlerList()`, `buildEtkinliklerList()` — liste sayfaları
 - `formOK(event, successId)` — form POST + başarı gösterimi

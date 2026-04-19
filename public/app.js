@@ -24,6 +24,7 @@ async function initApp() {
     for (const e of etkinlikler) etkinlikMap[e.slug] = e;
 
     buildTicker();
+    buildHeroLive();
     buildFeaturedHaberler();
     buildFeaturedEtkinlikler();
     buildHaberlerList();
@@ -31,6 +32,105 @@ async function initApp() {
   } catch (err) {
     console.error('Veri yüklenemedi:', err);
   }
+}
+
+// ── Hero Live (Son Tarihli İçerik) ─────────────────────────
+function buildHeroLive() {
+  const titleEl = document.getElementById('hero-live-title');
+  const linkEl = document.getElementById('hero-live-link');
+  if (!titleEl || !linkEl) return;
+
+  const haber = (DATA.haberler || []).reduce((acc, cur) => {
+    if (!acc) return cur;
+    return compareByPublishedDate(cur, acc) > 0 ? cur : acc;
+  }, null);
+
+  const etkinlikItem = (DATA.etkinlikler || []).reduce((acc, cur) => {
+    if (!acc) return cur;
+    return compareByPublishedDate(cur, acc) > 0 ? cur : acc;
+  }, null);
+
+  let latest = null;
+  let type = '';
+  if (haber && etkinlikItem) {
+    if (compareByPublishedDate(haber, etkinlikItem) >= 0) {
+      latest = haber;
+      type = 'haber';
+    } else {
+      latest = etkinlikItem;
+      type = 'etkinlik';
+    }
+  } else if (haber) {
+    latest = haber;
+    type = 'haber';
+  } else if (etkinlikItem) {
+    latest = etkinlikItem;
+    type = 'etkinlik';
+  }
+
+  if (!latest) {
+    titleEl.textContent = 'Henüz içerik bulunmuyor.';
+    linkEl.style.display = 'none';
+    return;
+  }
+
+  titleEl.textContent = latest.baslik || 'Yeni içerik';
+  linkEl.style.display = 'inline-block';
+  linkEl.onclick = (e) => {
+    e.preventDefault();
+    if (type === 'haber') article(latest.slug);
+    else etkinlik(latest.slug);
+  };
+}
+
+function compareByPublishedDate(a, b) {
+  const aPublished = getPublishedTimestamp(a);
+  const bPublished = getPublishedTimestamp(b);
+  if (aPublished !== bPublished) return aPublished - bPublished;
+
+  const aCreated = getCreatedTimestamp(a);
+  const bCreated = getCreatedTimestamp(b);
+  if (aCreated !== bCreated) return aCreated - bCreated;
+
+  const aId = Number(a?.id) || 0;
+  const bId = Number(b?.id) || 0;
+  if (aId !== bId) return aId - bId;
+
+  return getPublishedTimestamp(a) - getPublishedTimestamp(b);
+}
+
+function getCreatedTimestamp(item) {
+  if (!item) return 0;
+  const created = parseFlexibleDate(item.olusturuldu);
+  if (!Number.isNaN(created)) return created;
+  return 0;
+}
+
+function getPublishedTimestamp(item) {
+  if (!item) return 0;
+  const published = parseFlexibleDate(item.tarih);
+  if (!Number.isNaN(published)) return published;
+  return 0;
+}
+
+function parseFlexibleDate(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return NaN;
+
+  const normalized = raw.replace(' ', 'T');
+  const direct = Date.parse(normalized);
+  if (!Number.isNaN(direct)) return direct;
+
+  const dmy = raw.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/);
+  if (dmy) {
+    const day = dmy[1].padStart(2, '0');
+    const month = dmy[2].padStart(2, '0');
+    const year = dmy[3];
+    const parsed = Date.parse(`${year}-${month}-${day}T00:00:00`);
+    if (!Number.isNaN(parsed)) return parsed;
+  }
+
+  return NaN;
 }
 
 // ── Navigasyon ───────────────────────────────────────────────
@@ -277,7 +377,7 @@ function renderArticle(d) {
   document.getElementById('a-tag').className = 'at' + (d.renk ? ' ' + d.renk : '');
   document.getElementById('a-title').textContent = d.baslik;
   document.getElementById('a-date').textContent = d.gosterim_tarihi || fmtDate(d.tarih);
-  document.getElementById('a-body').innerHTML = d.ozet_icerik || d.detayli_icerik || '';
+  document.getElementById('a-body').innerHTML = linkifyHtmlContent(d.ozet_icerik || d.detayli_icerik || '');
   go('haber');
 }
 
@@ -295,8 +395,75 @@ function renderEtkinlik(d) {
   document.getElementById('e-tag').textContent = d.kategori;
   document.getElementById('e-title').textContent = d.baslik;
   document.getElementById('e-date').textContent = d.gosterim_tarihi || fmtDate(d.tarih);
-  document.getElementById('e-body').innerHTML = d.icerik;
+  document.getElementById('e-body').innerHTML = linkifyHtmlContent(d.icerik || '');
   go('etkinlik');
+}
+
+// ── Metin İçindeki URL'leri Linke Çevir ─────────────────────
+function linkifyHtmlContent(html) {
+  if (!html) return '';
+
+  const container = document.createElement('div');
+  container.innerHTML = html;
+
+  const textNodes = [];
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parentEl = node.parentElement;
+      if (!parentEl) return NodeFilter.FILTER_REJECT;
+      if (parentEl.closest('a, code, pre, script, style, textarea')) return NodeFilter.FILTER_REJECT;
+      if (!/https?:\/\//i.test(node.nodeValue || '')) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  let current;
+  while ((current = walker.nextNode())) {
+    textNodes.push(current);
+  }
+
+  const urlRegex = /https?:\/\/[^\s<>"]+/gi;
+
+  for (const node of textNodes) {
+    const text = node.nodeValue || '';
+    const frag = document.createDocumentFragment();
+    let last = 0;
+
+    text.replace(urlRegex, (raw, offset) => {
+      if (offset > last) {
+        frag.appendChild(document.createTextNode(text.slice(last, offset)));
+      }
+
+      let url = raw;
+      let trailing = '';
+      while (/[),.;!?]$/.test(url)) {
+        trailing = url.slice(-1) + trailing;
+        url = url.slice(0, -1);
+      }
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.textContent = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      frag.appendChild(a);
+
+      if (trailing) {
+        frag.appendChild(document.createTextNode(trailing));
+      }
+
+      last = offset + raw.length;
+      return raw;
+    });
+
+    if (last < text.length) {
+      frag.appendChild(document.createTextNode(text.slice(last)));
+    }
+
+    node.replaceWith(frag);
+  }
+
+  return container.innerHTML;
 }
 
 // ── Ticker ───────────────────────────────────────────────────
@@ -305,8 +472,28 @@ function buildTicker() {
   if (!inner || !DATA.ticker.length) return;
   const doubled = [...DATA.ticker, ...DATA.ticker];
   inner.innerHTML = doubled
-    .map(t => `<span><strong>${esc(t.etiket)}</strong> · ${esc(t.metin)}</span>`)
+    .map(t => `<a href="#" data-tur="${esc(t.tur || '')}" data-slug="${esc(t.slug || '')}" title="Detaya git" style="color:inherit;text-decoration:none"><strong>${esc(t.etiket)}</strong> · ${esc(t.metin)}</a>`)
     .join('');
+
+  inner.onclick = (event) => {
+    const item = event.target.closest('[data-tur][data-slug]');
+    if (!item) return;
+    event.preventDefault();
+    const tur = item.getAttribute('data-tur');
+    const slug = item.getAttribute('data-slug');
+    openTickerItem(tur, slug);
+  };
+}
+
+function openTickerItem(tur, slug) {
+  if (!slug) return;
+  if (tur === 'haber') {
+    article(slug);
+    return;
+  }
+  if (tur === 'etkinlik') {
+    etkinlik(slug);
+  }
 }
 
 // ── Ana Sayfa: Öne Çıkan Haberler ───────────────────────────

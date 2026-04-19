@@ -211,3 +211,74 @@
 - `resetHaberForm()`: dizi güncellendi
 - `saveHaber()`: içerik zorunluluk kontrolü kaldırıldı; body'de `ozet_icerik` + `detayli_icerik` gönderiliyor
 
+---
+
+## [2026-04-14] — Beşinci Oturum: Token Mimarisi + Detay Sayfası Okunabilirlik Düzeltmeleri
+
+### Özet
+Bu oturumda sitenin görsel kararları token tabanına taşındı. Amaç: tek dosyadan tema değiştirebilmek. Ardından `index.html` içindeki inline stiller tokenize edildi ve detay sayfalarında `.ah` başlık alanlarında açık zemin üstündeki düşük okunurluk problemi düzeltildi.
+
+### Yapılan Değişiklikler
+
+#### `public/tokens.css` (yeni)
+- Merkezi tasarım token dosyası eklendi.
+- Kategoriler:
+  - Renk tokenları (`--color-*`)
+  - Tipografi tokenları (`--font-*`)
+  - Boyut tokenları (`--text-*`)
+  - Ağırlık tokenları (`--weight-*`)
+  - Boşluk/radius tokenları (`--space-*`, `--radius-*`)
+  - Gölge/geçiş tokenları (`--shadow-*`, `--transition-*`)
+
+#### `public/shared.css`
+- Eski `:root` değerleri tokenlara yönlendiren alias yapısına çekildi.
+- Hardcoded renk/boyut/ağırlık değerleri büyük ölçüde `var(--...)` kullanacak şekilde normalize edildi.
+
+#### `public/index.html`
+- `tokens.css` yükleme sırasına dahil edildi (`<style>` bloğundan önce).
+- Inline `style="..."` alanlarında hardcoded `font-size`, `font-weight`, `color:#fff`, `color:rgba(255,255,255,...)` değerleri tokenlara dönüştürüldü.
+- `<style>` bloğundaki mükerrer class tanımları temizlendi; her selector tek tanım olacak şekilde düzenlendi.
+
+#### Detay Sayfası Okunabilirlik Düzeltmeleri (`.ah` başlık alanları)
+- `.ah` arka planı `var(--color-bg-alt)` olarak sabitlendi.
+- `.ah` alt kenarlığı `1px solid var(--color-border)` olarak güncellendi.
+- Başlık/metin renkleri erişilebilir kontrasta çekildi:
+  - Sayfa başlıkları: `var(--color-text-primary)`
+  - Alt başlıklar (`span`): `var(--color-text-secondary)`
+  - Meta/tarih alanları (`.adate`, `#fd-meta`, `#vd-tarih`): `var(--color-text-faint)`
+  - Geri dönüş linkleri (`.ab`): normal `var(--color-text-faint)`, hover `var(--color-text-primary)`
+
+#### `public/admin/index.html`
+- `tokens.css` linki eklendi (ortak token sistemi ile uyumlu hale getirildi).
+
+### Git
+- Commit oluşturuldu:
+  - `e349d10` — `Refactor styling to design tokens and fix detail header readability`
+
+### Ek Not
+- Yanlışlıkla workspace içine düşen `venv/` klasörü kaldırıldı (repo temiz durumda).
+
+---
+
+## [2026-04-20] — Altıncı Oturum: Hero Live Son Tarihli Gönderi Seçimi
+
+### Özet
+Ana sayfadaki hero-live bileşeninin seçim kuralı güncellendi. Artık "son eklenen" değil, "son tarihli" gönderi (haber veya etkinlik) gösteriliyor.
+
+### Yapılan Değişiklikler
+
+#### `public/app.js`
+- `buildHeroLive()` içinde seçim karşılaştırması `compareByInsertion` yerine `compareByPublishedDate` ile çalışacak şekilde güncellendi.
+- Yeni kıyaslama önceliği:
+  1. `tarih` (en yeni tarih)
+  2. `olusturuldu` (eşit tarihte daha yeni kayıt)
+  3. `id` (eşitlik durumunda deterministik seçim)
+- Tarih parse akışı güçlendirildi:
+  - `parseFlexibleDate()` eklendi.
+  - ISO tarih/saat, `YYYY-MM-DD` ve `DD.MM.YYYY` / `DD-MM-YYYY` benzeri girişler desteklendi.
+
+### Doğrulama
+- `node --check public/app.js` ile sözdizimi kontrolü temiz.
+- Editör hata kontrolünde `public/app.js` için hata yok.
+- Veritabanı doğrulamasında hero-live seçimi, haber ve etkinlik arasında en büyük `tarih` değerine göre doğru kayıtla eşleşti.
+
