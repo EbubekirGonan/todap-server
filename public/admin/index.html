@@ -163,6 +163,32 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
 .deploy-text{font-size:12px;color:var(--text-muted)}
 .deploy-text strong{color:var(--text)}
 
+/* THEME COLORS */
+.theme-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:1.25rem;align-items:start}
+.theme-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem;box-shadow:0 2px 8px rgba(17,24,39,.04)}
+.theme-field{display:grid;grid-template-columns:1.7fr .8fr 1fr;gap:.6rem;align-items:center;padding:.45rem 0;border-bottom:1px solid var(--border)}
+.theme-field:last-child{border-bottom:none}
+.theme-label{font-size:12px;color:var(--text);font-weight:600}
+.theme-color{height:34px;width:100%;border:1px solid var(--border);border-radius:7px;background:#fff;cursor:pointer}
+.theme-hex{padding:8px 10px;background:#fff;border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--fd);font-size:12px;outline:none}
+.theme-hex:focus{border-color:var(--mustard)}
+.theme-snippet{white-space:pre-wrap;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.85rem;font-size:11px;line-height:1.55;color:var(--text-muted)}
+.theme-preview{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface)}
+.theme-preview-nav{background:var(--preview-green,#009736);color:#fff;padding:.55rem .8rem;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.theme-preview-body{padding:.9rem;background:var(--preview-white,#fff)}
+.theme-preview-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:3px 8px;background:var(--preview-red-light,#fdeaec);color:var(--preview-red-dark,#c41e28);border:1px solid color-mix(in srgb, var(--preview-red-dark,#c41e28) 18%, white)}
+.theme-preview-title{margin:.55rem 0 .4rem;font-size:14px;font-weight:700;color:var(--preview-black,#000)}
+.theme-preview-text{font-size:12px;color:var(--preview-gray-light,#666)}
+.theme-preview-actions{display:flex;gap:.5rem;margin-top:.85rem}
+.theme-preview-btn{padding:6px 10px;border-radius:7px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:1px solid transparent}
+.theme-preview-btn.primary{background:var(--preview-green,#009736);border-color:var(--preview-green,#009736);color:#fff}
+.theme-preview-btn.ghost{background:var(--preview-white-off,#fafafa);border-color:color-mix(in srgb, var(--preview-black,#000) 18%, white);color:var(--preview-black,#000)}
+.history-list{display:flex;flex-direction:column;gap:.55rem;max-height:320px;overflow:auto;padding-right:.2rem}
+.history-item{display:flex;justify-content:space-between;align-items:flex-start;gap:.8rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.65rem .75rem}
+.history-name{font-size:12px;font-weight:700;color:var(--text)}
+.history-meta{font-size:11px;color:var(--text-faint);margin-top:2px}
+.history-status{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:999px;padding:2px 7px}
+
 /* PAGES */
 .page{display:none}
 .page.active{display:block}
@@ -204,6 +230,10 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
 .ql-toolbar.ql-snow .ql-color-picker:hover .ql-stroke,.ql-toolbar.ql-snow .ql-background-picker:hover .ql-stroke{stroke:var(--text)}
 .ql-snow .ql-tooltip a.ql-action::after{color:var(--mustard)}
 .ql-snow .ql-tooltip a.ql-remove::before{color:var(--text-muted)}
+
+@media (max-width: 1100px){
+  .theme-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -251,6 +281,10 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
       <div class="nav-item" id="nav-ticker" onclick="showPage('ticker')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
         Duyuru Bandı
+      </div>
+      <div class="nav-item" id="nav-theme" onclick="showPage('theme-colors')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="12.5" r="2.5"/><circle cx="13.5" cy="18.5" r="2.5"/><circle cx="7" cy="15" r="2.5"/><path d="M11 8 8.6 12.7M15.7 8.3 16.7 10.3M15.7 16.7 16.7 14.7M11.1 16.2 9.2 15.5"/></svg>
+        Renk Değişkenleri
       </div>
       <div class="nav-item" id="nav-sabit" onclick="showPage('sabit-sayfalar')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -579,6 +613,56 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
         </div>
       </div>
 
+      <!-- THEME COLORS -->
+      <div class="page" id="page-theme-colors">
+        <div class="theme-grid">
+          <div class="theme-card">
+            <div class="form-section-title" style="margin-bottom:1rem">1. Renkler ve Varyantlar (Toplu Kayıt)</div>
+            <div class="form-row single" style="margin-bottom:.9rem">
+              <div class="form-group">
+                <label class="form-label">Profil Adı</label>
+                <input class="form-input" id="theme-profile-name" placeholder="Örn: Bahar 2026 Tema" maxlength="120"/>
+                <span class="form-hint">Tek kayıtta tüm değişkenler birlikte saklanır. Tek alan kaydedilemez.</span>
+              </div>
+            </div>
+            <div id="theme-fields"></div>
+            <div class="form-actions">
+              <button class="btn btn-secondary" onclick="resetThemeFormToActive()">Aktif Profili Geri Yükle</button>
+              <button class="btn btn-secondary" onclick="resetThemeFormToDefaults()">Varsayılan Değerler</button>
+              <button class="btn btn-primary" onclick="saveThemeColors()">Canlıya Al (PUT)</button>
+            </div>
+          </div>
+
+          <div style="display:grid;gap:1rem">
+            <div class="theme-card">
+              <div class="form-section-title" style="margin-bottom:.85rem">Canlı Önizleme</div>
+              <div class="theme-preview" id="theme-preview">
+                <div class="theme-preview-nav">TODAP</div>
+                <div class="theme-preview-body">
+                  <span class="theme-preview-badge">Duyuru</span>
+                  <div class="theme-preview-title">Renk değişkenleri canlı test</div>
+                  <div class="theme-preview-text">Kaydetmeden önce seçilen renk uyumunu buradan görebilirsiniz.</div>
+                  <div class="theme-preview-actions">
+                    <button class="theme-preview-btn primary" type="button">Birincil</button>
+                    <button class="theme-preview-btn ghost" type="button">İkincil</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="theme-card">
+              <div class="form-section-title" style="margin-bottom:.85rem">Geçmiş Profiller</div>
+              <div id="theme-history" class="history-list"></div>
+            </div>
+
+            <div class="theme-card">
+              <div class="form-section-title" style="margin-bottom:.85rem">Yorumlu Token Rehberi</div>
+              <div class="theme-snippet" id="theme-guide-snippet"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       </div>
 
       <!-- SABİT SAYFALAR -->
@@ -779,6 +863,11 @@ let tickerItems = [];
 let faaliyetler = [];
 let basinda = [];
 let videos  = [];
+let themeDefaults = {};
+let themeLabels = {};
+let themeActive = {};
+let themeHistory = [];
+let themeActiveMeta = null;
 
 // ── Quill Editor Helpers ───────────────────────────────────
 const quills = {};
@@ -856,7 +945,7 @@ async function doLogout() {
 async function init() {
   showLoading('Veriler yükleniyor...');
   try {
-    const [h, e, y, t, m, b, ss, fl, bs, vs] = await Promise.all([
+    const [h, e, y, t, m, b, ss, fl, bs, vs, theme] = await Promise.all([
       fetch('/api/admin/haberler').then(r => r.json()),
       fetch('/api/admin/etkinlikler').then(r => r.json()),
       fetch('/api/admin/yayinlar').then(r => r.json()),
@@ -867,6 +956,7 @@ async function init() {
       fetch('/api/admin/faaliyetler').then(r => r.json()),
       fetch('/api/admin/basinda-todap').then(r => r.json()),
       fetch('/api/admin/videos').then(r => r.json()),
+      fetch('/api/admin/theme-colors').then(r => r.json()),
     ]);
     haberler    = h;
     etkinlikler = e;
@@ -886,6 +976,8 @@ async function init() {
     renderFaaliyetTable();
     renderBasindaTable();
     renderVideoTable();
+    setupThemeData(theme);
+    renderThemeManager();
     hideLoading();
   } catch (err) {
     hideLoading();
@@ -915,7 +1007,7 @@ function showPage(name) {
     'dashboard': 'Dashboard', 'haberler': 'Haberler', 'haber-yeni': 'Haber Ekle / Düzenle',
     'etkinlikler': 'Etkinlikler', 'etkinlik-yeni': 'Etkinlik Ekle / Düzenle',
     'yayinlar': 'Yayınlar & Kaynaklar', 'yayinlar-yeni': 'Yayın / Kaynak Ekle / Düzenle',
-    'ticker': 'Duyuru Bandı', 'mesajlar': 'Mesajlar', 'basvurular': 'Üyelik Başvuruları',
+    'ticker': 'Duyuru Bandı', 'theme-colors': 'Renk Değişkenleri', 'mesajlar': 'Mesajlar', 'basvurular': 'Üyelik Başvuruları',
     'sabit-sayfalar': 'Sabit Sayfalar',
     'faaliyetler': 'Faaliyet Listesi',
     'faaliyet-yeni': 'Faaliyet Ekle / Düzenle',
@@ -930,6 +1022,7 @@ function showPage(name) {
   if (name === 'haber-yeni') { initQuill('editor-haber-ozet-icerik'); initQuill('editor-haber-detayli-icerik'); }
   if (name === 'etkinlik-yeni') initQuill('editor-etkinlik-icerik');
   if (name === 'faaliyet-yeni') initQuill('editor-faaliyet-icerik');
+  if (name === 'theme-colors') renderThemeManager();
 }
 
 // ── Dashboard ────────────────────────────────────────────────
@@ -1266,6 +1359,235 @@ async function saveAllTicker() {
   }
   tickerItems = await fetch('/api/admin/ticker').then(r => r.json());
   showToast('✓ Duyuru bandı güncellendi!', 'success');
+}
+
+// ── Theme Colors ─────────────────────────────────────────────
+const THEME_COLUMN_ORDER = [
+  'var_color_white_base',
+  'var_color_green_base',
+  'var_color_red_base',
+  'var_color_black_base',
+  'var_color_green_dark_variant',
+  'var_color_red_dark_variant',
+  'var_color_green_light_variant',
+  'var_color_red_light_variant',
+  'var_color_white_off_variant',
+  'var_color_gray_light_variant',
+  'var_color_gray_lighter_variant'
+];
+
+function setupThemeData(payload) {
+  themeDefaults = payload?.defaults || {};
+  themeLabels = payload?.labels || {};
+  themeActive = payload?.active || {};
+  themeActiveMeta = payload?.activeMeta || null;
+  themeHistory = payload?.history || [];
+}
+
+function renderThemeManager() {
+  const fieldsEl = document.getElementById('theme-fields');
+  const historyEl = document.getElementById('theme-history');
+  const guideEl = document.getElementById('theme-guide-snippet');
+  if (!fieldsEl || !historyEl || !guideEl) return;
+
+  fieldsEl.innerHTML = THEME_COLUMN_ORDER.map((key) => {
+    const val = themeActive[key] || themeDefaults[key] || '#000000';
+    return `
+      <div class="theme-field">
+        <div class="theme-label">
+          <div>${esc(themeLabels[key] || key)}</div>
+          <div style="font-size:10px;color:var(--text-faint);margin-top:1px">${esc(key)}</div>
+        </div>
+        <input class="theme-color" id="theme-color-${key}" type="color" value="${esc(val)}" oninput="themeColorInputChanged('${key}', this.value)"/>
+        <input class="theme-hex" id="theme-hex-${key}" value="${esc(val)}" maxlength="7" oninput="themeHexInputChanged('${key}', this.value)"/>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('theme-profile-name').value = '';
+  renderThemeHistory();
+  renderThemeGuide();
+  applyThemePreview(readThemeFormValues());
+}
+
+function renderThemeGuide() {
+  const guideEl = document.getElementById('theme-guide-snippet');
+  if (!guideEl) return;
+  const t = readThemeFormValues();
+  guideEl.textContent = `/* ── 1. RENKLER (ADMIN DEGISKENLERI) ──\n\n` +
+`/* Beyaz - ANA RENK (en çok kullanılan) */\n` +
+`--color-white:        ${t.var_color_white_base || themeDefaults.var_color_white_base || '#FFFFFF'};  // var_color_white_base\n\n` +
+`/* Yeşil - 2. RENK (navbar, buton, link) */\n` +
+`--color-green:        ${t.var_color_green_base || themeDefaults.var_color_green_base || '#009736'};  // var_color_green_base\n\n` +
+`/* Kırmızı - 3. RENK (ticker, uyarı, aktif) */\n` +
+`--color-red:          ${t.var_color_red_base || themeDefaults.var_color_red_base || '#EE2A35'};  // var_color_red_base\n\n` +
+`/* Siyah - 4. RENK (sadece yazılar) */\n` +
+`--color-black:        ${t.var_color_black_base || themeDefaults.var_color_black_base || '#000000'};  // var_color_black_base\n\n` +
+`/* ── VARYANTLAR ── */\n` +
+`/* hover için */\n` +
+`--color-green-dark:   ${t.var_color_green_dark_variant || themeDefaults.var_color_green_dark_variant || '#007A2B'};  // var_color_green_dark_variant\n` +
+`/* hover için */\n` +
+`--color-red-dark:     ${t.var_color_red_dark_variant || themeDefaults.var_color_red_dark_variant || '#C41E28'};  // var_color_red_dark_variant\n` +
+`/* hafif arka plan */\n` +
+`--color-green-light:  ${t.var_color_green_light_variant || themeDefaults.var_color_green_light_variant || '#E6F4E9'};  // var_color_green_light_variant\n` +
+`/* hafif arka plan */\n` +
+`--color-red-light:    ${t.var_color_red_light_variant || themeDefaults.var_color_red_light_variant || '#FDEAEC'};  // var_color_red_light_variant\n` +
+`/* alternatif zemin */\n` +
+`--color-white-off:    ${t.var_color_white_off_variant || themeDefaults.var_color_white_off_variant || '#FAFAFA'};  // var_color_white_off_variant\n` +
+`/* muted yazılar */\n` +
+`--color-gray-light:   ${t.var_color_gray_light_variant || themeDefaults.var_color_gray_light_variant || '#666666'};  // var_color_gray_light_variant\n` +
+`/* faint yazılar */\n` +
+`--color-gray-lighter: ${t.var_color_gray_lighter_variant || themeDefaults.var_color_gray_lighter_variant || '#999999'}; // var_color_gray_lighter_variant\n*/`;
+}
+
+function renderThemeHistory() {
+  const historyEl = document.getElementById('theme-history');
+  if (!historyEl) return;
+  if (!themeHistory.length) {
+    historyEl.innerHTML = '<div style="font-size:12px;color:var(--text-faint)">Henüz profil geçmişi yok.</div>';
+    return;
+  }
+
+  historyEl.innerHTML = themeHistory.map((item) => `
+    <div class="history-item">
+      <div>
+        <div class="history-name">${esc(item.profile_name || `Profil #${item.id}`)}</div>
+        <div class="history-meta">#${item.id} · ${esc(item.created_at || '')}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.5rem">
+        ${item.is_active ? '<span class="history-status">Aktif</span>' : ''}
+        <button class="btn btn-secondary btn-sm" onclick="activateThemeProfile(${item.id})" ${item.is_active ? 'disabled' : ''}>Geç</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function themeColorInputChanged(key, value) {
+  const hexEl = document.getElementById('theme-hex-' + key);
+  if (hexEl) hexEl.value = value.toUpperCase();
+  applyThemePreview(readThemeFormValues());
+  renderThemeGuide();
+}
+
+function themeHexInputChanged(key, value) {
+  const normalized = normalizeHexClient(value);
+  const colorEl = document.getElementById('theme-color-' + key);
+  if (normalized && colorEl) colorEl.value = normalized;
+  applyThemePreview(readThemeFormValues());
+  renderThemeGuide();
+}
+
+function normalizeHexClient(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  const withHash = raw.startsWith('#') ? raw : '#' + raw;
+  const shortMatch = withHash.match(/^#([0-9a-fA-F]{3})$/);
+  if (shortMatch) {
+    const h = shortMatch[1].toUpperCase();
+    return `#${h[0]}${h[0]}${h[1]}${h[1]}${h[2]}${h[2]}`;
+  }
+  const fullMatch = withHash.match(/^#([0-9a-fA-F]{6})$/);
+  if (!fullMatch) return '';
+  return '#' + fullMatch[1].toUpperCase();
+}
+
+function readThemeFormValues() {
+  const out = {};
+  for (const key of THEME_COLUMN_ORDER) {
+    const input = document.getElementById('theme-hex-' + key);
+    out[key] = normalizeHexClient(input ? input.value : '');
+  }
+  return out;
+}
+
+function validateThemeForm(values) {
+  const missing = [];
+  for (const key of THEME_COLUMN_ORDER) {
+    if (!values[key]) missing.push(key);
+  }
+  return {
+    ok: missing.length === 0,
+    error: missing.length ? `Eksik/gecersiz alanlar: ${missing.join(', ')}` : ''
+  };
+}
+
+function applyThemePreview(theme) {
+  const el = document.getElementById('theme-preview');
+  if (!el) return;
+  el.style.setProperty('--preview-white', theme.var_color_white_base || '#FFFFFF');
+  el.style.setProperty('--preview-green', theme.var_color_green_base || '#009736');
+  el.style.setProperty('--preview-red-dark', theme.var_color_red_dark_variant || '#C41E28');
+  el.style.setProperty('--preview-red-light', theme.var_color_red_light_variant || '#FDEAEC');
+  el.style.setProperty('--preview-white-off', theme.var_color_white_off_variant || '#FAFAFA');
+  el.style.setProperty('--preview-black', theme.var_color_black_base || '#000000');
+  el.style.setProperty('--preview-gray-light', theme.var_color_gray_light_variant || '#666666');
+}
+
+function resetThemeFormToActive() {
+  for (const key of THEME_COLUMN_ORDER) {
+    const val = themeActive[key] || themeDefaults[key] || '#000000';
+    const colorEl = document.getElementById('theme-color-' + key);
+    const hexEl = document.getElementById('theme-hex-' + key);
+    if (colorEl) colorEl.value = val;
+    if (hexEl) hexEl.value = val;
+  }
+  applyThemePreview(readThemeFormValues());
+  renderThemeGuide();
+}
+
+function resetThemeFormToDefaults() {
+  for (const key of THEME_COLUMN_ORDER) {
+    const val = themeDefaults[key] || '#000000';
+    const colorEl = document.getElementById('theme-color-' + key);
+    const hexEl = document.getElementById('theme-hex-' + key);
+    if (colorEl) colorEl.value = val;
+    if (hexEl) hexEl.value = val;
+  }
+  applyThemePreview(readThemeFormValues());
+  renderThemeGuide();
+}
+
+async function saveThemeColors() {
+  const values = readThemeFormValues();
+  const validation = validateThemeForm(values);
+  if (!validation.ok) {
+    showToast(validation.error, 'error');
+    return;
+  }
+
+  const profileName = document.getElementById('theme-profile-name').value.trim();
+  try {
+    showLoading('Tema profili kaydediliyor...');
+    await apiFetch('/api/admin/theme-colors', 'PUT', {
+      profile_name: profileName || `Tema ${new Date().toLocaleString('tr-TR')}`,
+      ...values
+    });
+    await refreshThemeData();
+    hideLoading();
+    showToast('✓ Tema canlıya alındı!', 'success');
+  } catch (e) {
+    hideLoading();
+    showToast('Hata: ' + e.message, 'error');
+  }
+}
+
+async function activateThemeProfile(id) {
+  try {
+    showLoading('Tema profili aktive ediliyor...');
+    await apiFetch('/api/admin/theme-colors/activate/' + id, 'POST');
+    await refreshThemeData();
+    hideLoading();
+    showToast('✓ Seçilen tema aktif edildi.', 'success');
+  } catch (e) {
+    hideLoading();
+    showToast('Hata: ' + e.message, 'error');
+  }
+}
+
+async function refreshThemeData() {
+  const theme = await fetch('/api/admin/theme-colors').then(r => r.json());
+  setupThemeData(theme);
+  renderThemeManager();
 }
 
 // ── Faaliyetler ───────────────────────────────────────────────

@@ -2,6 +2,7 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
+const { THEME_COLUMNS, DEFAULT_THEME } = require('./themeTokens');
 
 const dataDir = process.env.NODE_ENV === 'production' ? '/data' : path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
@@ -134,6 +135,24 @@ db.exec(`
     aktif            INTEGER DEFAULT 1,
     olusturma_tarihi TEXT DEFAULT (datetime('now')),
     guncelleme_tarihi TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS theme_color_profiles (
+    id                               INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_name                     TEXT DEFAULT '',
+    var_color_white_base             TEXT NOT NULL,
+    var_color_green_base             TEXT NOT NULL,
+    var_color_red_base               TEXT NOT NULL,
+    var_color_black_base             TEXT NOT NULL,
+    var_color_green_dark_variant     TEXT NOT NULL,
+    var_color_red_dark_variant       TEXT NOT NULL,
+    var_color_green_light_variant    TEXT NOT NULL,
+    var_color_red_light_variant      TEXT NOT NULL,
+    var_color_white_off_variant      TEXT NOT NULL,
+    var_color_gray_light_variant     TEXT NOT NULL,
+    var_color_gray_lighter_variant   TEXT NOT NULL,
+    is_active                        INTEGER DEFAULT 0,
+    created_at                       TEXT DEFAULT (datetime('now'))
   );
 `);
 
@@ -274,6 +293,33 @@ function seedIfEmpty() {
   console.log('✓ sabit_sayfalar seed yüklendi.');
 })()
 
+function seedThemeProfiles() {
+  const count = db.prepare('SELECT COUNT(*) AS c FROM theme_color_profiles').get().c;
+  if (count > 0) return;
+
+  const cols = THEME_COLUMNS.join(',');
+  const placeholders = THEME_COLUMNS.map((k) => `@${k}`).join(',');
+  const stmt = db.prepare(`
+    INSERT INTO theme_color_profiles (
+      profile_name,
+      ${cols},
+      is_active
+    ) VALUES (
+      @profile_name,
+      ${placeholders},
+      1
+    )
+  `);
+
+  stmt.run({
+    profile_name: 'Varsayilan Tema',
+    ...DEFAULT_THEME
+  });
+
+  console.log('✓ Varsayilan tema profili olusturuldu.');
+}
+
 seedIfEmpty();
+seedThemeProfiles();
 
 module.exports = db;

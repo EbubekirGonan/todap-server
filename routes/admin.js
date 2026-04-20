@@ -4,6 +4,7 @@ const router  = express.Router();
 const bcrypt  = require('bcryptjs');
 const db      = require('../db');
 const auth    = require('../middleware/auth');
+const { THEME_COLUMNS, DEFAULT_THEME, THEME_LABELS, validateAndNormalizeTheme, rowToTheme } = require('../themeTokens');
 
 // ── Oturum ───────────────────────────────────────────────────
 router.post('/login', async (req, res) => {
@@ -33,6 +34,87 @@ router.get('/me', (req, res) => {
   if (req.session && req.session.admin)
     return res.json({ username: req.session.admin.username });
   res.status(401).json({ error: 'Oturum açılmamış' });
+});
+
+// ── Tema / Renk Degiskenleri ───────────────────────────────
+router.get('/theme-colors', auth, (_req, res) => {
+  const active = db.prepare(`
+    SELECT * FROM theme_color_profiles
+    WHERE is_active=1
+    ORDER BY datetime(created_at) DESC, id DESC
+    LIMIT 1
+  `).get();
+
+  const history = db.prepare(`
+    SELECT id, profile_name, created_at, is_active, ${THEME_COLUMNS.join(', ')}
+    FROM theme_color_profiles
+    ORDER BY datetime(created_at) DESC, id DESC
+    LIMIT 30
+  `).all();
+
+  res.json({
+    defaults: DEFAULT_THEME,
+    labels: THEME_LABELS,
+    active: rowToTheme(active),
+    activeMeta: active ? { id: active.id, profile_name: active.profile_name, created_at: active.created_at } : null,
+    history: history.map((row) => ({
+      id: row.id,
+      profile_name: row.profile_name,
+      created_at: row.created_at,
+      is_active: !!row.is_active,
+      colors: rowToTheme(row)
+    }))
+  });
+});
+
+router.put('/theme-colors', auth, (req, res) => {
+  const validation = validateAndNormalizeTheme(req.body || {}, { requireAll: true });
+  if (!validation.ok) {
+    return res.status(400).json({ error: validation.errors.join(' ') });
+  }
+
+  const profileName = String(req.body.profile_name || '').trim().slice(0, 120) || 'Tema Profili';
+  const columns = THEME_COLUMNS.join(',');
+  const placeholders = THEME_COLUMNS.map((k) => `@${k}`).join(',');
+
+  db.transaction(() => {
+    db.prepare('UPDATE theme_color_profiles SET is_active=0 WHERE is_active=1').run();
+    db.prepare(`
+      INSERT INTO theme_color_profiles (
+        profile_name,
+        ${columns},
+        is_active
+      ) VALUES (
+        @profile_name,
+        ${placeholders},
+        1
+      )
+    `).run({
+      profile_name: profileName,
+      ...validation.value
+    });
+  })();
+
+  res.json({ ok: true });
+});
+
+router.post('/theme-colors/activate/:id', auth, (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ error: 'Gecersiz profil kimligi.' });
+  }
+
+  const exists = db.prepare('SELECT id FROM theme_color_profiles WHERE id=?').get(id);
+  if (!exists) {
+    return res.status(404).json({ error: 'Tema profili bulunamadi.' });
+  }
+
+  db.transaction(() => {
+    db.prepare('UPDATE theme_color_profiles SET is_active=0 WHERE is_active=1').run();
+    db.prepare('UPDATE theme_color_profiles SET is_active=1 WHERE id=?').run(id);
+  })();
+
+  res.json({ ok: true });
 });
 
 // ── Haberler CRUD ────────────────────────────────────────────
