@@ -28,11 +28,11 @@ app.use(session({
 }));
 
 // ── Dinamik tokens.css ──────────────────────────────────────
-app.get('/tokens.css', (_req, res) => {
-  const row = db.prepare(`
+app.get('/tokens.css', async (_req, res) => {
+  const row = await db.prepare(`
     SELECT * FROM theme_color_profiles
-    WHERE is_active=1
-    ORDER BY datetime(created_at) DESC, id DESC
+    WHERE is_active=true
+    ORDER BY created_at DESC, id DESC
     LIMIT 1
   `).get();
 
@@ -60,7 +60,15 @@ app.use((_req, res) => {
 });
 
 // ── Başlat ───────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\nTODAP sunucu çalışıyor: http://localhost:${PORT}`);
-  console.log(`Admin panel: http://localhost:${PORT}/admin\n`);
+async function start() {
+  await db.init();
+  app.listen(PORT, () => {
+    console.log(`\nTODAP sunucu çalışıyor: http://localhost:${PORT}`);
+    console.log(`Admin panel: http://localhost:${PORT}/admin\n`);
+  });
+}
+
+start().catch((err) => {
+  console.error('Sunucu baslatilirken hata:', err);
+  process.exit(1);
 });

@@ -1,5 +1,5 @@
 // TODAP Frontend — API tabanlı veri yönetimi
-// localStorage yok; tüm veri Express/SQLite'dan gelir
+// localStorage yok; tüm veri Express/PostgreSQL'den gelir
 
 let DATA = { haberler: [], etkinlikler: [], birimler: [], yayinlar: [], ticker: [] };
 let haberMap = {};    // slug → haber

@@ -5,10 +5,24 @@
 
 ---
 
+## [2026-04-21] — Durum Notu: PostgreSQL-Only
+
+### Güncel Durum
+- Proje runtime veritabanı olarak yalnızca PostgreSQL kullanır.
+- API ve admin CRUD işlemleri PostgreSQL üzerinden çalışır.
+- Tablolar `public` şemada doğrulandı; eksik tablo yok.
+
+### Notlar
+- `data/` klasöründeki SQLite dosyaları tarihsel arşiv niteliğindedir.
+- Geçmiş oturumlarda geçen SQLite ifadeleri, migration öncesi durumu anlatır.
+- Aktif geliştirme ve veri yönetimi PostgreSQL üzerinden devam eder.
+
+---
+
 ## [2026-04-12] — İlk Oturum: Proje Kurulumu + Mobil Duyarlılık
 
 ### Projenin Başlangıç Durumu
-- Express + better-sqlite3 + bcryptjs tabanlı tam çalışan sunucu
+- Express + better-sqlite3 + bcryptjs tabanlı tam çalışan sunucu (ilk kurulum dönemi, tarihsel not)
 - Ana SPA (`public/index.html`) ve Admin SPA (`public/admin/index.html`) mevcut
 - Temel responsive kurallar vardı ama eksikti:
   - `html`/`body`'de `overflow-x:hidden` yoktu → sağda boşluk sorunu
@@ -188,7 +202,7 @@
 
 ### Yapılan Değişiklikler
 
-#### `data/todap.db`
+#### `data/todap.db` (tarihsel not, SQLite dönemi)
 - `ALTER TABLE haberler RENAME COLUMN icerik TO ozet_icerik;`
 - `ALTER TABLE haberler ADD COLUMN detayli_icerik TEXT DEFAULT '';`
 

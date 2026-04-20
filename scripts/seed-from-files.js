@@ -1,4 +1,5 @@
 'use strict';
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const db = require('../db');
@@ -145,7 +146,7 @@ function parseFile(filePath) {
 }
 
 // ── Import haberler ───────────────────────────────────────────
-function importHaberler() {
+async function importHaberler() {
   const newsDir = path.join(__dirname, '../basin_aciklamalari');
   if (!fs.existsSync(newsDir)) {
     console.log('⚠️  basin_aciklamalari/ klasörü bulunamadı, atlanıyor.');
@@ -155,9 +156,10 @@ function importHaberler() {
   console.log(`\n📰 HABERler: ${files.length} dosya bulundu`);
 
   const insert = db.prepare(`
-    INSERT OR IGNORE INTO haberler
+    INSERT INTO haberler
       (slug, baslik, ozet, detayli_icerik, tarih, gosterim_tarihi, kategori, renk, keywords)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT (slug) DO NOTHING
   `);
 
   let inserted = 0, skipped = 0, errors = 0;
@@ -179,7 +181,7 @@ function importHaberler() {
       const keywords = createKeywords(baslik, icerik);
       const { kategori, renk } = getNewsCategory(baslik, icerik);
 
-      const result = insert.run(slug, baslik, ozet, icerik, dateInfo.iso, dateInfo.display, kategori, renk, keywords);
+      const result = await insert.run(slug, baslik, ozet, icerik, dateInfo.iso, dateInfo.display, kategori, renk, keywords);
       if (result.changes > 0) inserted++;
       else skipped++;
     } catch (err) {
@@ -192,7 +194,7 @@ function importHaberler() {
 }
 
 // ── Import etkinlikler ────────────────────────────────────────
-function importEtkinlikler() {
+async function importEtkinlikler() {
   const etkinlikDir = path.join(__dirname, '../Etkinlik');
   if (!fs.existsSync(etkinlikDir)) {
     console.log('⚠️  Etkinlik/ klasörü bulunamadı, atlanıyor.');
@@ -202,9 +204,10 @@ function importEtkinlikler() {
   console.log(`\n📅 ETKİNLİKler: ${files.length} dosya bulundu`);
 
   const insert = db.prepare(`
-    INSERT OR IGNORE INTO etkinlikler
+    INSERT INTO etkinlikler
       (slug, baslik, ozet, icerik, tarih, gosterim_tarihi, gun, ay, kategori, keywords)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT (slug) DO NOTHING
   `);
 
   let inserted = 0, skipped = 0, errors = 0;
@@ -226,7 +229,7 @@ function importEtkinlikler() {
       const keywords = createKeywords(baslik, icerik);
       const kategori = getEventCategory(baslik, icerik);
 
-      const result = insert.run(
+      const result = await insert.run(
         slug, baslik, ozet, icerik,
         dateInfo.iso, dateInfo.display,
         dateInfo.gun, dateInfo.ayKisa,
@@ -244,11 +247,19 @@ function importEtkinlikler() {
 }
 
 // ── Run ───────────────────────────────────────────────────────
-console.log('🚀 Veritabanına aktarım başlıyor...');
-importHaberler();
-importEtkinlikler();
+async function main() {
+  console.log('🚀 Veritabanına aktarım başlıyor...');
+  await db.init();
+  await importHaberler();
+  await importEtkinlikler();
 
-const haberCount = db.prepare('SELECT COUNT(*) as c FROM haberler').get().c;
-const etkinlikCount = db.prepare('SELECT COUNT(*) as c FROM etkinlikler').get().c;
-console.log(`\n📊 Toplam kayıt: haberler=${haberCount}, etkinlikler=${etkinlikCount}`);
-console.log('✅ Tamamlandı.');
+  const haberCount = (await db.prepare('SELECT COUNT(*)::int as c FROM haberler').get()).c;
+  const etkinlikCount = (await db.prepare('SELECT COUNT(*)::int as c FROM etkinlikler').get()).c;
+  console.log(`\n📊 Toplam kayıt: haberler=${haberCount}, etkinlikler=${etkinlikCount}`);
+  console.log('✅ Tamamlandı.');
+}
+
+main().catch((err) => {
+  console.error('❌ Seed sırasında hata:', err);
+  process.exit(1);
+});

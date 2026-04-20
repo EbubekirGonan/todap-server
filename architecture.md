@@ -9,10 +9,28 @@
 | Özellik       | Değer                                              |
 |---------------|----------------------------------------------------|
 | Proje         | TODAP — Toplumsal Dayanışma İçin Psikologlar Derneği |
-| Stack         | Node.js · Express · better-sqlite3 · vanilla JS    |
-| Veritabanı    | SQLite (`data/todap.db`)                           |
+| Stack         | Node.js · Express · PostgreSQL (`pg`) · vanilla JS |
+| Veritabanı    | PostgreSQL                                         |
 | Port (varsayılan) | `3001` (`.env` ile değiştirilebilir)           |
-| Başlatma      | `npm start` (prod) · `npm run dev` (watch modu)    |
+| Başlatma      | `npm run up` (PostgreSQL + Express)  · `npm start` (yalnız Express) · `npm run dev` (watch) |
+
+---
+
+## Hızlı Başlatma
+
+```bash
+# Tek komut: PostgreSQL + Express
+npm run up
+
+# Yalnız Express (PostgreSQL zaten çalışıyorsa)
+npm start
+
+# Watch modu (geliştirme)
+npm run dev
+
+# PostgreSQL'i durdur
+npm run db:stop
+```
 
 ---
 
@@ -21,16 +39,13 @@
 ```
 todap-server/
 ├── server.js              # Express app giriş noktası
-├── db.js                  # SQLite bağlantısı, tablo tanımları, seed verisi
+├── db.js                  # PostgreSQL bağlantısı, tablo tanımları, seed verisi
 ├── package.json           # Bağımlılıklar ve npm scriptleri
 ├── .env                   # Ortam değişkenleri (git'e dahil değil)
 ├── .env.example           # .env şablonu
 ├── .copilotignore         # Copilot'ın taramasına gerek olmayan dosyalar
 ├── architecture.md        # Bu dosya — proje mimarisi
 ├── progress.md            # Geliştirme kayıtları
-│
-├── data/
-│   └── todap.db           # SQLite veritabanı dosyası (git'e dahil değil)
 │
 ├── middleware/
 │   └── auth.js            # Admin oturum guard'ı (requireAdmin)
@@ -298,6 +313,7 @@ todap-server/
 
 ```env
 PORT=3001
+DATABASE_URL=postgres://todap@localhost:55432/todap
 SESSION_SECRET=<rastgele uzun string>
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD_HASH=<npm run hash ile üret>
@@ -307,7 +323,9 @@ ADMIN_PASSWORD_HASH=<npm run hash ile üret>
 
 ## Seed Verisi
 
-`db.js` içindeki `seedIfEmpty()` fonksiyonu, `haberler` tablosu boşsa otomatik örnek veri ekler:
+`db.js` içindeki seed akışı, veritabanı boşsa varsayılan tema profilini otomatik ekler.
+
+Not: içerik verileri için ayrı SQL/JSON import scripti kullanılmalıdır.
 - 5 haber (Yargı paketi, LGBTİ+, Kuyu hapishaneler, Aslı Aydemir, Serbest meslek)
 - 3 etkinlik (Eleştirel Psikoloji Dersliği, 1 Mayıs, Sempozyum)
 - 4 birim
@@ -320,7 +338,7 @@ ADMIN_PASSWORD_HASH=<npm run hash ile üret>
 | Paket            | Versiyon | Kullanım                              |
 |------------------|----------|---------------------------------------|
 | express          | ^4.18.2  | HTTP sunucusu, routing                |
-| better-sqlite3   | ^9.4.3   | SQLite veritabanı (senkron API)       |
+| pg               | ^8.x     | PostgreSQL veritabanı sürücüsü         |
 | bcryptjs         | ^2.4.3   | Admin şifre hash/verify               |
 | express-session  | ^1.17.3  | Oturum yönetimi                       |
 | dotenv           | ^16.4.5  | `.env` dosyasını yükler               |
