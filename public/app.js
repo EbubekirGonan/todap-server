@@ -625,9 +625,11 @@ function esc(str) {
 
 // ── Navbar Scroll Gizle/Göster ───────────────────────────────
 (function () {
-  const NAV_HEIGHT  = 56;   // px — nav yüksekliği
   const THRESHOLD   = 80;   // px — bu kadar aşağı inince saklama başlar
   const TOLERANCE   = 6;    // px — küçük titremeleri yok say
+
+  // Mobilden navbar'ı gizleme — tarayıcı UI değişimi sahte scroll üretir
+  const isMobile = () => window.innerWidth < 768;
 
   let lastY = window.scrollY;
   let ticking = false;
@@ -635,6 +637,14 @@ function esc(str) {
   function handleScroll() {
     const nav = document.querySelector('nav');
     if (!nav) return;
+
+    if (isMobile()) {
+      nav.classList.remove('nav-hidden');
+      lastY = window.scrollY;
+      ticking = false;
+      return;
+    }
+
     const y   = window.scrollY;
     const diff = y - lastY;
 
