@@ -70,6 +70,35 @@
 
 ---
 
+## [2026-04-23] — Yedinci Oturum: Veritabanı Render.com'a Taşındı
+
+### Özet
+Yerel PostgreSQL veritabanındaki tüm veriler Render.com'daki bulut PostgreSQL veritabanına aktarıldı. Uygulama artık yerel veritabanına bağlı değil; tüm veri yönetimi Render üzerinden yapılıyor.
+
+### Yapılan Değişiklikler
+
+#### Veritabanı Aktarımı
+- Yerel dump (`backups/todap_local_20260421_021755.dump`) base olarak kullanıldı.
+- `pg_restore` ile doğrudan aktarım ağ/SSL sorunları nedeniyle tamamlanamadı.
+- `pg_restore -f` ile dump plain SQL'e çevrildi (`todap_restore.sql`).
+- pgAdmin4 (web arayüzü) kurularak Render bağlantısı sağlandı.
+- SQL dosyası pgAdmin için uyumlu hale getirildi:
+  - `COPY ... FROM stdin` blokları `INSERT INTO` ifadelerine dönüştürüldü
+  - `OWNER TO todap` satırları kaldırıldı (Render'da rol mevcut değil)
+  - `CREATE TABLE` ifadelerinden önce `DROP TABLE IF EXISTS ... CASCADE` eklendi
+- `todap_final.sql` pgAdmin Query Tool üzerinden başarıyla çalıştırıldı.
+
+#### `.env`
+- `DATABASE_URL` güncellendi: yerel PostgreSQL → Render.com external URL
+- `PGSSLMODE=require` eklendi
+
+### Mevcut Durum
+- Veritabanı: `dpg-d7jaott7vvec738qrfkg-a.frankfurt-postgres.render.com / todap_db`
+- Yerel veritabanı bağlantısı tamamen kaldırıldı
+- `npm start` / `npm run dev` komutu doğrudan Render DB'ye bağlanıyor
+
+---
+
 ## [2026-04-13] — Dördüncü Oturum: Videolar Modülü + doLogin Düzeltmesi + Logo + Tam Görsel Yeniden Tasarım
 
 ### 1. Videolar Modülü

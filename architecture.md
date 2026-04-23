@@ -10,26 +10,20 @@
 |---------------|----------------------------------------------------|
 | Proje         | TODAP — Toplumsal Dayanışma İçin Psikologlar Derneği |
 | Stack         | Node.js · Express · PostgreSQL (`pg`) · vanilla JS |
-| Veritabanı    | PostgreSQL                                         |
+| Veritabanı    | PostgreSQL — Render.com'da barındırılıyor          |
 | Port (varsayılan) | `3001` (`.env` ile değiştirilebilir)           |
-| Başlatma      | `npm run up` (PostgreSQL + Express)  · `npm start` (yalnız Express) · `npm run dev` (watch) |
+| Başlatma      | `npm start` (Express) · `npm run dev` (watch)      |
 
 ---
 
 ## Hızlı Başlatma
 
 ```bash
-# Tek komut: PostgreSQL + Express
-npm run up
-
-# Yalnız Express (PostgreSQL zaten çalışıyorsa)
+# Express başlat (PostgreSQL Render.com'da, yerel kurulum gerekmez)
 npm start
 
 # Watch modu (geliştirme)
 npm run dev
-
-# PostgreSQL'i durdur
-npm run db:stop
 ```
 
 ---
