@@ -11,6 +11,9 @@ const { buildTokensCss, rowToTheme } = require('./themeTokens');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
+// Render.com gibi reverse proxy arkasında çalışırken güvenli session için gerekli
+app.set('trust proxy', 1);
+
 // ── Middleware ───────────────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

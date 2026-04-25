@@ -942,21 +942,31 @@ async function doLogout() {
 }
 
 // ── Init ─────────────────────────────────────────────────────
+async function afetch(url) {
+  const r = await fetch(url);
+  if (!r.ok) {
+    let msg;
+    try { msg = (await r.json()).error; } catch { msg = null; }
+    throw new Error(msg || `HTTP ${r.status} — ${url}`);
+  }
+  return r.json();
+}
+
 async function init() {
   showLoading('Veriler yükleniyor...');
   try {
     const [h, e, y, t, m, b, ss, fl, bs, vs, theme] = await Promise.all([
-      fetch('/api/admin/haberler').then(r => r.json()),
-      fetch('/api/admin/etkinlikler').then(r => r.json()),
-      fetch('/api/admin/yayinlar').then(r => r.json()),
-      fetch('/api/admin/ticker').then(r => r.json()),
-      fetch('/api/admin/mesajlar').then(r => r.json()),
-      fetch('/api/admin/basvurular').then(r => r.json()),
-      fetch('/api/admin/sabit-sayfalar').then(r => r.json()),
-      fetch('/api/admin/faaliyetler').then(r => r.json()),
-      fetch('/api/admin/basinda-todap').then(r => r.json()),
-      fetch('/api/admin/videos').then(r => r.json()),
-      fetch('/api/admin/theme-colors').then(r => r.json()),
+      afetch('/api/admin/haberler'),
+      afetch('/api/admin/etkinlikler'),
+      afetch('/api/admin/yayinlar'),
+      afetch('/api/admin/ticker'),
+      afetch('/api/admin/mesajlar'),
+      afetch('/api/admin/basvurular'),
+      afetch('/api/admin/sabit-sayfalar'),
+      afetch('/api/admin/faaliyetler'),
+      afetch('/api/admin/basinda-todap'),
+      afetch('/api/admin/videos'),
+      afetch('/api/admin/theme-colors'),
     ]);
     haberler    = h;
     etkinlikler = e;
@@ -1140,12 +1150,12 @@ async function saveHaber() {
     } else {
       await apiFetch('/api/admin/haberler', 'POST', { ...body, slug });
     }
-    const h = await fetch('/api/admin/haberler').then(r => r.json());
+    const h = await afetch('/api/admin/haberler');
     haberler = h;
     renderHaberTable();
     renderDashboard(haberler, etkinlikler,
-      await fetch('/api/admin/mesajlar').then(r=>r.json()),
-      await fetch('/api/admin/basvurular').then(r=>r.json()));
+      await afetch('/api/admin/mesajlar'),
+      await afetch('/api/admin/basvurular'));
     hideLoading();
     showToast('✓ Haber kaydedildi!', 'success');
     showPage('haberler');
@@ -1236,7 +1246,7 @@ async function saveEtkinlik() {
     } else {
       await apiFetch('/api/admin/etkinlikler', 'POST', { ...body, slug });
     }
-    etkinlikler = await fetch('/api/admin/etkinlikler').then(r => r.json());
+    etkinlikler = await afetch('/api/admin/etkinlikler');
     renderEtkinlikTable();
     hideLoading();
     showToast('✓ Etkinlik kaydedildi!', 'success');
@@ -1312,7 +1322,7 @@ async function saveYayin() {
     } else {
       await apiFetch('/api/admin/yayinlar', 'POST', body);
     }
-    yayinlar = await fetch('/api/admin/yayinlar').then(r => r.json());
+    yayinlar = await afetch('/api/admin/yayinlar');
     renderYayinTable();
     hideLoading();
     showToast('✓ Yayın kaydedildi!', 'success');
@@ -1337,7 +1347,7 @@ function renderTickerEditor() {
 async function addTickerItem() {
   try {
     const r = await apiFetch('/api/admin/ticker', 'POST', { etiket: 'Yeni', metin: '...', sira: tickerItems.length });
-    tickerItems = await fetch('/api/admin/ticker').then(r => r.json());
+    tickerItems = await afetch('/api/admin/ticker');
     renderTickerEditor();
   } catch (e) { showToast('Hata: ' + e.message, 'error'); }
 }
@@ -1357,7 +1367,7 @@ async function saveAllTicker() {
     const metin  = item.querySelector('[data-field="metin"]').value.trim();
     await apiFetch(`/api/admin/ticker/${id}`, 'PUT', { etiket, metin, sira: i++ });
   }
-  tickerItems = await fetch('/api/admin/ticker').then(r => r.json());
+  tickerItems = await afetch('/api/admin/ticker');
   showToast('✓ Duyuru bandı güncellendi!', 'success');
 }
 
@@ -1585,7 +1595,7 @@ async function activateThemeProfile(id) {
 }
 
 async function refreshThemeData() {
-  const theme = await fetch('/api/admin/theme-colors').then(r => r.json());
+  const theme = await afetch('/api/admin/theme-colors');
   setupThemeData(theme);
   renderThemeManager();
 }
@@ -1650,7 +1660,7 @@ async function saveFaaliyet() {
     } else {
       await apiFetch('/api/admin/faaliyetler', 'POST', { baslik, ozet, icerik, crdate, keywords });
     }
-    faaliyetler = await fetch('/api/admin/faaliyetler').then(r => r.json());
+    faaliyetler = await afetch('/api/admin/faaliyetler');
     renderFaaliyetTable();
     hideLoading();
     showToast('✓ Faaliyet kaydedildi!', 'success');
@@ -1722,7 +1732,7 @@ async function saveBasinda() {
     } else {
       await apiFetch('/api/admin/basinda-todap', 'POST', { baslik, adres_ismi, baglanti_adresi, crdate, keywords });
     }
-    basinda = await fetch('/api/admin/basinda-todap').then(r => r.json());
+    basinda = await afetch('/api/admin/basinda-todap');
     renderBasindaTable();
     hideLoading();
     showToast('✓ Kaydedildi!', 'success');
@@ -1808,7 +1818,7 @@ async function saveVideo() {
     } else {
       await apiFetch('/api/admin/videos', 'POST', body);
     }
-    videos = await fetch('/api/admin/videos').then(r => r.json());
+    videos = await afetch('/api/admin/videos');
     renderVideoTable();
     hideLoading();
     showToast('✓ Kaydedildi!', 'success');
@@ -1868,7 +1878,7 @@ async function saveSabitSayfa(kategori, id) {
   const r = await apiFetch(`/api/admin/sabit-sayfalar/${encodeURIComponent(kategori)}`, 'PUT', { baslik, icerik });
   if (r && r.ok) {
     showToast('✓ Sayfa güncellendi!', 'success');
-    const fresh = await fetch('/api/admin/sabit-sayfalar').then(r => r.json());
+    const fresh = await afetch('/api/admin/sabit-sayfalar');
     renderSabitSayfalar(fresh);
   }
 }
@@ -1917,22 +1927,22 @@ function confirmDelete(type, id, title) {
       showLoading('Siliniyor...');
       await apiFetch(`/api/admin/${type === 'haber' ? 'haberler' : type === 'etkinlik' ? 'etkinlikler' : type === 'yayin' ? 'yayinlar' : type === 'faaliyet' ? 'faaliyetler' : type === 'video' ? 'videos' : 'basinda-todap'}/${id}`, 'DELETE');
       if (type === 'haber') {
-        haberler = await fetch('/api/admin/haberler').then(r => r.json());
+        haberler = await afetch('/api/admin/haberler');
         renderHaberTable();
       } else if (type === 'etkinlik') {
-        etkinlikler = await fetch('/api/admin/etkinlikler').then(r => r.json());
+        etkinlikler = await afetch('/api/admin/etkinlikler');
         renderEtkinlikTable();
       } else if (type === 'yayin') {
-        yayinlar = await fetch('/api/admin/yayinlar').then(r => r.json());
+        yayinlar = await afetch('/api/admin/yayinlar');
         renderYayinTable();
       } else if (type === 'faaliyet') {
-        faaliyetler = await fetch('/api/admin/faaliyetler').then(r => r.json());
+        faaliyetler = await afetch('/api/admin/faaliyetler');
         renderFaaliyetTable();
       } else if (type === 'video') {
-        videos = await fetch('/api/admin/videos').then(r => r.json());
+        videos = await afetch('/api/admin/videos');
         renderVideoTable();
       } else {
-        basinda = await fetch('/api/admin/basinda-todap').then(r => r.json());
+        basinda = await afetch('/api/admin/basinda-todap');
         renderBasindaTable();
       }
       hideLoading();
