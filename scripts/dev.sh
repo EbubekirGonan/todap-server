@@ -20,4 +20,7 @@ fi
 # ── Express Dev (watch modu) ────────────────────────────
 echo "🔄 Dev modu başlatılıyor (file watching etkin)..."
 cd "$PROJECT_DIR"
+PORT="${PORT:-3001}" \
+DATABASE_URL="${DATABASE_URL:-postgres://todap@localhost:${PGPORT}/todap}" \
+PGSSLMODE="${PGSSLMODE:-disable}" \
 npm run dev:watch

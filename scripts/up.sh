@@ -20,5 +20,8 @@ fi
 # ── Express Başlat ───────────────────────────────────────
 echo "🚀 Express sunucusu başlatılıyor..."
 cd "$PROJECT_DIR"
+PORT="${PORT:-3001}" \
+DATABASE_URL="${DATABASE_URL:-postgres://todap@localhost:${PGPORT}/todap}" \
+PGSSLMODE="${PGSSLMODE:-disable}" \
 npm start
 

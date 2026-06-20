@@ -8,6 +8,7 @@
     "dev": "bash scripts/dev.sh",
     "dev:watch": "node --watch server.js",
     "seed:files": "node scripts/seed-from-files.js",
+    "migrate:sqlite": "node scripts/migrate-sqlite-to-postgres.js",
     "hash": "node scripts/hash-password.js",
     "up": "bash scripts/up.sh",
     "db:stop": "/usr/lib/postgresql/16/bin/pg_ctl -D .pgdata stop || true"
