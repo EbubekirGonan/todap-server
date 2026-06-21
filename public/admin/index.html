@@ -663,8 +663,6 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
         </div>
       </div>
 
-      </div>
-
       <!-- SABİT SAYFALAR -->
       <div class="page" id="page-sabit-sayfalar">
         <div style="max-width:720px">
@@ -675,12 +673,15 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
 
       <!-- FAALİYETLER -->
       <div class="page" id="page-faaliyetler">
-        <div style="max-width:720px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
-            <div id="faaliyet-count" style="font-size:12px;color:var(--text-muted)"></div>
-            <button class="btn btn-primary" onclick="showPage('faaliyet-yeni');resetFaaliyetForm()">+ Yeni Faaliyet</button>
-          </div>
-          <div id="faaliyet-list"></div>
+        <div class="list-toolbar">
+          <span style="font-size:12px;color:var(--text-muted)" id="faaliyet-count"></span>
+          <button class="btn btn-primary" onclick="showPage('faaliyet-yeni');resetFaaliyetForm()">+ Yeni Faaliyet</button>
+        </div>
+        <div class="list-table">
+          <table>
+            <thead><tr><th>Başlık</th><th>Özet</th><th>Tarih</th><th>İşlem</th></tr></thead>
+            <tbody id="faaliyet-tbody"></tbody>
+          </table>
         </div>
       </div>
 
@@ -720,12 +721,15 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
       <!-- MESAJLAR -->
       <!-- BASINDA TODAP -->
       <div class="page" id="page-basinda-todap">
-        <div style="max-width:720px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
-            <div id="basinda-count" style="font-size:12px;color:var(--text-muted)"></div>
-            <button class="btn btn-primary" onclick="showPage('basinda-yeni');resetBasindaForm()">+ Yeni Haber Ekle</button>
-          </div>
-          <div id="basinda-list"></div>
+        <div class="list-toolbar">
+          <span style="font-size:12px;color:var(--text-muted)" id="basinda-count"></span>
+          <button class="btn btn-primary" onclick="showPage('basinda-yeni');resetBasindaForm()">+ Yeni Haber Ekle</button>
+        </div>
+        <div class="list-table">
+          <table>
+            <thead><tr><th>Başlık</th><th>Kaynak</th><th>Bağlantı</th><th>Tarih</th><th>İşlem</th></tr></thead>
+            <tbody id="basinda-tbody"></tbody>
+          </table>
         </div>
       </div>
 
@@ -755,11 +759,6 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
             <label class="form-label">Tarih</label>
             <input class="form-input" id="basinda-crdate" type="text" placeholder="GG/AA/YYYY">
           </div>
-          <div class="form-group">
-            <label class="form-label">Anahtar Kelimeler</label>
-            <input class="form-input" id="basinda-keywords" placeholder="Örn: basında, psikoloji, medya">
-            <span class="form-hint">Virgülle ayrılmış anahtar kelimeler (SEO için)</span>
-          </div>
           <div style="display:flex;gap:.75rem;margin-top:1rem">
             <button class="btn btn-primary" onclick="saveBasinda()">Kaydet</button>
             <button class="btn btn-secondary" onclick="showPage('basinda-todap')">İptal</button>
@@ -769,11 +768,16 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
 
       <!-- VİDEOLAR -->
       <div class="page" id="page-videolar">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
-          <div style="font-size:12px;color:var(--text-muted)" id="video-count"></div>
+        <div class="list-toolbar">
+          <span style="font-size:12px;color:var(--text-muted)" id="video-count"></span>
           <button class="btn btn-primary" onclick="showPage('video-yeni');resetVideoForm()">+ Yeni Video Ekle</button>
         </div>
-        <div id="video-list"></div>
+        <div class="list-table">
+          <table>
+            <thead><tr><th>Başlık</th><th>Tarih</th><th>Durum</th><th>İşlem</th></tr></thead>
+            <tbody id="video-tbody"></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- VİDEO FORM -->
@@ -819,14 +823,28 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
 
       <!-- MESAJLAR -->
       <div class="page" id="page-mesajlar">
-        <div style="margin-bottom:1.5rem;font-size:12px;color:var(--text-muted)" id="mesaj-count"></div>
-        <div id="mesajlar-list"></div>
+        <div class="list-toolbar">
+          <span style="font-size:12px;color:var(--text-muted)" id="mesaj-count"></span>
+        </div>
+        <div class="list-table">
+          <table>
+            <thead><tr><th>Gönderen</th><th>Konu</th><th>Mesaj</th><th>Tarih</th></tr></thead>
+            <tbody id="mesaj-tbody"></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- BAŞVURULAR -->
       <div class="page" id="page-basvurular">
-        <div style="margin-bottom:1.5rem;font-size:12px;color:var(--text-muted)" id="basvuru-count"></div>
-        <div id="basvurular-list"></div>
+        <div class="list-toolbar">
+          <span style="font-size:12px;color:var(--text-muted)" id="basvuru-count"></span>
+        </div>
+        <div class="list-table">
+          <table>
+            <thead><tr><th>Ad Soyad</th><th>İletişim</th><th>Meslek / Şehir</th><th>Neden</th><th>Tarih</th></tr></thead>
+            <tbody id="basvuru-tbody"></tbody>
+          </table>
+        </div>
       </div>
 
     </div>
@@ -1604,13 +1622,12 @@ async function refreshThemeData() {
 function renderFaaliyetTable() {
   faaliyetler.sort((a, b) => (b.crdate || '').localeCompare(a.crdate || ''));
   document.getElementById('faaliyet-count').textContent = `${faaliyetler.length} faaliyet`;
-  const el = document.getElementById('faaliyet-list');
+  const tbody = document.getElementById('faaliyet-tbody');
   if (!faaliyetler.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">Henüz faaliyet eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'faaliyet-yeni\');resetFaaliyetForm()">İlk Faaliyeti Ekle</button></div>';
+    tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">Henüz faaliyet eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'faaliyet-yeni\');resetFaaliyetForm()">İlk Faaliyeti Ekle</button></div></td></tr>';
     return;
   }
-  el.innerHTML = `<table class="table"><thead><tr><th>Başlık</th><th>Özet</th><th>Tarih</th><th></th></tr></thead><tbody>${
-    faaliyetler.map(f => `<tr>
+  tbody.innerHTML = faaliyetler.map(f => `<tr>
       <td class="td-title">${esc(f.baslik)}</td>
       <td style="font-size:12px;color:var(--text-muted);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(f.ozet||'')}</td>
       <td class="td-date">${esc(f.crdate)}</td>
@@ -1618,8 +1635,7 @@ function renderFaaliyetTable() {
         <button class="btn btn-secondary btn-sm" onclick="editFaaliyet(${f.id})">Düzenle</button>
         <button class="btn btn-danger btn-sm" onclick="confirmDelete('faaliyet',${f.id},'${esc(f.baslik)}')">Sil</button>
       </td>
-    </tr>`).join('')
-  }</tbody></table>`;
+    </tr>`).join('');
 }
 
 function editFaaliyet(id) {
@@ -1675,13 +1691,12 @@ async function saveFaaliyet() {
 function renderBasindaTable() {
   basinda.sort((a, b) => (b.crdate || '').localeCompare(a.crdate || ''));
   document.getElementById('basinda-count').textContent = `${basinda.length} haber`;
-  const el = document.getElementById('basinda-list');
+  const tbody = document.getElementById('basinda-tbody');
   if (!basinda.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📰</div><div class="empty-state-text">Henüz haber eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'basinda-yeni\');resetBasindaForm()">İlk Haberi Ekle</button></div>';
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">📰</div><div class="empty-state-text">Henüz haber eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'basinda-yeni\');resetBasindaForm()">İlk Haberi Ekle</button></div></td></tr>';
     return;
   }
-  el.innerHTML = `<table class="table"><thead><tr><th>Başlık</th><th>Kaynak</th><th>Bağlantı</th><th>Tarih</th><th></th></tr></thead><tbody>${
-    basinda.map(item => `<tr>
+  tbody.innerHTML = basinda.map(item => `<tr>
       <td class="td-title">${esc(item.baslik)}</td>
       <td style="font-size:12px;color:var(--text-muted)">${esc(item.adres_ismi || '')}</td>
       <td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.baglanti_adresi ? `<a href="${esc(item.baglanti_adresi)}" target="_blank" rel="noopener noreferrer" style="color:var(--mustard)">${esc(item.baglanti_adresi)}</a>` : ''}</td>
@@ -1690,8 +1705,7 @@ function renderBasindaTable() {
         <button class="btn btn-secondary btn-sm" onclick="editBasinda(${item.id})">Düzenle</button>
         <button class="btn btn-danger btn-sm" onclick="confirmDelete('basinda',${item.id},'${esc(item.baslik)}')">Sil</button>
       </td>
-    </tr>`).join('')
-  }</tbody></table>`;
+    </tr>`).join('');
 }
 
 function editBasinda(id) {
@@ -1758,13 +1772,12 @@ function onVideoUrlInput(val) {
 }
 function renderVideoTable() {
   document.getElementById('video-count').textContent = `${videos.length} video`;
-  const el = document.getElementById('video-list');
+  const tbody = document.getElementById('video-tbody');
   if (!videos.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎬</div><div class="empty-state-text">Henüz video eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'video-yeni\');resetVideoForm()">İlk Videoyu Ekle</button></div>';
+    tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-state-icon">🎬</div><div class="empty-state-text">Henüz video eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'video-yeni\');resetVideoForm()">İlk Videoyu Ekle</button></div></td></tr>';
     return;
   }
-  el.innerHTML = `<table class="table"><thead><tr><th>Başlık</th><th>Tarih</th><th>Aktif</th><th></th></tr></thead><tbody>${
-    videos.map(v => `<tr>
+  tbody.innerHTML = videos.map(v => `<tr>
       <td class="td-title">${esc(v.baslik)}</td>
       <td class="td-date">${fmtDate(v.yayinlanma_tarihi)}</td>
       <td style="font-size:12px">${v.aktif ? '✓' : '—'}</td>
@@ -1772,8 +1785,7 @@ function renderVideoTable() {
         <button class="btn btn-secondary btn-sm" onclick="editVideo(${v.id})">Düzenle</button>
         <button class="btn btn-danger btn-sm" onclick="confirmDelete('video',${v.id},'${esc(v.baslik)}')">Sil</button>
       </td>
-    </tr>`).join('')
-  }</tbody></table>`;
+    </tr>`).join('');
 }
 function editVideo(id) {
   const v = videos.find(x => x.id === id);
@@ -1886,35 +1898,38 @@ async function saveSabitSayfa(kategori, id) {
 // ── Mesajlar & Başvurular ─────────────────────────────────────
 function renderMesajlar(m) {
   document.getElementById('mesaj-count').textContent = `${m.length} mesaj`;
-  document.getElementById('mesajlar-list').innerHTML = !m.length
-    ? '<div class="empty-state"><div class="empty-state-icon">✉️</div><div class="empty-state-text">Henüz mesaj yok.</div></div>'
-    : m.map(x => `
-      <div class="inbox-item">
-        <div class="inbox-meta">
-          <span><strong>İsim:</strong> ${esc(x.isim)}</span>
-          <span><strong>E-posta:</strong> ${esc(x.eposta)}</span>
-          <span><strong>Konu:</strong> ${esc(x.konu)}</span>
-          <span>${esc(x.olusturuldu)}</span>
-        </div>
-        <div class="inbox-body">${esc(x.mesaj)}</div>
-      </div>`).join('');
+  const tbody = document.getElementById('mesaj-tbody');
+  if (!m.length) {
+    tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-state-icon">✉️</div><div class="empty-state-text">Henüz mesaj yok.</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = m.map(x => `
+    <tr>
+      <td class="td-title">
+        ${esc(x.isim)}
+        <div style="font-size:11px;color:var(--text-faint);margin-top:2px">${esc(x.eposta)}</div>
+      </td>
+      <td style="font-size:12px;color:var(--text-muted)">${esc(x.konu || '—')}</td>
+      <td style="max-width:520px;white-space:pre-wrap;word-break:break-word">${esc(x.mesaj)}</td>
+      <td class="td-date">${esc(x.olusturuldu || '')}</td>
+    </tr>`).join('');
 }
 
 function renderBasvurular(b) {
   document.getElementById('basvuru-count').textContent = `${b.length} başvuru`;
-  document.getElementById('basvurular-list').innerHTML = !b.length
-    ? '<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">Henüz başvuru yok.</div></div>'
-    : b.map(x => `
-      <div class="inbox-item">
-        <div class="inbox-meta">
-          <span><strong>${esc(x.ad)} ${esc(x.soyad)}</strong></span>
-          <span>${esc(x.eposta)}</span>
-          <span>${esc(x.meslek)}</span>
-          <span>${esc(x.sehir)}</span>
-          <span>${esc(x.olusturuldu)}</span>
-        </div>
-        ${x.neden ? `<div class="inbox-body">${esc(x.neden)}</div>` : ''}
-      </div>`).join('');
+  const tbody = document.getElementById('basvuru-tbody');
+  if (!b.length) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">Henüz başvuru yok.</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = b.map(x => `
+    <tr>
+      <td class="td-title">${esc(x.ad)} ${esc(x.soyad)}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${esc(x.eposta || '—')}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${esc(x.meslek || '—')} / ${esc(x.sehir || '—')}</td>
+      <td style="max-width:380px;white-space:pre-wrap;word-break:break-word">${esc(x.neden || '—')}</td>
+      <td class="td-date">${esc(x.olusturuldu || '')}</td>
+    </tr>`).join('');
 }
 
 // ── Sil ───────────────────────────────────────────────────────
