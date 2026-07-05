@@ -33,11 +33,13 @@ nav.nav-hidden{opacity:0;transform:translateY(-100%);pointer-events:none}
 .nl{display:flex;gap:2rem;list-style:none;align-items:center}
 .nl>li{display:flex;align-items:center}
 .nl>li>a,.nl>li>.nd-label{display:inline-flex;align-items:center;line-height:1}
-.nl a{font-family:var(--fd);font-size:var(--text-xs);font-weight:var(--weight-medium);letter-spacing:.06em;color:#FFFFFF;text-decoration:none;transition:color var(--transition-fast),opacity var(--transition-fast);text-transform:uppercase;cursor:pointer}
+.nl a{font-family:var(--fd);font-size:var(--text-xs);font-weight:var(--weight-medium);letter-spacing:.06em;color:#FFFFFF;text-decoration:none;transition:color var(--transition-fast),opacity var(--transition-fast);text-transform:uppercase;cursor:pointer;position:relative}
+.nl a::before{content:'';position:absolute;inset:-8px -14px;pointer-events:auto;z-index:-1}
 .nl a:hover{color:#FFFFFF;opacity:0.85}
 /* Nav dropdown */
 .nl li.nav-dropdown{position:relative;list-style:none}
-.nl .nd-label{font-family:var(--fd);font-size:var(--text-xs);font-weight:var(--weight-medium);letter-spacing:.06em;color:#FFFFFF;text-transform:uppercase;cursor:default;user-select:none;display:flex;align-items:center;gap:5px;white-space:nowrap;pointer-events:none}
+.nl .nd-label{font-family:var(--fd);font-size:var(--text-xs);font-weight:var(--weight-medium);letter-spacing:.06em;color:#FFFFFF;text-transform:uppercase;cursor:pointer;user-select:none;display:flex;align-items:center;gap:5px;white-space:nowrap;position:relative}
+.nl .nd-label::before{content:'';position:absolute;inset:-8px -14px;pointer-events:auto;z-index:-1}
 .nl .nd-label::after{content:none}
 .nav-dropdown.open .nd-label{color:#FFFFFF;opacity:0.85}
 .nav-dropdown.open .nd-label::after{transform:none}
@@ -335,7 +337,7 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
       <span class="nd-label">Süreli Yayınlar</span>
       <div class="nd-menu">
         <a href="https://elestirelpsikolojibulteni.todap.org/" target="_blank" rel="noopener">Eleştirel Psikoloji Bülteni</a>
-        <a href="https://psikolojivetoplum.todap.org/" target="_blank" rel="noopener">Psikoloji ve Toplum Bülteni</a>
+        <a href="https://psikolojivetoplum.todap.org/" target="_blank" rel="noopener">Psikoloji ve Toplum Dergisi</a>
       </div>
     </li>
     <li><a href="https://elestirelpsikolojisempozyumu.todap.org/" target="_blank" rel="noopener">Sempozyum</a></li>
@@ -367,7 +369,7 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
   <a onclick="closeMobileMenu();go('etik-kurullar')">Etik Kurullar</a>
   <span class="mobile-sub-label">Süreli Yayınlar</span>
   <a class="sub-item" href="http://elestirelpsikolojibulteni.todap.org/" target="_blank" rel="noopener">Eleştirel Psikoloji Bülteni</a>
-  <a class="sub-item" href="http://elestirelpsikolojibulteni.todap.org/" target="_blank" rel="noopener">Psikoloji ve Toplum Bülteni</a>
+  <a class="sub-item" href="http://elestirelpsikolojibulteni.todap.org/" target="_blank" rel="noopener">Psikoloji ve Toplum Dergisi</a>
   <a href="https://elestirelpsikolojisempozyumu.todap.org/" target="_blank" rel="noopener">Sempozyum</a>
   <a onclick="closeMobileMenu();go('faaliyet-listesi')">Faaliyet Listesi</a>
   <span class="mobile-sub-label">Medya</span>
@@ -481,7 +483,7 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
       <span class="sl">Bilgi Üretimi</span><h2 class="dp">Yayınlar & <em>Kaynaklar</em></h2>
       <div class="pr">
         <a class="pi" href="http://elestirelpsikolojibulteni.todap.org/" target="_blank" rel="noopener"><span class="pt">Süreli Yayın</span><h3>Eleştirel Psikoloji Bülteni</h3><p>Psikoloji pratiğine eleştirel bakış.</p></a>
-        <a class="pi" href="http://psikolojivetoplum.todap.org/" target="_blank" rel="noopener"><span class="pt">Süreli Yayın</span><h3>Psikoloji ve Toplum Bülteni</h3><p>Psikoloji ile toplumsal meseleler arasındaki ilişkiyi araştıran yayınımız.</p></a>
+        <a class="pi" href="http://psikolojivetoplum.todap.org/" target="_blank" rel="noopener"><span class="pt">Süreli Yayın</span><h3>Psikoloji ve Toplum Dergisi</h3><p>Psikoloji ile toplumsal meseleler arasındaki ilişkiyi araştıran yayınımız.</p></a>
         <a class="pi" href="https://todap.org/images/raporlar_brosurler/psikologlar_icin_lgbtilerle_calisma_kilavuzu_TODAP.pdf" target="_blank" rel="noopener"><span class="pt">Kılavuz · PDF</span><h3>LGBTİ+'larla Çalışma Kılavuzu</h3><p>Psikologlar için kapsamlı uygulama rehberi. Ücretsiz indir.</p></a>
         <a class="pi" href="https://todap.org/images/raporlar_brosurler/MeslekYasasiDosyasi.pdf" target="_blank" rel="noopener"><span class="pt">Rapor · PDF</span><h3>Meslek Yasası Önerisi Dosyası</h3><p>TODAP'ın bağımsız meslek yasası önerisi ve detaylı gerekçe raporu.</p></a>
       </div>
@@ -609,11 +611,11 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
       <div id="i-ok" class="sm">✓ Mesajınız iletildi. En kısa sürede yanıt vereceğiz.</div>
     </div>
     <div style="padding-top:1rem">
-      <div style="margin-bottom:2rem"><div style="font-family:var(--fd);font-size:var(--text-xs);font-weight:var(--weight-bold);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:.5rem">E-posta</div><a href="mailto:iletisim@todap.org" style="font-size:var(--text-base);color:var(--burgundy);text-decoration:none">iletisim@todap.org</a></div>
+      <div style="margin-bottom:2rem"><div style="font-family:var(--fd);font-size:var(--text-xs);font-weight:var(--weight-bold);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:.5rem">E-posta</div><a href="mailto:todap.der@gmail.com" style="font-size:var(--text-base);color:var(--burgundy);text-decoration:none">todap.der@gmail.com</a></div>
       <div style="margin-bottom:2rem"><div style="font-family:var(--fd);font-size:var(--text-xs);font-weight:var(--weight-bold);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:.5rem">Sosyal Medya</div>
         <div style="display:flex;flex-direction:column;gap:6px">
           <a href="https://twitter.com/todapder" target="_blank" rel="noopener" style="font-size:var(--text-sm);color:var(--ink-muted);text-decoration:none">Twitter · @todapder</a>
-          <a href="https://facebook.com/todap" target="_blank" rel="noopener" style="font-size:var(--text-sm);color:var(--ink-muted);text-decoration:none">Facebook · TODAP</a>
+          <a href="https://www.facebook.com/todapder" target="_blank" rel="noopener" style="font-size:var(--text-sm);color:var(--ink-muted);text-decoration:none">Facebook · TODAP</a>
         </div>
       </div>
     </div>
@@ -706,11 +708,11 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
   <section><div style="max-width:680px;margin:0 auto"><p>İçerik yakında eklenecek.</p></div></section>
 </div>
 
-<!-- PSİKOLOJİ VE TOPLUM BÜLTENİ -->
+<!-- PSİKOLOJİ VE TOPLUM Dergisi -->
 <div id="p-psikoloji-ve-toplum-bulteni" class="pv">
   <div class="ah" style="min-height:auto;padding:3rem 2.5rem 2.5rem"><div style="max-width:680px;margin:0 auto">
     <a class="ab" onclick="goHome()">Ana Sayfaya Dön</a>
-    <h1 style="font-family:var(--fd);font-size:clamp(32px,5vw,54px);font-weight:var(--weight-black);color:var(--color-text-primary);text-transform:uppercase;margin-top:1.5rem;line-height:1.05">Psikoloji ve Toplum Bülteni<br><span style="font-family:var(--fs);font-style:italic;font-weight:var(--weight-regular);text-transform:none;font-size:.7em;color:var(--color-text-secondary)">Süreli yayın</span></h1>
+    <h1 style="font-family:var(--fd);font-size:clamp(32px,5vw,54px);font-weight:var(--weight-black);color:var(--color-text-primary);text-transform:uppercase;margin-top:1.5rem;line-height:1.05">Psikoloji ve Toplum Dergisi<br><span style="font-family:var(--fs);font-style:italic;font-weight:var(--weight-regular);text-transform:none;font-size:.7em;color:var(--color-text-secondary)">Süreli yayın</span></h1>
   </div></div>
   <section><div style="max-width:680px;margin:0 auto"><p>İçerik yakında eklenecek.</p></div></section>
 </div>
@@ -801,7 +803,7 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
       <li><a onclick="go('ogrenci-komisyonu')">Öğrenci Komisyonu</a></li>
     </ul></div>
     <div class="fc"><h4>Bağlantı</h4><ul>
-      <li><a onclick="go('iletisim')">iletisim@todap.org</a></li>
+      <li><a onclick="go('iletisim')">todap.der@gmail.com</a></li>
       <li><a href="https://twitter.com/todapder" target="_blank" rel="noopener">@todapder</a></li>
       <li><a onclick="go('uyelik')">Üyelik Başvurusu</a></li>
       <li><a onclick="go('iletisim')">İletişim Formu</a></li>

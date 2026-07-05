@@ -358,6 +358,15 @@ function closeMobileMenu() {
     document.querySelectorAll('.nav-dropdown').forEach(li => {
       li.addEventListener('mouseenter', () => openDropdown(li));
       li.addEventListener('mouseleave', () => scheduleClose(li));
+      
+      // Click handler for .nd-label
+      const label = li.querySelector('.nd-label');
+      if (label) {
+        label.addEventListener('click', (e) => {
+          e.preventDefault();
+          li.classList.toggle('open');
+        });
+      }
     });
   });
 })();

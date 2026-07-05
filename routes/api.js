@@ -2,6 +2,7 @@
 const express = require('express');
 const router  = express.Router();
 const db      = require('../db');
+const { sendContactNotification, sendMembershipNotification } = require('../mailer');
 
 function ah(fn) {
   return (req, res, next) => Promise.resolve(fn(req, res, next)).catch((err) => {
@@ -98,6 +99,13 @@ router.post('/iletisim', ah(async (req, res) => {
   }
   await db.prepare('INSERT INTO mesajlar (isim,eposta,konu,mesaj) VALUES (?,?,?,?)')
     .run(String(isim).slice(0, 200), String(eposta).slice(0, 200), String(konu || '').slice(0, 200), String(mesaj).slice(0, 5000));
+
+  try {
+    await sendContactNotification({ isim, eposta, konu, mesaj });
+  } catch (err) {
+    console.error('Iletisim e-postasi gonderilemedi:', err.message);
+  }
+
   res.json({ ok: true });
 }));
 
@@ -115,6 +123,13 @@ router.post('/uyelik', ah(async (req, res) => {
       String(meslek || '').slice(0, 100), String(alan || '').slice(0, 200),
       String(sehir || '').slice(0, 100), String(neden || '').slice(0, 2000)
     );
+
+  try {
+    await sendMembershipNotification({ ad, soyad, eposta, telefon, meslek, alan, sehir, neden });
+  } catch (err) {
+    console.error('Uyelik e-postasi gonderilemedi:', err.message);
+  }
+
   res.json({ ok: true });
 }));
 
