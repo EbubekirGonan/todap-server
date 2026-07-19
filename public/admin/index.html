@@ -1107,7 +1107,7 @@ function renderHaberTable() {
 }
 
 function editHaber(id) {
-  const d = haberler.find(h => h.id === id);
+  const d = haberler.find(h => String(h.id) === String(id));
   if (!d) return;
   document.getElementById('haber-form-title').textContent = 'Haberi Düzenle';
   document.getElementById('haber-edit-id').value    = id;
@@ -1205,7 +1205,7 @@ function renderEtkinlikTable() {
 }
 
 function editEtkinlik(id) {
-  const d = etkinlikler.find(e => e.id === id);
+  const d = etkinlikler.find(e => String(e.id) === String(id));
   if (!d) return;
   document.getElementById('etkinlik-form-title').textContent = 'Etkinliği Düzenle';
   document.getElementById('etkinlik-edit-id').value    = id;
@@ -1297,7 +1297,7 @@ function renderYayinTable() {
 }
 
 function editYayin(id) {
-  const item = yayinlar.find(y => y.id === id);
+  const item = yayinlar.find(y => String(y.id) === String(id));
   if (!item) return;
   document.getElementById('yayin-form-title').textContent = 'Yayın / Kaynak Düzenle';
   document.getElementById('yayin-edit-id').value = id;
@@ -1639,7 +1639,7 @@ function renderFaaliyetTable() {
 }
 
 function editFaaliyet(id) {
-  const f = faaliyetler.find(x => x.id === id);
+  const f = faaliyetler.find(x => String(x.id) === String(id));
   if (!f) return;
   document.getElementById('faaliyet-form-title').textContent = 'Faaliyeti Düzenle';
   document.getElementById('faaliyet-edit-id').value  = id;
@@ -1709,7 +1709,7 @@ function renderBasindaTable() {
 }
 
 function editBasinda(id) {
-  const item = basinda.find(x => x.id === id);
+  const item = basinda.find(x => String(x.id) === String(id));
   if (!item) return;
   document.getElementById('basinda-form-title').textContent = 'Haberi Düzenle';
   document.getElementById('basinda-edit-id').value    = id;
@@ -1788,7 +1788,7 @@ function renderVideoTable() {
     </tr>`).join('');
 }
 function editVideo(id) {
-  const v = videos.find(x => x.id === id);
+  const v = videos.find(x => String(x.id) === String(id));
   if (!v) return;
   document.getElementById('video-form-title').textContent = 'Videoyu Düzenle';
   document.getElementById('video-edit-id').value          = id;

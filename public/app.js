@@ -24,7 +24,6 @@ async function initApp() {
     for (const e of etkinlikler) etkinlikMap[e.slug] = e;
 
     buildTicker();
-    buildHeroLive();
     buildFeaturedHaberler();
     buildFeaturedEtkinlikler();
     buildHaberlerList();
@@ -32,105 +31,6 @@ async function initApp() {
   } catch (err) {
     console.error('Veri yüklenemedi:', err);
   }
-}
-
-// ── Hero Live (Son Tarihli İçerik) ─────────────────────────
-function buildHeroLive() {
-  const titleEl = document.getElementById('hero-live-title');
-  const linkEl = document.getElementById('hero-live-link');
-  if (!titleEl || !linkEl) return;
-
-  const haber = (DATA.haberler || []).reduce((acc, cur) => {
-    if (!acc) return cur;
-    return compareByPublishedDate(cur, acc) > 0 ? cur : acc;
-  }, null);
-
-  const etkinlikItem = (DATA.etkinlikler || []).reduce((acc, cur) => {
-    if (!acc) return cur;
-    return compareByPublishedDate(cur, acc) > 0 ? cur : acc;
-  }, null);
-
-  let latest = null;
-  let type = '';
-  if (haber && etkinlikItem) {
-    if (compareByPublishedDate(haber, etkinlikItem) >= 0) {
-      latest = haber;
-      type = 'haber';
-    } else {
-      latest = etkinlikItem;
-      type = 'etkinlik';
-    }
-  } else if (haber) {
-    latest = haber;
-    type = 'haber';
-  } else if (etkinlikItem) {
-    latest = etkinlikItem;
-    type = 'etkinlik';
-  }
-
-  if (!latest) {
-    titleEl.textContent = 'Henüz içerik bulunmuyor.';
-    linkEl.style.display = 'none';
-    return;
-  }
-
-  titleEl.textContent = latest.baslik || 'Yeni içerik';
-  linkEl.style.display = 'inline-block';
-  linkEl.onclick = (e) => {
-    e.preventDefault();
-    if (type === 'haber') article(latest.slug);
-    else etkinlik(latest.slug);
-  };
-}
-
-function compareByPublishedDate(a, b) {
-  const aPublished = getPublishedTimestamp(a);
-  const bPublished = getPublishedTimestamp(b);
-  if (aPublished !== bPublished) return aPublished - bPublished;
-
-  const aCreated = getCreatedTimestamp(a);
-  const bCreated = getCreatedTimestamp(b);
-  if (aCreated !== bCreated) return aCreated - bCreated;
-
-  const aId = Number(a?.id) || 0;
-  const bId = Number(b?.id) || 0;
-  if (aId !== bId) return aId - bId;
-
-  return getPublishedTimestamp(a) - getPublishedTimestamp(b);
-}
-
-function getCreatedTimestamp(item) {
-  if (!item) return 0;
-  const created = parseFlexibleDate(item.olusturuldu);
-  if (!Number.isNaN(created)) return created;
-  return 0;
-}
-
-function getPublishedTimestamp(item) {
-  if (!item) return 0;
-  const published = parseFlexibleDate(item.tarih);
-  if (!Number.isNaN(published)) return published;
-  return 0;
-}
-
-function parseFlexibleDate(value) {
-  const raw = String(value || '').trim();
-  if (!raw) return NaN;
-
-  const normalized = raw.replace(' ', 'T');
-  const direct = Date.parse(normalized);
-  if (!Number.isNaN(direct)) return direct;
-
-  const dmy = raw.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/);
-  if (dmy) {
-    const day = dmy[1].padStart(2, '0');
-    const month = dmy[2].padStart(2, '0');
-    const year = dmy[3];
-    const parsed = Date.parse(`${year}-${month}-${day}T00:00:00`);
-    if (!Number.isNaN(parsed)) return parsed;
-  }
-
-  return NaN;
 }
 
 // ── Navigasyon ───────────────────────────────────────────────

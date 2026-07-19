@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>TODAP — Toplumsal Dayanışma İçin Psikologlar Derneği</title>
+<link rel="icon" type="image/png" href="/logo-raw.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -412,8 +413,8 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
             <div class="hero-live">
               <span class="hero-live-dot"></span>
               <div class="hero-live-text">
-                <strong id="hero-live-title">Yeni içerik yükleniyor...</strong>
-                <a id="hero-live-link" class="hero-live-link" href="#">Detayları Gör</a>
+                <strong>Todap Çalışmalarına Destek Ol!</strong>
+                <a class="hero-live-link" href="#" onclick="event.preventDefault();go('sabit-duyuru')">Detayları Gör</a>
               </div>
             </div>
           </div>
@@ -498,6 +499,20 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
       </div>
     </div>
   </section>
+</div>
+
+<!-- SABİT DUYURU -->
+<div id="p-sabit-duyuru" class="pv">
+  <div class="ah" style="min-height:auto;padding:3rem 2.5rem 2.5rem"><div style="max-width:680px;margin:0 auto">
+    <a class="ab" onclick="goHome()">Ana Sayfaya Dön</a>
+    <h1 style="font-family:var(--fd);font-size:clamp(32px,5vw,54px);font-weight:var(--weight-black);color:var(--color-text-primary);text-transform:uppercase;margin-top:1.5rem;line-height:1.05">Todap Çalışmalarına Destek Ol!<br><span style="font-family:var(--fs);font-style:italic;font-weight:var(--weight-regular);text-transform:none;font-size:.7em;color:var(--color-text-secondary)"></span></h1>
+  </div></div>
+  <section><div style="max-width:680px;margin:0 auto;padding-bottom:3rem">
+    <!-- Bu alandaki metin ve bağlantıyı ihtiyaca göre güncelleyebilirsiniz. -->
+    <p style="font-size:var(--text-base);color:var(--ink-muted);line-height:1.8;margin-bottom:1.25rem">
+      Todap'ın faaliyetlerine destek olmak için aşağıdaki adresten bağışta bulunabilirsiniz.  </p>
+    <a class="fs2" href="https://fonzip.com/todap/bagis" target="_blank" rel="noopener noreferrer" style="display:inline-flex;justify-content:center;align-items:center;text-align:center;text-decoration:none">Bağış Sayfası</a>
+  </div></section>
 </div>
 
 <!-- HABER DETAY -->
