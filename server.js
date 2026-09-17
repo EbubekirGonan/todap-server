@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path    = require('path');
 const session = require('express-session');
+const helmet  = require('helmet');
 const db      = require('./db');
 const { buildTokensCss, rowToTheme } = require('./themeTokens');
 
@@ -10,16 +11,23 @@ const { buildTokensCss, rowToTheme } = require('./themeTokens');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+const sessionSecret = process.env.SESSION_SECRET || 'todap-dev-secret-key';
+
+if (process.env.NODE_ENV === 'production' && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32)) {
+  throw new Error('Production ortamında en az 32 karakterlik SESSION_SECRET zorunludur.');
+}
 
 // Render.com gibi reverse proxy arkasında çalışırken güvenli session için gerekli
 app.set('trust proxy', 1);
+app.disable('x-powered-by');
 
 // ── Middleware ───────────────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(helmet({ contentSecurityPolicy: false }));
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'todap-dev-secret-key',
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
   cookie: {

@@ -2,8 +2,11 @@
 const express = require('express');
 const router  = express.Router();
 const bcrypt  = require('bcryptjs');
+const crypto  = require('crypto');
+const rateLimit = require('express-rate-limit');
 const db      = require('../db');
 const auth    = require('../middleware/auth');
+const { sendAdminSecurityNotification } = require('../mailer');
 const { THEME_COLUMNS, DEFAULT_THEME, THEME_LABELS, validateAndNormalizeTheme, rowToTheme } = require('../themeTokens');
 
 function ah(fn) {
@@ -17,8 +20,45 @@ function isUniqueError(err) {
   return /duplicate key|unique/i.test(String(err && err.message));
 }
 
+const loginAlertedIps = new Map();
+const loginLimit = Number(process.env.ADMIN_LOGIN_LIMIT || 10);
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: loginLimit,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { error: 'Çok fazla giriş denemesi. Lütfen 15 dakika sonra tekrar deneyin.' },
+  handler: (req, res) => {
+    const ip = req.ip || 'bilinmiyor';
+    const now = Date.now();
+    const alertedUntil = loginAlertedIps.get(ip) || 0;
+    if (alertedUntil <= now) {
+      loginAlertedIps.set(ip, now + 15 * 60 * 1000);
+      void sendAdminSecurityNotification({
+        attempts: loginLimit,
+        ip,
+        username: req.body && req.body.username,
+        userAgent: req.get('user-agent')
+      }).catch((err) => console.error('[security-alert] E-posta gönderilemedi:', err));
+    }
+    res.status(429).json({ error: 'Çok fazla giriş denemesi. Lütfen 15 dakika sonra tekrar deneyin.' });
+  }
+});
+
+function csrfProtection(req, res, next) {
+  if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) return next();
+  const expected = req.session && req.session.csrfToken;
+  const received = req.get('X-CSRF-Token');
+  if (!expected || !received || expected.length !== received.length ||
+      !crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(received))) {
+    return res.status(403).json({ error: 'Geçersiz CSRF token.' });
+  }
+  next();
+}
+
 // ── Oturum ───────────────────────────────────────────────────
-router.post('/login', ah(async (req, res) => {
+router.post('/login', loginLimiter, ah(async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password)
     return res.status(400).json({ error: 'Kullanıcı adı ve şifre gerekli.' });
@@ -33,11 +73,15 @@ router.post('/login', ah(async (req, res) => {
   if (!valid)
     return res.status(401).json({ error: 'Hatalı kullanıcı adı veya şifre.' });
 
+  await new Promise((resolve, reject) => {
+    req.session.regenerate((err) => err ? reject(err) : resolve());
+  });
   req.session.admin = { username };
+  req.session.csrfToken = crypto.randomBytes(32).toString('hex');
   res.json({ ok: true });
 }));
 
-router.post('/logout', (req, res) => {
+router.post('/logout', csrfProtection, (req, res) => {
   req.session.destroy(() => res.json({ ok: true }));
 });
 
@@ -46,6 +90,13 @@ router.get('/me', (req, res) => {
     return res.json({ username: req.session.admin.username });
   res.status(401).json({ error: 'Oturum açılmamış' });
 });
+
+router.get('/csrf-token', auth, (req, res) => {
+  if (!req.session.csrfToken) req.session.csrfToken = crypto.randomBytes(32).toString('hex');
+  res.json({ token: req.session.csrfToken });
+});
+
+router.use(csrfProtection);
 
 // ── Tema / Renk Degiskenleri ───────────────────────────────
 router.get('/theme-colors', auth, ah(async (_req, res) => {

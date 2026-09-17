@@ -99,8 +99,23 @@ async function sendMembershipNotification(payload) {
   });
 }
 
+async function sendAdminSecurityNotification(payload) {
+  const now = new Date().toLocaleString('tr-TR');
+  return sendFormNotification({
+    subject: 'TODAP admin: Şüpheli giriş denemeleri',
+    fields: {
+      Tarih: now,
+      'Deneme sayısı': payload.attempts,
+      'IP adresi': payload.ip,
+      'Kullanıcı adı': payload.username || '—',
+      'User-Agent': payload.userAgent || '—'
+    }
+  });
+}
+
 module.exports = {
   isMailerConfigured,
   sendContactNotification,
-  sendMembershipNotification
+  sendMembershipNotification,
+  sendAdminSecurityNotification
 };
