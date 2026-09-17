@@ -45,6 +45,12 @@ app.get('/tokens.css', async (_req, res) => {
   res.send(css);
 });
 
+// Yönetim paneli arama sonuçlarında görünmemeli.
+app.use('/admin', (_req, res, next) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
+  next();
+});
+
 // ── Statik dosyalar ──────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -54,6 +60,7 @@ app.use('/api/admin', require('./routes/admin'));
 
 // ── Admin SPA ────────────────────────────────────────────────
 app.get('/admin', (_req, res) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
   res.sendFile(path.join(__dirname, 'public', 'admin', 'index.html'));
 });
 
