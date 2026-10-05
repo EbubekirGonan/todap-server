@@ -34,17 +34,135 @@ async function initApp() {
 }
 
 // ── Navigasyon ───────────────────────────────────────────────
-function go(page) {
+const PAGE_ROUTES = {
+  home: '/home',
+  'sabit-duyuru': '/sayfa/sabit-duyuru',
+  haberler: '/haberler',
+  haber: '/haber',
+  etkinlikler: '/etkinlikler',
+  etkinlik: '/etkinlik',
+  uyelik: '/uyelik',
+  iletisim: '/iletisim',
+  'todap-kimdir': '/sayfa/todap-kimdir',
+  tuzuk: '/sayfa/tuzuk',
+  'psikolog-haklari-birimi': '/birim/psikolog-haklari-birimi',
+  'kadin-komisyonu': '/birim/kadin-komisyonu',
+  'meslek-yasasi-komisyonu': '/birim/meslek-yasasi-komisyonu',
+  'ogrenci-komisyonu': '/birim/ogrenci-komisyonu',
+  'etik-kurullar': '/sayfa/etik-kurullar',
+  'elestirel-psikoloji-bulteni': '/sayfa/elestirel-psikoloji-bulteni',
+  'psikoloji-ve-toplum-bulteni': '/sayfa/psikoloji-ve-toplum-bulteni',
+  sempozyum: '/sayfa/sempozyum',
+  'faaliyet-listesi': '/faaliyetler',
+  'faaliyet-detay': '/faaliyet',
+  'basinda-todap': '/basinda-todap',
+  videolar: '/videolar',
+};
+const ROUTE_PAGES = Object.fromEntries(
+  Object.entries(PAGE_ROUTES).map(([page, route]) => [route, page])
+);
+
+function renderPage(page) {
   closeMobileMenu();
   document.querySelectorAll('.pv').forEach(p => p.classList.remove('on'));
-  const t = document.getElementById('p-' + page);
-  if (t) { t.classList.add('on'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  const target = document.getElementById('p-' + page);
+  if (target) {
+    target.classList.add('on');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   loadSabitSayfa(page);
   if (page === 'faaliyet-listesi') loadFaaliyetler();
   if (page === 'faaliyet-detay') window.scrollTo({ top: 0, behavior: 'instant' });
   if (page === 'basinda-todap') loadBasindaTodap();
   if (page === 'videolar') loadVideolar();
-  if (page === 'video-detay') window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function pageFromLocation() {
+  const route = window.location.hash.slice(1);
+  const detailMatch = route.match(/^\/(haber|etkinlik|faaliyet)\/([1-9]\d*)$/);
+  if (detailMatch) {
+    const id = Number(detailMatch[2]);
+    if (Number.isSafeInteger(id) && id > 0) {
+      return { page: detailMatch[1] === 'faaliyet' ? 'faaliyet-detay' : detailMatch[1], id };
+    }
+  }
+  if (route === '/haber' || route.startsWith('/haber/')) return { page: 'haberler', normalizeToList: true };
+  if (route === '/etkinlik' || route.startsWith('/etkinlik/')) return { page: 'etkinlikler', normalizeToList: true };
+  if (route === '/faaliyet' || route.startsWith('/faaliyet/')) return { page: 'faaliyet-listesi', normalizeToList: true };
+  const page = ROUTE_PAGES[route];
+  return page ? { page } : null;
+}
+
+function restorePageFromLocation() {
+  let route = pageFromLocation();
+  if (!route) {
+    route = { page: 'home' };
+    history.replaceState(route, '', `#${PAGE_ROUTES.home}`);
+  }
+  if (route.normalizeToList) {
+    history.replaceState({ page: route.page }, '', `#${PAGE_ROUTES[route.page]}`);
+  }
+  if (route.id) {
+    loadDetailFromLocation(route.page, route.id);
+    return;
+  }
+  renderPage(route.page);
+}
+
+function initializeNavigation() {
+  if (!pageFromLocation()) {
+    history.replaceState({ page: 'home' }, '', `#${PAGE_ROUTES.home}`);
+  }
+  restorePageFromLocation();
+  window.addEventListener('popstate', restorePageFromLocation);
+}
+
+function go(page) {
+  const route = PAGE_ROUTES[page];
+  if (!route) {
+    renderPage(page);
+    return;
+  }
+
+  const url = `#${route}`;
+  if (window.location.hash !== url) {
+    history.pushState({ page }, '', url);
+  }
+  renderPage(page);
+}
+
+function goToDetail(page, id) {
+  if (!Number.isSafeInteger(Number(id)) || Number(id) <= 0) {
+    console.error(`Geçersiz ${page} kimliği: ${id}`);
+    return;
+  }
+  const route = `${PAGE_ROUTES[page]}/${Number(id)}`;
+  if (window.location.hash !== `#${route}`) {
+    history.pushState({ page, id: Number(id) }, '', `#${route}`);
+  }
+  renderPage(page);
+}
+
+let detailLoadSequence = 0;
+async function loadDetailFromLocation(page, id) {
+  const sequence = ++detailLoadSequence;
+  renderPage(page);
+  const endpoint = page === 'haber' ? 'haberler' : page === 'etkinlik' ? 'etkinlikler' : 'faaliyetler';
+  try {
+    const response = await fetch(`/api/${endpoint}/id/${id}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const record = await response.json();
+    if (sequence !== detailLoadSequence || window.location.hash !== `#${PAGE_ROUTES[page]}/${id}`) return;
+    if (page === 'haber') renderArticle(record, false);
+    else if (page === 'etkinlik') renderEtkinlik(record, false);
+    else renderFaaliyet(record, false);
+  } catch (err) {
+    if (sequence !== detailLoadSequence || window.location.hash !== `#${PAGE_ROUTES[page]}/${id}`) return;
+    console.error(`${page} detayı yüklenemedi:`, err);
+    const listPage = page === 'haber' ? 'haberler' : page === 'etkinlik' ? 'etkinlikler' : 'faaliyet-listesi';
+    history.replaceState({ page: listPage }, '', `#${PAGE_ROUTES[listPage]}`);
+    renderPage(listPage);
+  }
 }
 
 // ── Sabit Sayfa Yükle ────────────────────────────────────────
@@ -109,12 +227,17 @@ function loadFaaliyetler() {
     .catch(() => {});
 }
 function openFaaliyet(id) {
-  const f = faaliyetListesi.find(x => x.id === id);
+  const f = faaliyetListesi.find(x => Number(x.id) === Number(id));
   if (!f) return;
+  renderFaaliyet(f);
+}
+
+function renderFaaliyet(f, navigate = true) {
   document.getElementById('fd-baslik').textContent = f.baslik;
   document.getElementById('fd-meta').textContent   = fmtDate(f.crdate) || '';
   document.getElementById('fd-icerik').innerHTML   = f.icerik || '<p>İçerik bulunmuyor.</p>';
-  go('faaliyet-detay');
+  if (navigate) goToDetail('faaliyet-detay', Number(f.id));
+  else renderPage('faaliyet-detay');
 }
 
 // ── Basında Todap Yükle ────────────────────────────────
@@ -166,6 +289,14 @@ function getYoutubeThumbnail(url) {
   const id = getYoutubeId(url);
   return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : '';
 }
+function getSafeVideoUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? parsed.href : '';
+  } catch {
+    return '';
+  }
+}
 
 function loadVideolar() {
   const listEl = document.getElementById('video-list-body');
@@ -182,15 +313,18 @@ function loadVideolar() {
       listEl.innerHTML = list.map(v => {
         const thumb = v.thumbnail_url || getYoutubeThumbnail(v.video_url);
         const ozet  = v.aciklama ? (v.aciklama.length > 120 ? v.aciklama.slice(0, 120) + '...' : v.aciklama) : '';
+        const videoUrl = getSafeVideoUrl(v.video_url);
+        const tag = videoUrl ? 'a' : 'div';
+        const linkAttrs = videoUrl ? `href="${esc(videoUrl)}" target="_blank" rel="noopener noreferrer"` : '';
         return `
-        <div onclick="openVideo(${v.id})" style="display:flex;gap:1rem;align-items:flex-start;padding:1.25rem 0;border-bottom:1px solid var(--border);cursor:pointer">
+        <${tag} ${linkAttrs} style="display:flex;gap:1rem;align-items:flex-start;padding:1.25rem 0;border-bottom:1px solid var(--border);cursor:pointer;text-decoration:none;color:inherit">
           ${thumb ? `<img src="${esc(thumb)}" alt="" style="width:120px;height:68px;object-fit:cover;border-radius:5px;flex-shrink:0;background:#eee">` : `<div style="width:120px;height:68px;background:var(--border);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px">▶</div>`}
           <div style="flex:1;min-width:0">
             <div style="font-family:var(--fd);font-size:15px;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:.3rem">${esc(v.baslik)}</div>
             ${ozet ? `<div style="font-size:13px;color:var(--ink-muted);line-height:1.5;margin-bottom:.3rem">${esc(ozet)}</div>` : ''}
             <div style="font-size:11px;font-family:var(--fd);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--burgundy)">${fmtDate(v.yayinlanma_tarihi)}</div>
           </div>
-        </div>`;
+        </${tag}>`;
       }).join('');
     })
     .catch(() => {});
@@ -281,13 +415,14 @@ function article(slug) {
     .catch(() => go('haberler'));
 }
 
-function renderArticle(d) {
+function renderArticle(d, navigate = true) {
   document.getElementById('a-tag').textContent = d.kategori;
   document.getElementById('a-tag').className = 'at' + (d.renk ? ' ' + d.renk : '');
   document.getElementById('a-title').textContent = d.baslik;
   document.getElementById('a-date').textContent = d.gosterim_tarihi || fmtDate(d.tarih);
   document.getElementById('a-body').innerHTML = linkifyHtmlContent(d.ozet_icerik || d.detayli_icerik || '');
-  go('haber');
+  if (navigate) goToDetail('haber', Number(d.id));
+  else renderPage('haber');
 }
 
 // ── Etkinlik Detay ───────────────────────────────────────────
@@ -300,12 +435,13 @@ function etkinlik(slug) {
     .catch(() => go('etkinlikler'));
 }
 
-function renderEtkinlik(d) {
+function renderEtkinlik(d, navigate = true) {
   document.getElementById('e-tag').textContent = d.kategori;
   document.getElementById('e-title').textContent = d.baslik;
   document.getElementById('e-date').textContent = d.gosterim_tarihi || fmtDate(d.tarih);
   document.getElementById('e-body').innerHTML = linkifyHtmlContent(d.icerik || '');
-  go('etkinlik');
+  if (navigate) goToDetail('etkinlik', Number(d.id));
+  else renderPage('etkinlik');
 }
 
 // ── Metin İçindeki URL'leri Linke Çevir ─────────────────────
@@ -497,28 +633,75 @@ function buildEtkinliklerList() {
 }
 
 // ── Form Gönderimi ───────────────────────────────────────────
-function formOK(e, successId) {
+async function formOK(e, successId) {
   e.preventDefault();
   const form   = e.target;
   const action = form.dataset.action;
   const data   = Object.fromEntries(new FormData(form));
+  const submitButton = form.querySelector('button[type="submit"]');
+  const error = document.getElementById(`${successId}-error`);
 
-  fetch(action, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  })
-    .then(r => r.json())
-    .then(() => {
-      form.style.display = 'none';
-      const ok = document.getElementById(successId);
-      if (ok) ok.style.display = 'block';
-    })
-    .catch(() => {
-      form.style.display = 'none';
-      const ok = document.getElementById(successId);
-      if (ok) ok.style.display = 'block';
+  if (submitButton?.disabled) return;
+  if (error) {
+    error.textContent = '';
+    error.style.display = 'none';
+  }
+  if (submitButton) submitButton.disabled = true;
+
+  try {
+    const response = await fetch(action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
     });
+    let result = {};
+    try {
+      result = await response.json();
+    } catch {
+      if (response.ok) throw new Error('Sunucudan geçerli bir yanıt alınamadı.');
+    }
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Gönderim başarısız oldu. Lütfen tekrar deneyin.');
+    }
+
+    form.style.display = 'none';
+    const ok = document.getElementById(successId);
+    if (ok) ok.style.display = 'block';
+    const resubmit = document.getElementById(`${successId}-resubmit`);
+    if (resubmit) resubmit.style.display = 'block';
+  } catch (err) {
+    if (error) {
+      error.textContent = err instanceof TypeError
+        ? 'Bağlantı kurulamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.'
+        : err?.message || 'Gönderim başarısız oldu. Lütfen tekrar deneyin.';
+      error.style.display = 'block';
+    } else {
+      console.error('Form gönderilemedi:', err);
+    }
+  } finally {
+    if (submitButton) submitButton.disabled = false;
+  }
+}
+
+function resubmitForm(formId, successId) {
+  const form = document.getElementById(formId);
+  const success = document.getElementById(successId);
+  if (!form || !success) return;
+
+  form.reset();
+  form.style.display = '';
+  success.style.display = 'none';
+  const resubmit = document.getElementById(`${successId}-resubmit`);
+  if (resubmit) resubmit.style.display = 'none';
+
+  const error = document.getElementById(`${successId}-error`);
+  if (error) {
+    error.textContent = '';
+    error.style.display = 'none';
+  }
+
+  form.querySelector('input, select, textarea')?.focus();
 }
 
 // ── Yardımcı: HTML kaçış ─────────────────────────────────────
@@ -584,4 +767,7 @@ function esc(str) {
 })();
 
 // ── Başlat ───────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', initApp);
+document.addEventListener('DOMContentLoaded', () => {
+  initializeNavigation();
+  initApp();
+});

@@ -1,6 +1,7 @@
 'use strict';
 const express = require('express');
 const router  = express.Router();
+const rateLimit = require('express-rate-limit');
 const db      = require('../db');
 const { sendContactNotification, sendMembershipNotification } = require('../mailer');
 
@@ -11,9 +12,86 @@ function ah(fn) {
   });
 }
 
+function createFormLimiter(message) {
+  return rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 5,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: { error: message }
+  });
+}
+
+const contactFormLimiter = createFormLimiter('Çok fazla mesaj gönderdiniz. Lütfen 15 dakika sonra tekrar deneyin.');
+const membershipFormLimiter = createFormLimiter('Çok fazla başvuru gönderdiniz. Lütfen 15 dakika sonra tekrar deneyin.');
+
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const contactFormLimits = { isim: 200, eposta: 200, konu: 200, mesaj: 5000 };
+const membershipFormLimits = {
+  ad: 100,
+  soyad: 100,
+  eposta: 200,
+  telefon: 50,
+  meslek: 100,
+  alan: 200,
+  sehir: 100,
+  neden: 2000
+};
+const formFieldLabels = {
+  isim: 'İsim',
+  ad: 'Ad',
+  soyad: 'Soyad',
+  eposta: 'E-posta',
+  konu: 'Konu',
+  mesaj: 'Mesaj',
+  telefon: 'Telefon',
+  meslek: 'Meslek / unvan',
+  alan: 'Çalışma alanı',
+  sehir: 'Şehir',
+  neden: 'Açıklama'
+};
+
+function validateForm(body, limits, requiredFields) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return { error: 'Form verileri geçersiz.' };
+  }
+
+  const values = {};
+  for (const [field, maxLength] of Object.entries(limits)) {
+    const value = body[field] === undefined ? '' : body[field];
+    if (typeof value !== 'string') {
+      return { error: 'Form alanları metin olmalıdır.' };
+    }
+    values[field] = value.trim();
+    if (values[field].length > maxLength) {
+      return { error: `${formFieldLabels[field]} en fazla ${maxLength} karakter olabilir.` };
+    }
+  }
+
+  const missingFields = requiredFields.filter((field) => !values[field]);
+  if (missingFields.length) {
+    return { error: `${missingFields.map((field) => formFieldLabels[field]).join(', ')} zorunludur.` };
+  }
+  if (!emailPattern.test(values.eposta)) {
+    return { error: 'Geçerli bir e-posta adresi girin.' };
+  }
+
+  return { values };
+}
+
 // ── Haberler ─────────────────────────────────────────────────
 router.get('/haberler', ah(async (_req, res) => {
   res.json(await db.prepare('SELECT * FROM haberler WHERE aktif=1 ORDER BY tarih DESC').all());
+}));
+
+router.get('/haberler/id/:id', ah(async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return res.status(400).json({ error: 'Geçersiz haber kimliği.' });
+  }
+  const row = await db.prepare('SELECT * FROM haberler WHERE id=? AND aktif=1').get(id);
+  if (!row) return res.status(404).json({ error: 'Haber bulunamadı.' });
+  res.json(row);
 }));
 
 router.get('/haberler/:slug', ah(async (req, res) => {
@@ -25,6 +103,16 @@ router.get('/haberler/:slug', ah(async (req, res) => {
 // ── Etkinlikler ──────────────────────────────────────────────
 router.get('/etkinlikler', ah(async (_req, res) => {
   res.json(await db.prepare('SELECT * FROM etkinlikler WHERE aktif=1 ORDER BY tarih DESC').all());
+}));
+
+router.get('/etkinlikler/id/:id', ah(async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return res.status(400).json({ error: 'Geçersiz etkinlik kimliği.' });
+  }
+  const row = await db.prepare('SELECT * FROM etkinlikler WHERE id=? AND aktif=1').get(id);
+  if (!row) return res.status(404).json({ error: 'Etkinlik bulunamadı.' });
+  res.json(row);
 }));
 
 router.get('/etkinlikler/:slug', ah(async (req, res) => {
@@ -92,13 +180,14 @@ router.get('/ticker', ah(async (_req, res) => {
 }));
 
 // ── İletişim Formu ───────────────────────────────────────────
-router.post('/iletisim', ah(async (req, res) => {
-  const { isim, eposta, konu, mesaj } = req.body;
-  if (!isim || !eposta || !mesaj) {
-    return res.status(400).json({ error: 'İsim, e-posta ve mesaj zorunludur.' });
+router.post('/iletisim', contactFormLimiter, ah(async (req, res) => {
+  const validation = validateForm(req.body, contactFormLimits, ['isim', 'eposta', 'mesaj']);
+  if (validation.error) {
+    return res.status(400).json({ error: validation.error });
   }
+  const { isim, eposta, konu, mesaj } = validation.values;
   await db.prepare('INSERT INTO mesajlar (isim,eposta,konu,mesaj) VALUES (?,?,?,?)')
-    .run(String(isim).slice(0, 200), String(eposta).slice(0, 200), String(konu || '').slice(0, 200), String(mesaj).slice(0, 5000));
+    .run(isim, eposta, konu, mesaj);
 
   try {
     await sendContactNotification({ isim, eposta, konu, mesaj });
@@ -110,19 +199,15 @@ router.post('/iletisim', ah(async (req, res) => {
 }));
 
 // ── Üyelik Başvurusu ─────────────────────────────────────────
-router.post('/uyelik', ah(async (req, res) => {
-  const { ad, soyad, eposta, telefon, meslek, alan, sehir, neden } = req.body;
-  if (!ad || !soyad || !eposta) {
-    return res.status(400).json({ error: 'Ad, soyad ve e-posta zorunludur.' });
+router.post('/uyelik', membershipFormLimiter, ah(async (req, res) => {
+  const validation = validateForm(req.body, membershipFormLimits, ['ad', 'soyad', 'eposta', 'meslek', 'sehir']);
+  if (validation.error) {
+    return res.status(400).json({ error: validation.error });
   }
+  const { ad, soyad, eposta, telefon, meslek, alan, sehir, neden } = validation.values;
   await db.prepare(`INSERT INTO basvurular (ad,soyad,eposta,telefon,meslek,alan,sehir,neden)
               VALUES (?,?,?,?,?,?,?,?)`)
-    .run(
-      String(ad).slice(0, 100), String(soyad).slice(0, 100),
-      String(eposta).slice(0, 200), String(telefon || '').slice(0, 50),
-      String(meslek || '').slice(0, 100), String(alan || '').slice(0, 200),
-      String(sehir || '').slice(0, 100), String(neden || '').slice(0, 2000)
-    );
+    .run(ad, soyad, eposta, telefon, meslek, alan, sehir, neden);
 
   try {
     await sendMembershipNotification({ ad, soyad, eposta, telefon, meslek, alan, sehir, neden });
@@ -143,6 +228,16 @@ router.get('/sabit-sayfalar/:kategori', ah(async (req, res) => {
 // ── Faaliyetler ──────────────────────────────────────────────
 router.get('/faaliyetler', ah(async (_req, res) => {
   res.json(await db.prepare('SELECT * FROM faaliyetler ORDER BY crdate DESC').all());
+}));
+
+router.get('/faaliyetler/id/:id', ah(async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return res.status(400).json({ error: 'Geçersiz faaliyet kimliği.' });
+  }
+  const row = await db.prepare('SELECT * FROM faaliyetler WHERE id=?').get(id);
+  if (!row) return res.status(404).json({ error: 'Faaliyet bulunamadı.' });
+  res.json(row);
 }));
 
 // ── Basında Todap ─────────────────────────────────────────────

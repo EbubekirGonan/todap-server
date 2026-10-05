@@ -176,8 +176,7 @@ h2.dp em{font-family:var(--fs);font-style:italic;font-weight:500;text-transform:
 .bws:hover{background:var(--accent-deep)}
 footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid var(--border)}
 .fi{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3rem}
-.fl{font-family:var(--fd);font-size:var(--text-xl);font-weight:var(--weight-black);color:var(--ink);display:block;margin-bottom:.75rem}
-.fl span{color:var(--mustard)}
+.fl{display:block;height:36px;width:auto;margin-bottom:.75rem}
 .fc h4{font-family:var(--fd);font-size:var(--text-xs);font-weight:var(--weight-bold);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:1rem}
 .fc ul{list-style:none}
 .fc li{margin-bottom:.5rem}
@@ -220,6 +219,9 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
 .fs2:hover{background:var(--accent-deep)}
 .fn{font-size:var(--text-xs);color:var(--ink-faint);margin-top:1rem;text-align:center;line-height:1.6}
 .sm{display:none;background:#eef7ee;border:1px solid #c3e6c3;border-radius:var(--radius-md);padding:1.25rem;text-align:center;font-size:var(--text-base);color:#2d6a2d;margin-top:1.5rem}
+.form-error{display:none;color:#9b1c1c;margin:1rem 0;font-size:var(--text-sm)}
+.form-restart-link{display:none;background:none;border:0;padding:0;margin:.85rem auto 0;color:var(--burgundy);font:inherit;font-weight:var(--weight-bold);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.form-restart-link:hover{color:var(--accent-deep)}
 /* Hamburger */
 .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;margin-left:8px;flex-shrink:0}
 .hamburger span{display:block;width:22px;height:2px;background:var(--ink);border-radius:1px;transition:all .3s}
@@ -574,7 +576,7 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
   <section><div class="fp">
     <h2>Başvuru Formu</h2>
     <p class="sub">TODAP üyesi olmak için aşağıdaki formu doldurun.</p>
-    <form data-action="/api/uyelik" onsubmit="formOK(event,'u-ok')">
+    <form id="uyelik-form" data-action="/api/uyelik" onsubmit="formOK(event,'u-ok')">
       <div class="fr2">
         <div class="fg"><label>Ad</label><input type="text" name="ad" required placeholder="Adınız"/></div>
         <div class="fg"><label>Soyad</label><input type="text" name="soyad" required placeholder="Soyadınız"/></div>
@@ -593,10 +595,14 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
         <div class="fg"><label>Şehir</label><input type="text" name="sehir" required placeholder="İstanbul"/></div>
       </div>
       <div class="fg"><label>Neden üye olmak istiyorsunuz?</label><textarea name="neden" placeholder="Kısaca belirtiniz..."></textarea></div>
+      <p id="u-ok-error" class="form-error" role="alert" aria-live="polite"></p>
       <button type="submit" class="fs2">Başvuruyu Gönder</button>
       <p class="fn">Başvurular TODAP Yönetim Kurulu tarafından değerlendirilir. Bilgileriniz üçüncü taraflarla paylaşılmaz.</p>
     </form>
-    <div id="u-ok" class="sm">✓ Başvurunuz alındı. En kısa sürede sizinle iletişime geçeceğiz.</div>
+    <div id="u-ok" class="sm">
+      ✓ Başvurunuz alındı. En kısa sürede sizinle iletişime geçeceğiz.
+    </div>
+    <button id="u-ok-resubmit" type="button" class="form-restart-link" onclick="resubmitForm('uyelik-form','u-ok')">Yeni başvuru yap</button>
   </div></section>
 </div>
 
@@ -610,7 +616,7 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
     <div class="fp" style="margin:0">
       <h2>Mesaj Gönder</h2>
       <p class="sub">Sorularınız, önerileriniz veya basın talepleri için.</p>
-      <form data-action="/api/iletisim" onsubmit="formOK(event,'i-ok')">
+      <form id="iletisim-form" data-action="/api/iletisim" onsubmit="formOK(event,'i-ok')">
         <div class="fr2">
           <div class="fg"><label>Ad Soyad</label><input type="text" name="isim" required placeholder="Adınız Soyadınız"/></div>
           <div class="fg"><label>E-posta</label><input type="email" name="eposta" required placeholder="ornek@mail.com"/></div>
@@ -623,9 +629,13 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
           </select>
         </div>
         <div class="fg"><label>Mesajınız</label><textarea name="mesaj" required placeholder="Mesajınızı buraya yazın..." style="min-height:150px"></textarea></div>
+        <p id="i-ok-error" class="form-error" role="alert" aria-live="polite"></p>
         <button type="submit" class="fs2">Gönder</button>
       </form>
-      <div id="i-ok" class="sm">✓ Mesajınız iletildi. En kısa sürede yanıt vereceğiz.</div>
+      <div id="i-ok" class="sm">
+        ✓ Mesajınız iletildi. En kısa sürede yanıt vereceğiz.
+      </div>
+      <button id="i-ok-resubmit" type="button" class="form-restart-link" onclick="resubmitForm('iletisim-form','i-ok')">Yeni mesaj gönder</button>
     </div>
     <div style="padding-top:1rem">
       <div style="margin-bottom:2rem"><div style="font-family:var(--fd);font-size:var(--text-xs);font-weight:var(--weight-bold);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:.5rem">E-posta</div><a href="mailto:todap.der@gmail.com" style="font-size:var(--text-base);color:var(--burgundy);text-decoration:none">todap.der@gmail.com</a></div>
@@ -807,7 +817,7 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
 <!-- FOOTER -->
 <footer>
   <div class="fi">
-    <div><span class="fl">TOD<span>AP</span></span><p style="font-size:var(--text-sm);color:var(--color-text-faint);line-height:1.6;font-family:var(--fs)">Toplumsal Dayanışma İçin Psikologlar Derneği.<br>Emek, eşitlik ve dayanışma değerleriyle<br>Türkiye'de faaliyet gösteriyoruz.</p></div>
+    <div><img class="fl" src="/logo.png" alt="TODAP"><p style="font-size:var(--text-sm);color:var(--color-text-faint);line-height:1.6;font-family:var(--fs)">Toplumsal Dayanışma İçin Psikologlar Derneği.<br>Emek, eşitlik ve dayanışma değerleriyle<br>Türkiye'de faaliyet gösteriyoruz.</p></div>
     <div class="fc"><h4>Kurumsal</h4><ul>
       <li><a onclick="goHome();goToSection('hakkinda-s')">TODAP Kimdir</a></li>
       <li><a onclick="go('tuzuk')">Tüzük</a></li>

@@ -201,9 +201,13 @@ todap-server/
 | Method | Endpoint               | Açıklama                      |
 |--------|------------------------|-------------------------------|
 | GET    | `/api/haberler`        | Aktif haberler (tarih DESC)   |
+| GET    | `/api/haberler/id/:id` | Aktif haber (ID ile)           |
 | GET    | `/api/haberler/:slug`  | Tekil haber                   |
 | GET    | `/api/etkinlikler`     | Aktif etkinlikler             |
+| GET    | `/api/etkinlikler/id/:id` | Aktif etkinlik (ID ile)     |
 | GET    | `/api/etkinlikler/:slug` | Tekil etkinlik              |
+| GET    | `/api/faaliyetler`     | Faaliyet listesi               |
+| GET    | `/api/faaliyetler/id/:id` | Tekil faaliyet (ID ile)     |
 | GET    | `/api/birimler`        | Birimler (sira ASC)           |
 | GET    | `/api/yayinlar`        | Yayınlar                      |
 | GET    | `/api/ticker`          | Ticker öğeleri                |
@@ -240,7 +244,8 @@ todap-server/
 
 ### `app.js` — Frontend Mantığı
 - `initApp()` — tüm API'lerden veri çeker, bileşenleri oluşturur
-- `go(page)` — sayfa geçişi (`.pv` class'larını toggle eder)
+- `go(page)` — `.pv` görünümlerini değiştirir ve hash rotasını tarayıcı geçmişine ekler; geri/ileri `popstate` ile görünümü geri yükler
+- Sabit sayfalar ve listeler hash rotalarıyla açılır; haber, etkinlik ve faaliyet detayları `#/haber/{id}`, `#/etkinlik/{id}` ve `#/faaliyet/{id}` rotalarıyla ID üzerinden doğrudan açılır
 - `goHome()` — ana sayfaya dön
 - `goToSection(id)` — sayfa içi kaydırma
 - `toggleMobileMenu()` / `closeMobileMenu()` — mobil hamburger menü
@@ -297,9 +302,12 @@ todap-server/
 - Admin şifresi `.env` içinde **bcrypt hash** olarak saklanır (`ADMIN_PASSWORD_HASH`)
 - Oturum yönetimi `express-session` ile yapılır
 - Tüm admin route'ları `middleware/auth.js` (requireAdmin) ile korunur
-- Form girişleri `String(...).slice(0, N)` ile boyut sınırlıdır
+- İletişim ve üyelik formu endpoint'leri, uygulama süreci başına IP başına 15 dakikada 5 istekle sınırlandırılır
+- İletişim ve üyelik formu girdileri sunucuda zorunlu alan, e-posta biçimi ve alan uzunluğu açısından doğrulanır; geçersiz girdiler veritabanına yazılmaz veya bildirim e-postasına eklenmez
 - Frontend'de `esc()` fonksiyonu XSS'e karşı HTML escape uygular
 - Session cookie: `httpOnly: true`, production'da `secure: true`
+
+> Form rate limit sayacı bellekte tutulur; sunucu yeniden başladığında sıfırlanır ve birden fazla uygulama örneği arasında paylaşılmaz.
 
 ---
 
