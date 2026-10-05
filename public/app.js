@@ -79,6 +79,7 @@ function renderPage(page) {
 
 function pageFromLocation() {
   const route = window.location.hash.slice(1);
+  if (!route) return { page: 'home' };
   const detailMatch = route.match(/^\/(haber|etkinlik|faaliyet)\/([1-9]\d*)$/);
   if (detailMatch) {
     const id = Number(detailMatch[2]);
@@ -89,6 +90,7 @@ function pageFromLocation() {
   if (route === '/haber' || route.startsWith('/haber/')) return { page: 'haberler', normalizeToList: true };
   if (route === '/etkinlik' || route.startsWith('/etkinlik/')) return { page: 'etkinlikler', normalizeToList: true };
   if (route === '/faaliyet' || route.startsWith('/faaliyet/')) return { page: 'faaliyet-listesi', normalizeToList: true };
+  if (route === PAGE_ROUTES.home) return { page: 'home', normalizeToRoot: true };
   const page = ROUTE_PAGES[route];
   return page ? { page } : null;
 }
@@ -96,8 +98,10 @@ function pageFromLocation() {
 function restorePageFromLocation() {
   let route = pageFromLocation();
   if (!route) {
-    route = { page: 'home' };
-    history.replaceState(route, '', `#${PAGE_ROUTES.home}`);
+    route = { page: 'home', normalizeToRoot: true };
+  }
+  if (route.normalizeToRoot) {
+    history.replaceState({ page: 'home' }, '', `${window.location.pathname}${window.location.search}`);
   }
   if (route.normalizeToList) {
     history.replaceState({ page: route.page }, '', `#${PAGE_ROUTES[route.page]}`);
@@ -110,9 +114,6 @@ function restorePageFromLocation() {
 }
 
 function initializeNavigation() {
-  if (!pageFromLocation()) {
-    history.replaceState({ page: 'home' }, '', `#${PAGE_ROUTES.home}`);
-  }
   restorePageFromLocation();
   window.addEventListener('popstate', restorePageFromLocation);
 }
@@ -124,8 +125,13 @@ function go(page) {
     return;
   }
 
-  const url = `#${route}`;
-  if (window.location.hash !== url) {
+  const url = page === 'home'
+    ? `${window.location.pathname}${window.location.search}`
+    : `#${route}`;
+  const alreadyAtPage = page === 'home'
+    ? !window.location.hash
+    : window.location.hash === url;
+  if (!alreadyAtPage) {
     history.pushState({ page }, '', url);
   }
   renderPage(page);
