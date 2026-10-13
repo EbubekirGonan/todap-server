@@ -567,6 +567,12 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
             <div class="form-group">
               <label class="form-label">Bağlantı</label>
               <input class="form-input" type="url" id="yayin-url" placeholder="https://..."/>
+              <span class="form-hint">Harici bağlantı girebilir veya aşağıdan PDF yükleyebilirsiniz.</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="yayin-pdf">PDF Dosyası Ekle</label>
+              <input class="form-input" type="file" id="yayin-pdf" accept="application/pdf,.pdf" onchange="uploadYayinPdf(this)"/>
+              <span class="form-hint">Yalnızca PDF, en fazla 10 MB. Yükleme tamamlanınca bağlantı otomatik eklenir.</span>
             </div>
           </div>
           <div class="form-row single">
@@ -1314,6 +1320,7 @@ function editYayin(id) {
   document.getElementById('yayin-baslik').value = item.baslik || '';
   document.getElementById('yayin-tur').value = item.tur || '';
   document.getElementById('yayin-url').value = item.url || '';
+  document.getElementById('yayin-pdf').value = '';
   document.getElementById('yayin-ozet').value = item.ozet || '';
   document.getElementById('yayin-keywords').value = item.keywords || '';
   document.getElementById('yayin-aktif').checked = item.aktif !== 0;
@@ -1326,6 +1333,7 @@ function resetYayinForm() {
   document.getElementById('yayin-baslik').value = '';
   document.getElementById('yayin-tur').value = '';
   document.getElementById('yayin-url').value = '';
+  document.getElementById('yayin-pdf').value = '';
   document.getElementById('yayin-ozet').value = '';
   document.getElementById('yayin-keywords').value = '';
   document.getElementById('yayin-aktif').checked = true;
@@ -1358,6 +1366,37 @@ async function saveYayin() {
   } catch (e) {
     hideLoading();
     showToast('Hata: ' + e.message, 'error');
+  }
+}
+
+async function uploadYayinPdf(input) {
+  const [file] = input.files;
+  if (!file) return;
+  if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+    input.value = '';
+    showToast('Lütfen bir PDF dosyası seçin.', 'error');
+    return;
+  }
+
+  const data = new FormData();
+  data.append('pdf', file);
+
+  try {
+    showLoading('PDF yükleniyor...');
+    const response = await fetch('/api/admin/yayinlar/pdf', {
+      method: 'POST',
+      headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
+      body: data
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    document.getElementById('yayin-url').value = result.url;
+    showToast('✓ PDF yüklendi. Yayını kaydetmeyi unutmayın.', 'success');
+  } catch (error) {
+    input.value = '';
+    showToast('PDF yüklenemedi: ' + error.message, 'error');
+  } finally {
+    hideLoading();
   }
 }
 

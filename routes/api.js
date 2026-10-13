@@ -128,7 +128,7 @@ router.get('/birimler', ah(async (_req, res) => {
 
 // ── Yayınlar ─────────────────────────────────────────────────
 router.get('/yayinlar', ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM yayinlar WHERE aktif=1').all());
+  res.json(await db.prepare('SELECT * FROM yayinlar WHERE aktif=1 ORDER BY id DESC').all());
 }));
 
 // ── Ticker ───────────────────────────────────────────────────

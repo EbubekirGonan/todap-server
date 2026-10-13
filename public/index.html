@@ -485,13 +485,11 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
 
   <section id="yayinlar" style="padding-top:2rem">
     <div class="cnt">
-      <span class="sl">Bilgi Üretimi</span><h2 class="dp">Yayınlar & <em>Kaynaklar</em></h2>
-      <div class="pr">
-        <a class="pi" href="http://elestirelpsikolojibulteni.todap.org/" target="_blank" rel="noopener"><span class="pt">Süreli Yayın</span><h3>Eleştirel Psikoloji Bülteni</h3><p>Psikoloji pratiğine eleştirel bakış.</p></a>
-        <a class="pi" href="http://psikolojivetoplum.todap.org/" target="_blank" rel="noopener"><span class="pt">Süreli Yayın</span><h3>Psikoloji ve Toplum Dergisi</h3><p>Psikoloji ile toplumsal meseleler arasındaki ilişkiyi araştıran yayınımız.</p></a>
-        <a class="pi" href="https://todap.org/images/raporlar_brosurler/psikologlar_icin_lgbtilerle_calisma_kilavuzu_TODAP.pdf" target="_blank" rel="noopener"><span class="pt">Kılavuz · PDF</span><h3>LGBTİ+'larla Çalışma Kılavuzu</h3><p>Psikologlar için kapsamlı uygulama rehberi. Ücretsiz indir.</p></a>
-        <a class="pi" href="https://todap.org/images/raporlar_brosurler/MeslekYasasiDosyasi.pdf" target="_blank" rel="noopener"><span class="pt">Rapor · PDF</span><h3>Meslek Yasası Önerisi Dosyası</h3><p>TODAP'ın bağımsız meslek yasası önerisi ve detaylı gerekçe raporu.</p></a>
+      <div class="st">
+        <div><span class="sl">Bilgi Üretimi</span><h2 class="dp">Yayınlar & <em>Kaynaklar</em></h2></div>
+        <a class="rm" onclick="go('yayinlar')">Tümünü Gör</a>
       </div>
+      <div class="pr" id="yayinlar-featured"></div>
     </div>
   </section>
 
@@ -565,6 +563,15 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
     <h1 style="font-family:var(--fd);font-size:clamp(32px,5vw,54px);font-weight:var(--weight-black);color:var(--color-text-primary);text-transform:uppercase;margin-top:1.5rem">Tüm <span style="font-family:var(--fs);font-style:italic;font-weight:var(--weight-regular);text-transform:none;font-size:.8em;color:var(--color-text-secondary)">Etkinlikler</span></h1>
   </div></div>
   <section><div class="cnt" id="etkinlik-list"></div></section>
+</div>
+
+<!-- TÜM YAYINLAR VE KAYNAKLAR -->
+<div id="p-yayinlar" class="pv">
+  <div class="ah" style="min-height:auto;padding:3rem 2.5rem 2.5rem"><div class="ahi">
+    <a class="ab" onclick="goHome()">Ana Sayfaya Dön</a>
+    <h1 style="font-family:var(--fd);font-size:clamp(32px,5vw,54px);font-weight:var(--weight-black);color:var(--color-text-primary);text-transform:uppercase;margin-top:1.5rem">Yayınlar & <span style="font-family:var(--fs);font-style:italic;font-weight:var(--weight-regular);text-transform:none;font-size:.8em;color:var(--color-text-secondary)">Kaynaklar</span></h1>
+  </div></div>
+  <section><div class="cnt"><div class="pr" id="yayinlar-list"></div></div></section>
 </div>
 
 <!-- ÜYELİK -->

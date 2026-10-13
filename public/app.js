@@ -28,6 +28,7 @@ async function initApp() {
     buildFeaturedEtkinlikler();
     buildHaberlerList();
     buildEtkinliklerList();
+    buildYayinlar();
   } catch (err) {
     console.error('Veri yüklenemedi:', err);
   }
@@ -41,6 +42,7 @@ const PAGE_ROUTES = {
   haber: '/haber',
   etkinlikler: '/etkinlikler',
   etkinlik: '/etkinlik',
+  yayinlar: '/yayinlar',
   uyelik: '/uyelik',
   iletisim: '/iletisim',
   'todap-kimdir': '/sayfa/todap-kimdir',
@@ -636,6 +638,43 @@ function buildEtkinliklerList() {
         <div class="edesc">${esc(e.ozet)}</div>
       </div>
     </a>`).join('');
+}
+
+// ── Yayınlar ve Kaynaklar ────────────────────────────────────
+function getSafeExternalUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? parsed.href : '';
+  } catch {
+    return '';
+  }
+}
+
+function renderYayinCards(yayinlar) {
+  if (!yayinlar.length) {
+    return '<p style="color:var(--ink-muted);padding:2rem 0">Henüz yayın veya kaynak eklenmemiş.</p>';
+  }
+  return yayinlar.map(yayin => {
+    const href = getSafeExternalUrl(yayin.url);
+    const tag = href ? 'a' : 'div';
+    const linkAttrs = href ? `href="${esc(href)}" target="_blank" rel="noopener noreferrer"` : '';
+    return `
+      <${tag} class="pi" ${linkAttrs}>
+        <span class="pt">${esc(yayin.tur || 'Kaynak')}</span>
+        <h3>${esc(yayin.baslik)}</h3>
+        ${yayin.ozet ? `<p>${esc(yayin.ozet)}</p>` : ''}
+      </${tag}>`;
+  }).join('');
+}
+
+function buildYayinlar() {
+  const yayinlar = [...DATA.yayinlar].sort((a, b) =>
+    Number(b.id || 0) - Number(a.id || 0)
+  );
+  const featured = document.getElementById('yayinlar-featured');
+  const list = document.getElementById('yayinlar-list');
+  if (featured) featured.innerHTML = renderYayinCards(yayinlar.slice(0, 4));
+  if (list) list.innerHTML = renderYayinCards(yayinlar);
 }
 
 // ── Form Gönderimi ───────────────────────────────────────────

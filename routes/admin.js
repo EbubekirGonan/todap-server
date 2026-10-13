@@ -3,11 +3,31 @@ const express = require('express');
 const router  = express.Router();
 const bcrypt  = require('bcryptjs');
 const crypto  = require('crypto');
+const fs      = require('fs');
+const path    = require('path');
+const multer  = require('multer');
 const rateLimit = require('express-rate-limit');
 const db      = require('../db');
 const auth    = require('../middleware/auth');
 const { sendAdminSecurityNotification } = require('../mailer');
 const { THEME_COLUMNS, DEFAULT_THEME, THEME_LABELS, validateAndNormalizeTheme, rowToTheme } = require('../themeTokens');
+
+const yayinUploadDir = path.join(__dirname, '..', 'public', 'uploads', 'yayinlar');
+fs.mkdirSync(yayinUploadDir, { recursive: true });
+
+const yayinPdfUpload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, yayinUploadDir),
+    filename: (_req, _file, cb) => cb(null, `${crypto.randomUUID()}.pdf`)
+  }),
+  limits: { fileSize: 10 * 1024 * 1024, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype !== 'application/pdf') {
+      return cb(new Error('Yalnızca PDF dosyaları yüklenebilir.'));
+    }
+    cb(null, true);
+  }
+});
 
 function ah(fn) {
   return (req, res, next) => Promise.resolve(fn(req, res, next)).catch((err) => {
@@ -55,6 +75,16 @@ function csrfProtection(req, res, next) {
     return res.status(403).json({ error: 'Geçersiz CSRF token.' });
   }
   next();
+}
+
+function uploadYayinPdf(req, res, next) {
+  yayinPdfUpload.single('pdf')(req, res, (err) => {
+    if (!err) return next();
+    if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'PDF dosyası en fazla 10 MB olabilir.' });
+    }
+    res.status(400).json({ error: err.message || 'PDF yüklenemedi.' });
+  });
 }
 
 // ── Oturum ───────────────────────────────────────────────────
@@ -294,6 +324,25 @@ router.put('/yayinlar/:id', auth, ah(async (req, res) => {
 router.delete('/yayinlar/:id', auth, ah(async (req, res) => {
   await db.prepare('DELETE FROM yayinlar WHERE id=?').run(req.params.id);
   res.json({ ok: true });
+}));
+
+router.post('/yayinlar/pdf', auth, uploadYayinPdf, ah(async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'PDF dosyası gerekli.' });
+
+  const uploadedPath = path.join(yayinUploadDir, req.file.filename);
+  const fileHandle = await fs.promises.open(uploadedPath, 'r');
+  const header = Buffer.alloc(5);
+  try {
+    await fileHandle.read(header, 0, header.length, 0);
+  } finally {
+    await fileHandle.close();
+  }
+  if (header.toString('ascii') !== '%PDF-') {
+    await fs.promises.unlink(uploadedPath);
+    return res.status(400).json({ error: 'Geçerli bir PDF dosyası yükleyin.' });
+  }
+
+  res.status(201).json({ url: `/uploads/yayinlar/${req.file.filename}` });
 }));
 
 // ── Ticker CRUD ──────────────────────────────────────────────
