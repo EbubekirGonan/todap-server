@@ -116,6 +116,7 @@ todap-server/
 | ozet   | TEXT |
 | tur    | TEXT | "Süreli Yayın", "Kılavuz · PDF", vb.
 | url    | TEXT |
+| crdate | TEXT | Yayın/kaynak tarihi |
 | aktif  | INTEGER |
 
 ### `ticker_items`

@@ -672,9 +672,16 @@ function renderYayinCards(yayinlar) {
 }
 
 function buildYayinlar() {
-  const yayinlar = [...DATA.yayinlar].sort((a, b) =>
-    Number(b.id || 0) - Number(a.id || 0)
-  );
+  const yayinlar = [...DATA.yayinlar].sort((a, b) => {
+    const aDate = String(a.crdate || '');
+    const bDate = String(b.crdate || '');
+    if (aDate !== bDate) {
+      if (!aDate) return 1;
+      if (!bDate) return -1;
+      return bDate.localeCompare(aDate);
+    }
+    return Number(b.id || 0) - Number(a.id || 0);
+  });
   const featured = document.getElementById('yayinlar-featured');
   const list = document.getElementById('yayinlar-list');
   if (featured) featured.innerHTML = renderYayinCards(yayinlar.slice(0, 4));

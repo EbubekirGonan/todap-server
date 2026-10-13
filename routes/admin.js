@@ -307,17 +307,17 @@ router.get('/yayinlar', auth, ah(async (_req, res) => {
 }));
 
 router.post('/yayinlar', auth, ah(async (req, res) => {
-  const { baslik, ozet, tur, url, keywords } = req.body;
+  const { baslik, ozet, tur, url, crdate, keywords } = req.body;
   if (!baslik) return res.status(400).json({ error: 'baslik zorunlu.' });
-  const r = await db.prepare('INSERT INTO yayinlar (baslik,ozet,tur,url,keywords) VALUES (?,?,?,?,?)')
-    .run(baslik, ozet || '', tur || '', url || '', keywords || '');
+  const r = await db.prepare('INSERT INTO yayinlar (baslik,ozet,tur,url,crdate,keywords) VALUES (?,?,?,?,?,?)')
+    .run(baslik, ozet || '', tur || '', url || '', crdate || new Date().toISOString().slice(0, 10), keywords || '');
   res.json({ id: r.lastInsertRowid });
 }));
 
 router.put('/yayinlar/:id', auth, ah(async (req, res) => {
-  const { baslik, ozet, tur, url, aktif, keywords } = req.body;
-  await db.prepare('UPDATE yayinlar SET baslik=?,ozet=?,tur=?,url=?,aktif=?,keywords=? WHERE id=?')
-    .run(baslik, ozet || '', tur || '', url || '', aktif !== undefined ? Number(aktif) : 1, keywords || '', req.params.id);
+  const { baslik, ozet, tur, url, crdate, aktif, keywords } = req.body;
+  await db.prepare('UPDATE yayinlar SET baslik=?,ozet=?,tur=?,url=?,crdate=?,aktif=?,keywords=? WHERE id=?')
+    .run(baslik, ozet || '', tur || '', url || '', crdate || '', aktif !== undefined ? Number(aktif) : 1, keywords || '', req.params.id);
   res.json({ ok: true });
 }));
 

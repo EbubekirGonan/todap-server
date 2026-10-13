@@ -550,7 +550,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
         </div>
         <div class="list-table">
           <table>
-            <thead><tr><th>Başlık</th><th>Tür</th><th>Bağlantı</th><th>İşlem</th></tr></thead>
+            <thead><tr><th>Başlık</th><th>Tür</th><th>Tarih</th><th>Bağlantı</th><th>Yayında</th><th>İşlem</th></tr></thead>
             <tbody id="yayin-tbody"></tbody>
           </table>
         </div>
@@ -571,6 +571,10 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
             <div class="form-group">
               <label class="form-label">Tür</label>
               <input class="form-input" type="text" id="yayin-tur" placeholder="Örn. Süreli Yayın, Rapor, PDF..."/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tarih (crdate)</label>
+              <input class="form-input" id="yayin-crdate" type="text" placeholder="GG/AA/YYYY">
             </div>
             <div class="form-group">
               <label class="form-label">Bağlantı</label>
@@ -1308,18 +1312,29 @@ async function saveEtkinlik() {
 
 // ── Yayınlar ─────────────────────────────────────────────────
 function renderYayinTable() {
-  yayinlar.sort((a, b) => String(a.baslik || '').localeCompare(String(b.baslik || ''), 'tr'));
+  yayinlar.sort((a, b) => {
+    const aDate = String(a.crdate || '');
+    const bDate = String(b.crdate || '');
+    if (aDate !== bDate) {
+      if (!aDate) return 1;
+      if (!bDate) return -1;
+      return bDate.localeCompare(aDate);
+    }
+    return String(a.baslik || '').localeCompare(String(b.baslik || ''), 'tr');
+  });
   document.getElementById('yayin-count').textContent = `${yayinlar.length} kayıt`;
   const tbody = document.getElementById('yayin-tbody');
   if (!yayinlar.length) {
-    tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-text">Henüz yayın veya kaynak eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'yayinlar-yeni\');resetYayinForm()">İlk Kaydı Ekle</button></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-text">Henüz yayın veya kaynak eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'yayinlar-yeni\');resetYayinForm()">İlk Kaydı Ekle</button></div></td></tr>';
     return;
   }
   tbody.innerHTML = yayinlar.map(item => `
     <tr>
       <td class="td-title">${esc(item.baslik)}</td>
       <td><span class="tag tag-mustard">${esc(item.tur || 'Belirtilmedi')}</span></td>
+      <td class="td-date">${fmtDate(item.crdate)}</td>
       <td style="font-size:12px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.url ? `<a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--mustard)">${esc(item.url)}</a>` : '<span style="color:var(--text-faint)">—</span>'}</td>
+      <td style="font-size:12px">${item.aktif ? '✓' : '—'}</td>
       <td class="td-actions">
         <button class="btn btn-secondary btn-sm" onclick="editYayin(${item.id})">Düzenle</button>
         <button class="btn btn-danger btn-sm" onclick="confirmDelete('yayin',${item.id},'${esc(item.baslik)}')">Sil</button>
@@ -1334,6 +1349,7 @@ function editYayin(id) {
   document.getElementById('yayin-edit-id').value = id;
   document.getElementById('yayin-baslik').value = item.baslik || '';
   document.getElementById('yayin-tur').value = item.tur || '';
+  document.getElementById('yayin-crdate').value = isoToDMY(item.crdate);
   document.getElementById('yayin-url').value = item.url || '';
   clearYayinPdfSelection();
   document.getElementById('yayin-ozet').value = item.ozet || '';
@@ -1347,6 +1363,7 @@ function resetYayinForm() {
   document.getElementById('yayin-edit-id').value = '';
   document.getElementById('yayin-baslik').value = '';
   document.getElementById('yayin-tur').value = '';
+  document.getElementById('yayin-crdate').value = todayDMY();
   document.getElementById('yayin-url').value = '';
   clearYayinPdfSelection();
   document.getElementById('yayin-ozet').value = '';
@@ -1358,6 +1375,7 @@ async function saveYayin() {
   const editId = document.getElementById('yayin-edit-id').value;
   const baslik = document.getElementById('yayin-baslik').value.trim();
   const tur = document.getElementById('yayin-tur').value.trim();
+  const crdate = dmyToISO(document.getElementById('yayin-crdate').value.trim());
   const url = document.getElementById('yayin-url').value.trim();
   const ozet = document.getElementById('yayin-ozet').value.trim();
   const keywords = document.getElementById('yayin-keywords').value.trim();
@@ -1367,7 +1385,7 @@ async function saveYayin() {
 
   try {
     showLoading('Kaydediliyor...');
-    const body = { baslik, tur, url, ozet, aktif, keywords };
+    const body = { baslik, tur, url, ozet, crdate, aktif, keywords };
     if (editId) {
       await apiFetch(`/api/admin/yayinlar/${editId}`, 'PUT', body);
     } else {

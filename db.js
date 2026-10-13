@@ -147,6 +147,7 @@ function createAdapter(executor) {
           tur TEXT DEFAULT '',
           url TEXT DEFAULT '',
           keywords TEXT DEFAULT '',
+          crdate TEXT DEFAULT '',
           aktif INTEGER DEFAULT 1
         );
 
@@ -238,6 +239,11 @@ function createAdapter(executor) {
           is_active BOOLEAN DEFAULT false,
           created_at TIMESTAMP DEFAULT NOW()
         );
+      `);
+
+      await executor.query(`
+        ALTER TABLE yayinlar
+        ADD COLUMN IF NOT EXISTS crdate TEXT DEFAULT '';
       `);
 
       const themeCount = await this.prepare('SELECT COUNT(*)::int AS c FROM theme_color_profiles').get();
