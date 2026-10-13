@@ -643,8 +643,12 @@ function buildEtkinliklerList() {
 // ── Yayınlar ve Kaynaklar ────────────────────────────────────
 function getSafeExternalUrl(url) {
   try {
-    const parsed = new URL(url);
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? parsed.href : '';
+    if (typeof url !== 'string' || !url.trim()) return '';
+    const isSiteRelativeUrl = url.startsWith('/') && !url.startsWith('//');
+    const parsed = isSiteRelativeUrl ? new URL(url, window.location.origin) : new URL(url);
+    const isHttpUrl = parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    const isSameOrigin = parsed.origin === window.location.origin;
+    return isHttpUrl && (!isSiteRelativeUrl || isSameOrigin) ? parsed.href : '';
   } catch {
     return '';
   }
