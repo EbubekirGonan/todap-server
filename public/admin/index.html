@@ -124,6 +124,14 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
 .form-textarea.tall{min-height:360px}
 .form-hint{font-size:11px;color:var(--text-faint);margin-top:2px}
 .form-actions{display:flex;gap:10px;align-items:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+.pdf-dropzone{position:relative;display:flex;align-items:center;justify-content:center;min-height:130px;padding:1.25rem;border:2px dashed var(--border2);border-radius:8px;background:var(--surface2);text-align:center;transition:border-color .2s,background .2s}
+.pdf-dropzone:hover,.pdf-dropzone.is-dragover,.pdf-dropzone:focus-within{border-color:var(--accent-deep);background:var(--accent-light)}
+.pdf-dropzone:focus-within{outline:2px solid var(--accent-deep);outline-offset:2px}
+.pdf-dropzone-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.pdf-dropzone-content{display:flex;flex-direction:column;gap:4px;pointer-events:none}
+.pdf-dropzone-content strong{font-size:13px;color:var(--text)}
+.pdf-dropzone-content span{font-size:12px;color:var(--text-muted)}
+.pdf-dropzone-content .pdf-dropzone-filename{font-weight:600;color:var(--accent-deep)}
 
 /* TOAST */
 .toast{position:fixed;bottom:2rem;right:2rem;padding:14px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:1000;transform:translateY(100px);opacity:0;transition:all .3s;max-width:340px;box-shadow:0 10px 30px rgba(17,24,39,.18)}
@@ -571,7 +579,14 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
             </div>
             <div class="form-group">
               <label class="form-label" for="yayin-pdf">PDF Dosyası Ekle</label>
-              <input class="form-input" type="file" id="yayin-pdf" accept="application/pdf,.pdf" onchange="uploadYayinPdf(this)"/>
+              <div class="pdf-dropzone" id="yayin-pdf-dropzone">
+                <input class="pdf-dropzone-input" type="file" id="yayin-pdf" accept="application/pdf,.pdf" aria-label="PDF dosyası seçin veya sürükleyip bırakın" onchange="uploadYayinPdf(this)"/>
+                <div class="pdf-dropzone-content">
+                  <strong>PDF dosyasını buraya sürükleyip bırakın</strong>
+                  <span>veya bilgisayarınızdan seçmek için tıklayın</span>
+                  <span class="pdf-dropzone-filename" id="yayin-pdf-filename" aria-live="polite"></span>
+                </div>
+              </div>
               <span class="form-hint">Yalnızca PDF, en fazla 10 MB. Yükleme tamamlanınca bağlantı otomatik eklenir.</span>
             </div>
           </div>
@@ -1320,7 +1335,7 @@ function editYayin(id) {
   document.getElementById('yayin-baslik').value = item.baslik || '';
   document.getElementById('yayin-tur').value = item.tur || '';
   document.getElementById('yayin-url').value = item.url || '';
-  document.getElementById('yayin-pdf').value = '';
+  clearYayinPdfSelection();
   document.getElementById('yayin-ozet').value = item.ozet || '';
   document.getElementById('yayin-keywords').value = item.keywords || '';
   document.getElementById('yayin-aktif').checked = item.aktif !== 0;
@@ -1333,7 +1348,7 @@ function resetYayinForm() {
   document.getElementById('yayin-baslik').value = '';
   document.getElementById('yayin-tur').value = '';
   document.getElementById('yayin-url').value = '';
-  document.getElementById('yayin-pdf').value = '';
+  clearYayinPdfSelection();
   document.getElementById('yayin-ozet').value = '';
   document.getElementById('yayin-keywords').value = '';
   document.getElementById('yayin-aktif').checked = true;
@@ -1369,15 +1384,21 @@ async function saveYayin() {
   }
 }
 
-async function uploadYayinPdf(input) {
-  const [file] = input.files;
+function clearYayinPdfSelection() {
+  document.getElementById('yayin-pdf').value = '';
+  document.getElementById('yayin-pdf-filename').textContent = '';
+}
+
+async function uploadYayinPdf(input, droppedFile = null) {
+  const file = droppedFile || input.files[0];
   if (!file) return;
   if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-    input.value = '';
+    clearYayinPdfSelection();
     showToast('Lütfen bir PDF dosyası seçin.', 'error');
     return;
   }
 
+  document.getElementById('yayin-pdf-filename').textContent = file.name;
   const data = new FormData();
   data.append('pdf', file);
 
@@ -1393,11 +1414,40 @@ async function uploadYayinPdf(input) {
     document.getElementById('yayin-url').value = result.url;
     showToast('✓ PDF yüklendi. Yayını kaydetmeyi unutmayın.', 'success');
   } catch (error) {
-    input.value = '';
+    clearYayinPdfSelection();
     showToast('PDF yüklenemedi: ' + error.message, 'error');
   } finally {
     hideLoading();
   }
+}
+
+function setupYayinPdfDropzone() {
+  const dropzone = document.getElementById('yayin-pdf-dropzone');
+  const input = document.getElementById('yayin-pdf');
+  let dragDepth = 0;
+
+  dropzone.addEventListener('dragenter', (event) => {
+    event.preventDefault();
+    dragDepth += 1;
+    dropzone.classList.add('is-dragover');
+  });
+  dropzone.addEventListener('dragover', (event) => event.preventDefault());
+  dropzone.addEventListener('dragleave', (event) => {
+    event.preventDefault();
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (!dragDepth) dropzone.classList.remove('is-dragover');
+  });
+  dropzone.addEventListener('drop', (event) => {
+    event.preventDefault();
+    dragDepth = 0;
+    dropzone.classList.remove('is-dragover');
+    const files = Array.from(event.dataTransfer.files);
+    if (files.length > 1) {
+      showToast('Lütfen aynı anda yalnızca bir PDF dosyası bırakın.', 'error');
+      return;
+    }
+    if (files[0]) uploadYayinPdf(input, files[0]);
+  });
 }
 
 // ── Ticker ────────────────────────────────────────────────────
@@ -2079,6 +2129,7 @@ function todayDMY() {
   const d = new Date();
   return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
 }
+setupYayinPdfDropzone();
 </script>
 </body>
 </html>
