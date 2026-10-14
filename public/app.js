@@ -523,12 +523,164 @@ function linkifyHtmlContent(html) {
 function buildTicker() {
   const inner = document.getElementById('ticker-inner');
   if (!inner || !DATA.ticker.length) return;
+  const wrap = inner.closest('.ticker-wrap');
   const doubled = [...DATA.ticker, ...DATA.ticker];
   inner.innerHTML = doubled
-    .map(t => `<a href="#" data-tur="${esc(t.tur || '')}" data-slug="${esc(t.slug || '')}" title="Detaya git" style="color:inherit;text-decoration:none"><strong>${esc(t.etiket)}</strong> · ${esc(t.metin)}</a>`)
+    .map(t => {
+      const type = t.tur === 'haber' || t.tur === 'etkinlik' ? t.tur : '';
+      const id = Number(t.id);
+      const href = type && Number.isSafeInteger(id) && id > 0
+        ? `#/${type}/${id}`
+        : '#';
+      return `<a href="${href}" data-tur="${esc(t.tur || '')}" data-slug="${esc(t.slug || '')}" title="Detaya git" style="color:inherit;text-decoration:none"><strong>${esc(t.etiket)}</strong> · ${esc(t.metin)}</a>`;
+    })
     .join('');
 
+  let offset = 0;
+  let animationFrame = 0;
+  let resumeTimer = 0;
+  let lastTimestamp = 0;
+  let accelerationStart = 0;
+  let momentumVelocity = 0;
+  let activePointerId = null;
+  let pointerStartX = 0;
+  let lastPointerX = 0;
+  let lastPointerTime = 0;
+  let pointerVelocity = 0;
+  let offsetStart = 0;
+  let dragged = false;
+  let suppressClick = false;
+
+  const getPeriod = () => inner.scrollWidth / 2;
+  const normalizeOffset = (value, period) => ((value % period) + period) % period;
+  const renderOffset = () => {
+    inner.style.transform = `translate3d(${-offset}px, 0, 0)`;
+  };
+
+  function stopAnimation() {
+    cancelAnimationFrame(animationFrame);
+    animationFrame = 0;
+    lastTimestamp = 0;
+  }
+
+  function animate(timestamp) {
+    const period = getPeriod();
+    if (period > 0) {
+      if (lastTimestamp) {
+        const elapsed = Math.min(timestamp - lastTimestamp, 100);
+        if (momentumVelocity) {
+          const friction = 0.003;
+          const decay = Math.exp(-friction * elapsed);
+          offset = normalizeOffset(offset + (momentumVelocity * (1 - decay)) / friction, period);
+          momentumVelocity *= decay;
+          if (Math.abs(momentumVelocity) < 0.015) {
+            momentumVelocity = 0;
+            stopAnimation();
+            scheduleResume();
+            return;
+          }
+        } else {
+          const rampProgress = accelerationStart
+            ? Math.min((timestamp - accelerationStart) / 1000, 1)
+            : 1;
+          const speed = rampProgress * rampProgress;
+          offset = normalizeOffset(offset + (elapsed * speed * period) / 38000, period);
+          if (rampProgress === 1) accelerationStart = 0;
+        }
+        renderOffset();
+      }
+      lastTimestamp = timestamp;
+    }
+    animationFrame = requestAnimationFrame(animate);
+  }
+
+  function startAnimation(rampUp = false) {
+    if (!animationFrame) {
+      accelerationStart = rampUp ? -1 : 0;
+      animationFrame = requestAnimationFrame((timestamp) => {
+        if (accelerationStart === -1) accelerationStart = timestamp;
+        animate(timestamp);
+      });
+    }
+  }
+
+  function scheduleResume() {
+    window.clearTimeout(resumeTimer);
+    resumeTimer = window.setTimeout(() => startAnimation(true), 500);
+
+  }
+
+  if (wrap) {
+    startAnimation();
+    inner.addEventListener('dragstart', (event) => event.preventDefault());
+
+    wrap.addEventListener('pointerdown', (event) => {
+      if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return;
+      activePointerId = event.pointerId;
+      pointerStartX = event.clientX;
+      lastPointerX = event.clientX;
+      lastPointerTime = event.timeStamp;
+      pointerVelocity = 0;
+      offsetStart = offset;
+      dragged = false;
+      window.clearTimeout(resumeTimer);
+      momentumVelocity = 0;
+      accelerationStart = 0;
+      stopAnimation();
+    });
+
+    document.addEventListener('pointermove', (event) => {
+      if (event.pointerId !== activePointerId) return;
+      const deltaX = event.clientX - pointerStartX;
+      const period = getPeriod();
+      if (period <= 0) return;
+      const elapsed = event.timeStamp - lastPointerTime;
+      if (elapsed > 0) {
+        const instantVelocity = (event.clientX - lastPointerX) / elapsed;
+        pointerVelocity = (pointerVelocity * 0.35) + (instantVelocity * 0.65);
+      }
+      lastPointerX = event.clientX;
+      lastPointerTime = event.timeStamp;
+      if (Math.abs(deltaX) > 4) {
+        dragged = true;
+        wrap.classList.add('is-dragging');
+      }
+      offset = normalizeOffset(offsetStart - deltaX, period);
+      renderOffset();
+    });
+
+    const finishPointer = (event) => {
+      if (event.pointerId !== activePointerId) return;
+      activePointerId = null;
+      wrap.classList.remove('is-dragging');
+      if (dragged) {
+        suppressClick = true;
+        window.setTimeout(() => { suppressClick = false; }, 0);
+      }
+      const sinceLastMove = event.timeStamp - lastPointerTime;
+      const releaseVelocity = dragged && sinceLastMove <= 100
+        ? Math.max(-1.6, Math.min(1.6, -pointerVelocity))
+        : 0;
+      if (Math.abs(releaseVelocity) > 0.05) {
+        momentumVelocity = releaseVelocity;
+        lastTimestamp = 0;
+        startAnimation();
+      } else {
+        scheduleResume();
+      }
+    };
+
+    document.addEventListener('pointerup', finishPointer);
+    document.addEventListener('pointercancel', finishPointer);
+  }
+
   inner.onclick = (event) => {
+    if (suppressClick) {
+      event.preventDefault();
+      event.stopPropagation();
+      suppressClick = false;
+      return;
+    }
     const item = event.target.closest('[data-tur][data-slug]');
     if (!item) return;
     event.preventDefault();

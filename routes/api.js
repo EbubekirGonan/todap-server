@@ -166,7 +166,7 @@ router.get('/ticker', ah(async (_req, res) => {
       ORDER BY yayin_tarihi DESC, id DESC
       LIMIT 5
     )
-    SELECT etiket, metin, slug, tur
+    SELECT etiket, metin, slug, tur, kaynak_id AS id
     FROM (
       SELECT * FROM son_haberler
       UNION ALL
