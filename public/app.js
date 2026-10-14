@@ -369,12 +369,14 @@ function toggleMobileMenu() {
   if (!nav) return;
   nav.classList.toggle('open');
   btn.classList.toggle('open');
+  document.body.classList.toggle('menu-open', nav.classList.contains('open'));
 }
 function closeMobileMenu() {
   const nav = document.getElementById('mobile-nav');
   const btn = document.getElementById('hamburger');
   if (nav) nav.classList.remove('open');
   if (btn) btn.classList.remove('open');
+  document.body.classList.remove('menu-open');
 }
 
 // ── Nav Dropdown (hover + 200ms gecikme) ────────────────────

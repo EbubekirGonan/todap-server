@@ -110,7 +110,7 @@ function buildTokensCss(themeRow) {
    - Siyah (4. renk): --color-black => ${theme.var_color_black_base}
    ═══════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap');
 
 :root {
 
@@ -189,8 +189,8 @@ function buildTokensCss(themeRow) {
 
   /* ── 2. TIPOGRAFI ───────────────────────────────────────────── */
 
-  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
-  --font-body:    'Inter', system-ui, sans-serif;
+  --font-display: 'Manrope', system-ui, sans-serif;
+  --font-body:    'Noto Sans', system-ui, sans-serif;
   --font-mono:    'JetBrains Mono', 'Courier New', monospace;
 
   /* ── 3. YAZI BUYUKLUKLERI ───────────────────────────────────── */

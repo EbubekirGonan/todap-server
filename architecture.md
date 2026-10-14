@@ -291,10 +291,10 @@ todap-server/
 ### Font Sistemi
 | Kullanım    | Font                | Kaynak        |
 |-------------|---------------------|---------------|
-| Başlıklar   | Plus Jakarta Sans   | Google Fonts  |
-| Gövde metni | Inter               | Google Fonts  |
+| Başlıklar   | Manrope             | Google Fonts  |
+| Gövde metni | Noto Sans           | Google Fonts  |
 
-> Önceki fontlar (Syne, Lora) tamamen kaldırılmıştır.
+> Fontlar Türkçe karakterleri destekleyen Google Fonts aileleridir.
 
 ---
 
