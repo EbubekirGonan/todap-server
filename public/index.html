@@ -31,7 +31,7 @@ img,video,iframe{max-width:100%;height:auto}
 nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--color-nav-bg);border-bottom:1px solid var(--border);padding:0 2.5rem;display:flex;align-items:center;justify-content:space-between;height:56px;transition:opacity var(--transition-slow),transform var(--transition-slow)}
 nav.nav-hidden{opacity:0;transform:translateY(-100%);pointer-events:none}
 .nav-logo{display:inline-flex;align-items:center;text-decoration:none;cursor:pointer}
-.nav-logo img{height:36px;width:auto;display:block}
+.nav-logo img{height:88px;width:88px;display:block;border-radius:50%;object-fit:cover;position:relative;top:28px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .nav-logo span{color:var(--mustard)}
 .nl{display:flex;gap:2rem;list-style:none;align-items:center}
 .nl>li{display:flex;align-items:center}
@@ -319,7 +319,7 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
 <body>
 
 <nav>
-  <a class="nav-logo" onclick="goHome()"><img src="/logo.png" alt="TODAP"></a>
+  <a class="nav-logo" onclick="goHome()"><img src="/logo-circle.jpg" alt="TODAP"></a>
   <ul class="nl">
     <li class="nav-dropdown">
       <span class="nd-label">Todap Hakkında</span>
