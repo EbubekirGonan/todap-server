@@ -898,6 +898,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
   <div class="loading-text" id="loading-text">Yükleniyor...</div>
 </div>
 
+<input type="file" id="content-image-input" accept="image/jpeg,image/png,image/gif,image/webp" hidden onchange="uploadContentImage(this)"/>
 <script>
 // ── Durum ────────────────────────────────────────────────────
 let haberler = [];
@@ -915,6 +916,11 @@ let themeActiveMeta = null;
 
 // ── Quill Editor Helpers ───────────────────────────────────
 const quills = {};
+const contentImageEditorIds = new Set([
+  'editor-haber-ozet-icerik',
+  'editor-haber-detayli-icerik',
+  'editor-etkinlik-icerik'
+]);
 const QUILL_TOOLBAR = [
   [{ header: [2, 3, false] }],
   ['bold', 'italic'],
@@ -923,13 +929,69 @@ const QUILL_TOOLBAR = [
   ['blockquote', 'link'],
   ['clean']
 ];
+const CONTENT_QUILL_TOOLBAR = [
+  ...QUILL_TOOLBAR.slice(0, 4),
+  ['blockquote', 'link', 'image'],
+  QUILL_TOOLBAR[5]
+];
+let activeImageEditor = null;
+let activeImageRange = null;
+
 function initQuill(id) {
   if (quills[id]) return quills[id];
   const el = document.getElementById(id);
   if (!el) return null;
-  const q = new Quill('#' + id, { theme: 'snow', modules: { toolbar: QUILL_TOOLBAR } });
+  const toolbar = contentImageEditorIds.has(id) ? CONTENT_QUILL_TOOLBAR : QUILL_TOOLBAR;
+  const modules = { toolbar };
+  if (contentImageEditorIds.has(id)) {
+    modules.toolbar = {
+      container: toolbar,
+      handlers: {
+        image() {
+          activeImageEditor = this.quill;
+          activeImageRange = activeImageEditor.getSelection(true);
+          document.getElementById('content-image-input').click();
+        }
+      }
+    };
+  }
+  const q = new Quill('#' + id, { theme: 'snow', modules });
   quills[id] = q;
   return q;
+}
+
+async function uploadContentImage(input) {
+  const file = input.files && input.files[0];
+  const editor = activeImageEditor;
+  const range = activeImageRange;
+  input.value = '';
+  if (!file || !editor || !range) {
+    activeImageEditor = null;
+    activeImageRange = null;
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('image', file);
+  showLoading('Görsel yükleniyor...');
+  try {
+    const response = await fetch('/api/admin/content-images', {
+      method: 'POST',
+      headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
+      body: formData
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    editor.insertEmbed(range.index, 'image', result.url, 'user');
+    editor.setSelection(range.index + 1, 0, 'silent');
+    hideLoading();
+  } catch (error) {
+    hideLoading();
+    showToast('Görsel yüklenemedi: ' + error.message, 'error');
+  } finally {
+    activeImageEditor = null;
+    activeImageRange = null;
+  }
 }
 function setQuillContent(id, html) {
   const q = quills[id];

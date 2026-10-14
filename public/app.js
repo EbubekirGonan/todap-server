@@ -65,6 +65,7 @@ const ROUTE_PAGES = Object.fromEntries(
 );
 
 function renderPage(page) {
+  closeArticleImageViewer();
   closeMobileMenu();
   document.querySelectorAll('.pv').forEach(p => p.classList.remove('on'));
   const target = document.getElementById('p-' + page);
@@ -430,7 +431,7 @@ function renderArticle(d, navigate = true) {
   document.getElementById('a-tag').className = 'at' + (d.renk ? ' ' + d.renk : '');
   document.getElementById('a-title').textContent = d.baslik;
   document.getElementById('a-date').textContent = d.gosterim_tarihi || fmtDate(d.tarih);
-  document.getElementById('a-body').innerHTML = linkifyHtmlContent(d.ozet_icerik || d.detayli_icerik || '');
+  setArticleContent('a-body', d.ozet_icerik || d.detayli_icerik || '');
   if (navigate) goToDetail('haber', Number(d.id));
   else renderPage('haber');
 }
@@ -449,9 +450,69 @@ function renderEtkinlik(d, navigate = true) {
   document.getElementById('e-tag').textContent = d.kategori;
   document.getElementById('e-title').textContent = d.baslik;
   document.getElementById('e-date').textContent = d.gosterim_tarihi || fmtDate(d.tarih);
-  document.getElementById('e-body').innerHTML = linkifyHtmlContent(d.icerik || '');
+  setArticleContent('e-body', d.icerik || '');
   if (navigate) goToDetail('etkinlik', Number(d.id));
   else renderPage('etkinlik');
+}
+
+function setArticleContent(containerId, html) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = linkifyHtmlContent(html);
+  container.querySelectorAll('img').forEach((image) => {
+    image.tabIndex = 0;
+    image.setAttribute('role', 'button');
+    image.setAttribute('aria-label', image.alt
+      ? `Görseli tam boyutta görüntüle: ${image.alt}`
+      : 'Görseli tam boyutta görüntüle');
+  });
+}
+
+function openArticleImageViewer(image) {
+  const viewer = document.getElementById('article-image-viewer');
+  const viewerImage = viewer.querySelector('img');
+  viewerImage.src = image.currentSrc || image.src;
+  viewerImage.alt = image.alt || '';
+  viewer.classList.remove('is-zoomed');
+  viewer.showModal();
+  viewer.querySelector('button').focus();
+}
+
+function closeArticleImageViewer() {
+  const viewer = document.getElementById('article-image-viewer');
+  if (viewer && viewer.open) viewer.close();
+}
+
+function initializeArticleImageViewer() {
+  const viewer = document.getElementById('article-image-viewer');
+  if (!viewer) return;
+
+  const closeButton = viewer.querySelector('button');
+  const viewerImage = viewer.querySelector('img');
+  closeButton.addEventListener('click', closeArticleImageViewer);
+  viewerImage.addEventListener('click', () => {
+    viewer.classList.toggle('is-zoomed');
+  });
+  viewer.addEventListener('click', (event) => {
+    if (event.target === viewer) closeArticleImageViewer();
+  });
+  viewer.addEventListener('close', () => {
+    viewer.classList.remove('is-zoomed');
+    viewerImage.removeAttribute('src');
+    viewerImage.alt = '';
+  });
+  document.addEventListener('click', (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const image = target && target.closest('#a-body img, #e-body img');
+    if (image) openArticleImageViewer(image);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const target = event.target instanceof Element ? event.target : null;
+    const image = target && target.closest('#a-body img, #e-body img');
+    if (!image) return;
+    event.preventDefault();
+    openArticleImageViewer(image);
+  });
 }
 
 // ── Metin İçindeki URL'leri Linke Çevir ─────────────────────
@@ -979,5 +1040,6 @@ function esc(str) {
 // ── Başlat ───────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initializeNavigation();
+  initializeArticleImageViewer();
   initApp();
 });

@@ -13,7 +13,9 @@ const { sendAdminSecurityNotification } = require('../mailer');
 const { THEME_COLUMNS, DEFAULT_THEME, THEME_LABELS, validateAndNormalizeTheme, rowToTheme } = require('../themeTokens');
 
 const yayinUploadDir = path.join(__dirname, '..', 'public', 'uploads', 'yayinlar');
+const contentImageUploadDir = path.join(__dirname, '..', 'public', 'uploads', 'icerik-gorselleri');
 fs.mkdirSync(yayinUploadDir, { recursive: true });
+fs.mkdirSync(contentImageUploadDir, { recursive: true });
 
 const yayinPdfUpload = multer({
   storage: multer.diskStorage({
@@ -28,6 +30,33 @@ const yayinPdfUpload = multer({
     cb(null, true);
   }
 });
+
+const contentImageUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.mimetype)) {
+      return cb(new Error('Yalnızca JPEG, PNG, GIF veya WebP görseller yüklenebilir.'));
+    }
+    cb(null, true);
+  }
+});
+
+function detectContentImageType(buffer) {
+  if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+    return { mimeType: 'image/jpeg', extension: 'jpg' };
+  }
+  if (buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) {
+    return { mimeType: 'image/png', extension: 'png' };
+  }
+  if (buffer.length >= 6 && ['GIF87a', 'GIF89a'].includes(buffer.toString('ascii', 0, 6))) {
+    return { mimeType: 'image/gif', extension: 'gif' };
+  }
+  if (buffer.length >= 12 && buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP') {
+    return { mimeType: 'image/webp', extension: 'webp' };
+  }
+  return null;
+}
 
 function ah(fn) {
   return (req, res, next) => Promise.resolve(fn(req, res, next)).catch((err) => {
@@ -87,6 +116,16 @@ function uploadYayinPdf(req, res, next) {
   });
 }
 
+function uploadContentImage(req, res, next) {
+  contentImageUpload.single('image')(req, res, (err) => {
+    if (!err) return next();
+    if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'Görsel dosyası en fazla 5 MB olabilir.' });
+    }
+    res.status(400).json({ error: err.message || 'Görsel yüklenemedi.' });
+  });
+}
+
 // ── Oturum ───────────────────────────────────────────────────
 router.post('/login', loginLimiter, ah(async (req, res) => {
   const { username, password } = req.body;
@@ -127,6 +166,19 @@ router.get('/csrf-token', auth, (req, res) => {
 });
 
 router.use(csrfProtection);
+
+router.post('/content-images', auth, uploadContentImage, ah(async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Görsel dosyası gerekli.' });
+
+  const imageType = detectContentImageType(req.file.buffer);
+  if (!imageType || imageType.mimeType !== req.file.mimetype) {
+    return res.status(400).json({ error: 'Dosya içeriği geçerli bir desteklenen görsel değil.' });
+  }
+
+  const filename = `${crypto.randomUUID()}.${imageType.extension}`;
+  await fs.promises.writeFile(path.join(contentImageUploadDir, filename), req.file.buffer, { flag: 'wx' });
+  res.status(201).json({ url: `/uploads/icerik-gorselleri/${filename}` });
+}));
 
 // ── Tema / Renk Degiskenleri ───────────────────────────────
 router.get('/theme-colors', auth, ah(async (_req, res) => {
