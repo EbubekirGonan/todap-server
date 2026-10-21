@@ -76,7 +76,8 @@ todap-server/
 | gosterim_tarihi   | TEXT    | Görsel tarih metni                        |
 | kategori          | TEXT    | Bildiri / Rapor / vb.                     |
 | renk              | TEXT    | `r`=kırmızı, `g`=yeşil, ``=varsayılan    |
-| aktif             | INTEGER | 1=yayında, 0=gizli                        |
+| yayinda           | TEXT    | `E`=sitede göster, `H`=taslak/gizli (varsayılan `E`) |
+| aktif             | INTEGER | İçeriğin aktiflik durumu                  |
 | olusturuldu       | TEXT    | datetime('now')                           |
 
 > **Not:** `icerik` sütunu `ozet_icerik` + `detayli_icerik` olarak ayrıldı (Üçüncü Oturum).
@@ -94,6 +95,7 @@ todap-server/
 | gun               | TEXT    | Gün numarası (örn. "12")          |
 | ay                | TEXT    | Ay kısaltması (örn. "Ara")        |
 | kategori          | TEXT    |                                   |
+| yayinda           | TEXT    | `E`=sitede göster, `H`=taslak/gizli (varsayılan `E`) |
 | aktif             | INTEGER |                                   |
 | olusturuldu       | TEXT    |                                   |
 
@@ -168,6 +170,7 @@ todap-server/
 | ozet       | TEXT |
 | icerik     | TEXT |
 | crdate     | TEXT |
+| yayinda    | TEXT | `E`=sitede göster, `H`=taslak/gizli (varsayılan `E`) |
 | guncelleme | TEXT |
 
 ### `basinda_todap`
@@ -178,6 +181,7 @@ todap-server/
 | adres_ismi      | TEXT    | Yayın adı / kurum adı  |
 | baglanti_adresi | TEXT    | Dış URL                |
 | crdate          | TEXT    | datetime('now')        |
+| yayinda         | TEXT    | `E`=sitede göster, `H`=taslak/gizli (varsayılan `E`) |
 | guncelleme      | TEXT    | datetime('now')        |
 
 ### `videos`
@@ -201,14 +205,15 @@ todap-server/
 
 | Method | Endpoint               | Açıklama                      |
 |--------|------------------------|-------------------------------|
-| GET    | `/api/haberler`        | Aktif haberler (tarih DESC)   |
-| GET    | `/api/haberler/id/:id` | Aktif haber (ID ile)           |
-| GET    | `/api/haberler/:slug`  | Tekil haber                   |
-| GET    | `/api/etkinlikler`     | Aktif etkinlikler             |
-| GET    | `/api/etkinlikler/id/:id` | Aktif etkinlik (ID ile)     |
-| GET    | `/api/etkinlikler/:slug` | Tekil etkinlik              |
-| GET    | `/api/faaliyetler`     | Faaliyet listesi               |
-| GET    | `/api/faaliyetler/id/:id` | Tekil faaliyet (ID ile)     |
+| GET    | `/api/haberler`        | Aktif ve yayında olan haberler (tarih DESC) |
+| GET    | `/api/haberler/id/:id` | Aktif ve yayında haber (ID ile) |
+| GET    | `/api/haberler/:slug`  | Aktif ve yayında tekil haber   |
+| GET    | `/api/etkinlikler`     | Aktif ve yayında etkinlikler   |
+| GET    | `/api/etkinlikler/id/:id` | Aktif ve yayında etkinlik (ID ile) |
+| GET    | `/api/etkinlikler/:slug` | Aktif ve yayında tekil etkinlik |
+| GET    | `/api/faaliyetler`     | Yayında olan faaliyetler       |
+| GET    | `/api/faaliyetler/id/:id` | Yayında tekil faaliyet (ID ile) |
+| GET    | `/api/basinda-todap`   | Yayında olan basın kayıtları   |
 | GET    | `/api/birimler`        | Birimler (sira ASC)           |
 | GET    | `/api/yayinlar`        | Yayınlar                      |
 | GET    | `/api/ticker`          | Ticker öğeleri                |
@@ -225,10 +230,11 @@ todap-server/
 | GET    | `/api/admin/me`             | Oturum kontrolü                |
 | GET/POST/PUT/DELETE | `/api/admin/haberler[/:id]` | Haber CRUD       |
 | GET/POST/PUT/DELETE | `/api/admin/etkinlikler[/:id]` | Etkinlik CRUD   |
+| GET/POST/PUT/DELETE | `/api/admin/faaliyetler[/:id]` | Faaliyet CRUD   |
+| GET/POST/PUT/DELETE | `/api/admin/basinda-todap[/:id]` | Basında TODAP CRUD |
 | GET/POST/PUT/DELETE | `/api/admin/birimler[/:id]` | Birim CRUD       |
 | GET/POST/PUT/DELETE | `/api/admin/yayinlar[/:id]` | Yayın CRUD       |
 | GET/POST/PUT/DELETE | `/api/admin/ticker[/:id]`  | Ticker CRUD       |
-| GET/POST/PUT/DELETE | `/api/admin/basinda-todap[/:id]` | Basında TODAP CRUD |
 | GET/POST/PUT/DELETE | `/api/admin/videos[/:id]`   | Video CRUD             |
 | GET    | `/api/admin/mesajlar`       | İletişim mesajları             |
 | GET    | `/api/admin/basvurular`     | Üyelik başvuruları             |

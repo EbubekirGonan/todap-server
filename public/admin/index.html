@@ -375,7 +375,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
         </div>
         <div class="list-table">
           <table>
-            <thead><tr><th>Başlık</th><th>Kategori</th><th>Tarih</th><th>İşlem</th></tr></thead>
+            <thead><tr><th>Başlık</th><th>Kategori</th><th>Tarih</th><th>Yayında</th><th>İşlem</th></tr></thead>
             <tbody id="haber-tbody"></tbody>
           </table>
         </div>
@@ -428,6 +428,15 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
           </div>
           <div class="form-row single">
             <div class="form-group">
+              <label class="form-label" for="haber-yayinda">Yayında</label>
+              <select class="form-select" id="haber-yayinda">
+                <option value="E">Evet - sitede yayınla</option>
+                <option value="H">Hayır - yayından kaldır / taslak</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
               <label class="form-label">Anahtar Kelimeler</label>
               <input class="form-input" type="text" id="haber-keywords" placeholder="Örn: psikoloji, mesleki haklar, yargı"/>
               <span class="form-hint">Virgülle ayrılmış anahtar kelimeler (SEO için)</span>
@@ -462,7 +471,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
         </div>
         <div class="list-table">
           <table>
-            <thead><tr><th>Başlık</th><th>Kategori</th><th>Tarih</th><th>İşlem</th></tr></thead>
+            <thead><tr><th>Başlık</th><th>Kategori</th><th>Tarih</th><th>Yayında</th><th>İşlem</th></tr></thead>
             <tbody id="etkinlik-tbody"></tbody>
           </table>
         </div>
@@ -520,6 +529,15 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
             <div class="form-group">
               <label class="form-label">Görüntüleme Tarihi</label>
               <input class="form-input" type="text" id="etkinlik-gosterim" placeholder="12 Aralık 2025"/>
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label class="form-label" for="etkinlik-yayinda">Yayında</label>
+              <select class="form-select" id="etkinlik-yayinda">
+                <option value="E">Evet - sitede yayınla</option>
+                <option value="H">Hayır - yayından kaldır / taslak</option>
+              </select>
             </div>
           </div>
           <div class="form-row single">
@@ -705,7 +723,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
         </div>
         <div class="list-table">
           <table>
-            <thead><tr><th>Başlık</th><th>Özet</th><th>Tarih</th><th>İşlem</th></tr></thead>
+            <thead><tr><th>Başlık</th><th>Özet</th><th>Tarih</th><th>Yayında</th><th>İşlem</th></tr></thead>
             <tbody id="faaliyet-tbody"></tbody>
           </table>
         </div>
@@ -727,6 +745,13 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
           <div class="form-group">
             <label class="form-label">Tarih (crdate)</label>
             <input class="form-input" id="faaliyet-crdate" type="text" placeholder="GG/AA/YYYY">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="faaliyet-yayinda">Yayında</label>
+            <select class="form-select" id="faaliyet-yayinda">
+              <option value="E">Evet - sitede yayınla</option>
+              <option value="H">Hayır - yayından kaldır / taslak</option>
+            </select>
           </div>
           <div class="form-group">
             <label class="form-label">Anahtar Kelimeler</label>
@@ -753,7 +778,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
         </div>
         <div class="list-table">
           <table>
-            <thead><tr><th>Başlık</th><th>Kaynak</th><th>Bağlantı</th><th>Tarih</th><th>İşlem</th></tr></thead>
+            <thead><tr><th>Başlık</th><th>Kaynak</th><th>Bağlantı</th><th>Tarih</th><th>Yayında</th><th>İşlem</th></tr></thead>
             <tbody id="basinda-tbody"></tbody>
           </table>
         </div>
@@ -784,6 +809,13 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
           <div class="form-group">
             <label class="form-label">Tarih</label>
             <input class="form-input" id="basinda-crdate" type="text" placeholder="GG/AA/YYYY">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="basinda-yayinda">Yayında</label>
+            <select class="form-select" id="basinda-yayinda">
+              <option value="E">Evet - sitede yayınla</option>
+              <option value="H">Hayır - yayından kaldır / taslak</option>
+            </select>
           </div>
           <div style="display:flex;gap:.75rem;margin-top:1rem">
             <button class="btn btn-primary" onclick="saveBasinda()">Kaydet</button>
@@ -1183,12 +1215,17 @@ function renderDashboard(h, e, m, b) {
 }
 
 // ── Haberler ─────────────────────────────────────────────────
+function yayindaBadge(value) {
+  const published = value === 'E';
+  return `<span class="tag ${published ? 'tag-green' : 'tag-red'}">${published ? 'Evet' : 'Hayır'}</span>`;
+}
+
 function renderHaberTable() {
   haberler.sort((a, b) => (b.tarih || '').localeCompare(a.tarih || ''));
   document.getElementById('haber-count').textContent = `${haberler.length} haber`;
   const tbody = document.getElementById('haber-tbody');
   if (!haberler.length) {
-    tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-state-icon">📰</div><div class="empty-state-text">Henüz haber eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'haber-yeni\')">İlk Haberi Ekle</button></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">📰</div><div class="empty-state-text">Henüz haber eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'haber-yeni\')">İlk Haberi Ekle</button></div></td></tr>';
     return;
   }
   tbody.innerHTML = haberler.map(d => `
@@ -1196,6 +1233,7 @@ function renderHaberTable() {
       <td class="td-title">${esc(d.baslik)}</td>
       <td><span class="tag ${d.renk==='r'?'tag-red':d.renk==='g'?'tag-green':'tag-mustard'}">${esc(d.kategori)}</span></td>
       <td class="td-date">${esc(d.gosterim_tarihi||d.tarih)}</td>
+      <td>${yayindaBadge(d.yayinda)}</td>
       <td class="td-actions">
         <button class="btn btn-secondary btn-sm" onclick="editHaber(${d.id})">Düzenle</button>
         <button class="btn btn-danger btn-sm" onclick="confirmDelete('haber',${d.id},'${esc(d.baslik)}')">Sil</button>
@@ -1215,6 +1253,7 @@ function editHaber(id) {
   document.getElementById('haber-ozet').value       = d.ozet || '';
   document.getElementById('haber-tarih').value      = isoToDMY(d.tarih);
   document.getElementById('haber-gosterim').value   = d.gosterim_tarihi || '';
+  document.getElementById('haber-yayinda').value    = d.yayinda || 'E';
   document.getElementById('haber-keywords').value   = d.keywords || '';
   showPage('haber-yeni');
   setQuillContent('editor-haber-ozet-icerik', d.ozet_icerik || '');
@@ -1234,6 +1273,7 @@ function resetHaberForm() {
   ['haber-baslik','haber-ozet'].forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('haber-tarih').value    = todayDMY();
   document.getElementById('haber-gosterim').value = _todayTR;
+  document.getElementById('haber-yayinda').value = 'E';
   document.getElementById('haber-keywords').value = '';
   setQuillContent('editor-haber-ozet-icerik', '');
   setQuillContent('editor-haber-detayli-icerik', '');
@@ -1249,6 +1289,7 @@ async function saveHaber() {
   const ozet_icerik    = getQuillHTML('editor-haber-ozet-icerik');
   const detayli_icerik = getQuillHTML('editor-haber-detayli-icerik');
   const keywords      = document.getElementById('haber-keywords').value.trim();
+  const yayinda       = document.getElementById('haber-yayinda').value;
   const kategoriEl    = document.getElementById('haber-kategori');
   const kategori      = kategoriEl.value;
   const renk          = kategoriEl.selectedOptions[0].dataset.cls || '';
@@ -1256,7 +1297,7 @@ async function saveHaber() {
   if (!baslik) { showToast('Başlık zorunlu!', 'error'); return; }
   if (!editId && !slug) { showToast('Slug zorunlu!', 'error'); return; }
 
-  const body = { baslik, ozet, ozet_icerik, detayli_icerik, tarih, gosterim_tarihi, kategori, renk, keywords };
+  const body = { baslik, ozet, ozet_icerik, detayli_icerik, tarih, gosterim_tarihi, kategori, renk, keywords, yayinda };
 
   try {
     showLoading('Kaydediliyor...');
@@ -1286,7 +1327,7 @@ function renderEtkinlikTable() {
   document.getElementById('etkinlik-count').textContent = `${etkinlikler.length} etkinlik`;
   const tbody = document.getElementById('etkinlik-tbody');
   if (!etkinlikler.length) {
-    tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-state-icon">📅</div><div class="empty-state-text">Henüz etkinlik eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'etkinlik-yeni\')">İlk Etkinliği Ekle</button></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">📅</div><div class="empty-state-text">Henüz etkinlik eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'etkinlik-yeni\')">İlk Etkinliği Ekle</button></div></td></tr>';
     return;
   }
   tbody.innerHTML = etkinlikler.map(d => `
@@ -1294,6 +1335,7 @@ function renderEtkinlikTable() {
       <td class="td-title">${esc(d.baslik)}</td>
       <td><span class="tag tag-mustard">${esc(d.kategori)}</span></td>
       <td class="td-date">${esc(d.gun)} ${esc(d.ay)}</td>
+      <td>${yayindaBadge(d.yayinda)}</td>
       <td class="td-actions">
         <button class="btn btn-secondary btn-sm" onclick="editEtkinlik(${d.id})">Düzenle</button>
         <button class="btn btn-danger btn-sm" onclick="confirmDelete('etkinlik',${d.id},'${esc(d.baslik)}')">Sil</button>
@@ -1315,6 +1357,7 @@ function editEtkinlik(id) {
   document.getElementById('etkinlik-ay').value         = d.ay || '';
   document.getElementById('etkinlik-tarih').value      = isoToDMY(d.tarih);
   document.getElementById('etkinlik-gosterim').value   = d.gosterim_tarihi || '';
+  document.getElementById('etkinlik-yayinda').value    = d.yayinda || 'E';
   document.getElementById('etkinlik-keywords').value   = d.keywords || '';
   showPage('etkinlik-yeni');
   setQuillContent('editor-etkinlik-icerik', d.icerik || '');
@@ -1333,6 +1376,7 @@ function resetEtkinlikForm() {
   document.getElementById('etkinlik-ay').value        = _months[_today.getMonth()];
   document.getElementById('etkinlik-tarih').value     = todayDMY();
   document.getElementById('etkinlik-gosterim').value  = `${_today.getDate()} ${_months[_today.getMonth()]} ${_today.getFullYear()}`;
+  document.getElementById('etkinlik-yayinda').value   = 'E';
   setQuillContent('editor-etkinlik-icerik', '');
 }
 
@@ -1348,11 +1392,12 @@ async function saveEtkinlik() {
   const icerik    = getQuillHTML('editor-etkinlik-icerik');
   const keywords  = document.getElementById('etkinlik-keywords').value.trim();
   const kategori  = document.getElementById('etkinlik-kategori').value;
+  const yayinda   = document.getElementById('etkinlik-yayinda').value;
 
   if (!baslik) { showToast('Başlık zorunlu!', 'error'); return; }
   if (!editId && !slug) { showToast('Slug zorunlu!', 'error'); return; }
 
-  const body = { baslik, ozet, icerik, tarih, gosterim_tarihi, gun: gun||'—', ay: ay||'?', kategori, keywords };
+  const body = { baslik, ozet, icerik, tarih, gosterim_tarihi, gun: gun||'—', ay: ay||'?', kategori, keywords, yayinda };
 
   try {
     showLoading('Kaydediliyor...');
@@ -1803,13 +1848,14 @@ function renderFaaliyetTable() {
   document.getElementById('faaliyet-count').textContent = `${faaliyetler.length} faaliyet`;
   const tbody = document.getElementById('faaliyet-tbody');
   if (!faaliyetler.length) {
-    tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">Henüz faaliyet eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'faaliyet-yeni\');resetFaaliyetForm()">İlk Faaliyeti Ekle</button></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">Henüz faaliyet eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'faaliyet-yeni\');resetFaaliyetForm()">İlk Faaliyeti Ekle</button></div></td></tr>';
     return;
   }
   tbody.innerHTML = faaliyetler.map(f => `<tr>
       <td class="td-title">${esc(f.baslik)}</td>
       <td style="font-size:12px;color:var(--text-muted);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(f.ozet||'')}</td>
       <td class="td-date">${esc(f.crdate)}</td>
+      <td>${yayindaBadge(f.yayinda)}</td>
       <td class="td-actions">
         <button class="btn btn-secondary btn-sm" onclick="editFaaliyet(${f.id})">Düzenle</button>
         <button class="btn btn-danger btn-sm" onclick="confirmDelete('faaliyet',${f.id},'${esc(f.baslik)}')">Sil</button>
@@ -1826,6 +1872,7 @@ function editFaaliyet(id) {
   document.getElementById('faaliyet-ozet').value     = f.ozet || '';
   document.getElementById('faaliyet-crdate').value   = isoToDMY(f.crdate);
   document.getElementById('faaliyet-keywords').value = f.keywords || '';
+  document.getElementById('faaliyet-yayinda').value = f.yayinda || 'E';
   showPage('faaliyet-yeni');
   setQuillContent('editor-faaliyet-icerik', f.icerik || '');
 }
@@ -1837,6 +1884,7 @@ function resetFaaliyetForm() {
   document.getElementById('faaliyet-ozet').value     = '';
   document.getElementById('faaliyet-crdate').value   = todayDMY();
   document.getElementById('faaliyet-keywords').value = '';
+  document.getElementById('faaliyet-yayinda').value = 'E';
   setQuillContent('editor-faaliyet-icerik', '');
 }
 
@@ -1847,13 +1895,14 @@ async function saveFaaliyet() {
   const crdate = dmyToISO(document.getElementById('faaliyet-crdate').value.trim());
   const icerik = getQuillHTML('editor-faaliyet-icerik');
   const keywords = document.getElementById('faaliyet-keywords').value.trim();
+  const yayinda = document.getElementById('faaliyet-yayinda').value;
   if (!baslik) { showToast('Başlık zorunlu!', 'error'); return; }
   try {
     showLoading('Kaydediliyor...');
     if (editId) {
-      await apiFetch(`/api/admin/faaliyetler/${editId}`, 'PUT', { baslik, ozet, icerik, crdate, keywords });
+      await apiFetch(`/api/admin/faaliyetler/${editId}`, 'PUT', { baslik, ozet, icerik, crdate, keywords, yayinda });
     } else {
-      await apiFetch('/api/admin/faaliyetler', 'POST', { baslik, ozet, icerik, crdate, keywords });
+      await apiFetch('/api/admin/faaliyetler', 'POST', { baslik, ozet, icerik, crdate, keywords, yayinda });
     }
     faaliyetler = await afetch('/api/admin/faaliyetler');
     renderFaaliyetTable();
@@ -1872,7 +1921,7 @@ function renderBasindaTable() {
   document.getElementById('basinda-count').textContent = `${basinda.length} haber`;
   const tbody = document.getElementById('basinda-tbody');
   if (!basinda.length) {
-    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">📰</div><div class="empty-state-text">Henüz haber eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'basinda-yeni\');resetBasindaForm()">İlk Haberi Ekle</button></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">📰</div><div class="empty-state-text">Henüz haber eklenmemiş.</div><button class="btn btn-primary" onclick="showPage(\'basinda-yeni\');resetBasindaForm()">İlk Haberi Ekle</button></div></td></tr>';
     return;
   }
   tbody.innerHTML = basinda.map(item => `<tr>
@@ -1880,6 +1929,7 @@ function renderBasindaTable() {
       <td style="font-size:12px;color:var(--text-muted)">${esc(item.adres_ismi || '')}</td>
       <td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.baglanti_adresi ? `<a href="${esc(item.baglanti_adresi)}" target="_blank" rel="noopener noreferrer" style="color:var(--mustard)">${esc(item.baglanti_adresi)}</a>` : ''}</td>
       <td class="td-date">${fmtDate(item.crdate)}</td>
+      <td>${yayindaBadge(item.yayinda)}</td>
       <td class="td-actions">
         <button class="btn btn-secondary btn-sm" onclick="editBasinda(${item.id})">Düzenle</button>
         <button class="btn btn-danger btn-sm" onclick="confirmDelete('basinda',${item.id},'${esc(item.baslik)}')">Sil</button>
@@ -1897,6 +1947,7 @@ function editBasinda(id) {
   document.getElementById('basinda-baglanti').value   = item.baglanti_adresi || '';
   document.getElementById('basinda-keywords').value   = item.keywords || '';
   document.getElementById('basinda-crdate').value     = isoToDMY(item.crdate);
+  document.getElementById('basinda-yayinda').value    = item.yayinda || 'E';
   showPage('basinda-yeni');
 }
 
@@ -1908,6 +1959,7 @@ function resetBasindaForm() {
   document.getElementById('basinda-baglanti').value   = '';
   document.getElementById('basinda-keywords').value   = '';
   document.getElementById('basinda-crdate').value     = todayDMY();
+  document.getElementById('basinda-yayinda').value    = 'E';
 }
 
 async function saveBasinda() {
@@ -1917,13 +1969,14 @@ async function saveBasinda() {
   const baglanti_adresi = document.getElementById('basinda-baglanti').value.trim();
   const keywords       = document.getElementById('basinda-keywords').value.trim();
   const crdate         = dmyToISO(document.getElementById('basinda-crdate').value.trim());
+  const yayinda        = document.getElementById('basinda-yayinda').value;
   if (!baslik) { showToast('Başlık zorunlu!', 'error'); return; }
   try {
     showLoading('Kaydediliyor...');
     if (editId) {
-      await apiFetch(`/api/admin/basinda-todap/${editId}`, 'PUT', { baslik, adres_ismi, baglanti_adresi, crdate, keywords });
+      await apiFetch(`/api/admin/basinda-todap/${editId}`, 'PUT', { baslik, adres_ismi, baglanti_adresi, crdate, keywords, yayinda });
     } else {
-      await apiFetch('/api/admin/basinda-todap', 'POST', { baslik, adres_ismi, baglanti_adresi, crdate, keywords });
+      await apiFetch('/api/admin/basinda-todap', 'POST', { baslik, adres_ismi, baglanti_adresi, crdate, keywords, yayinda });
     }
     basinda = await afetch('/api/admin/basinda-todap');
     renderBasindaTable();
