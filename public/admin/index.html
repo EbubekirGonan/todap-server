@@ -239,6 +239,13 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
 .ql-toolbar.ql-snow .ql-color-picker:hover .ql-stroke,.ql-toolbar.ql-snow .ql-background-picker:hover .ql-stroke{stroke:var(--text)}
 .ql-snow .ql-tooltip a.ql-action::after{color:var(--mustard)}
 .ql-snow .ql-tooltip a.ql-remove::before{color:var(--text-muted)}
+.ql-contentCarousel{width:auto!important;padding:0 8px!important}
+.content-carousel{margin:1rem 0;padding:8px;border:1px dashed var(--border);border-radius:8px}
+.content-carousel-track{display:flex;gap:0;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin}
+.content-carousel-slide{flex:0 0 100%;scroll-snap-align:start;text-align:center}
+.content-carousel-slide img{display:block;max-width:100%;max-height:280px;margin:0 auto;object-fit:contain}
+.content-carousel-add{display:block;margin:8px auto 0;padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text);cursor:pointer}
+.content-carousel-add:hover{border-color:var(--mustard);color:var(--text)}
 
 @media (max-width: 1100px){
   .theme-grid{grid-template-columns:1fr}
@@ -963,11 +970,54 @@ const QUILL_TOOLBAR = [
 ];
 const CONTENT_QUILL_TOOLBAR = [
   ...QUILL_TOOLBAR.slice(0, 4),
-  ['blockquote', 'link', 'image'],
+  ['blockquote', 'link', 'image', 'contentCarousel'],
   QUILL_TOOLBAR[5]
 ];
 let activeImageEditor = null;
 let activeImageRange = null;
+let activeCarouselTarget = null;
+
+const BlockEmbed = Quill.import('blots/block/embed');
+class ContentCarouselBlot extends BlockEmbed {
+  static blotName = 'contentCarousel';
+  static tagName = 'DIV';
+  static className = 'content-carousel';
+
+  static create(value) {
+    const node = super.create();
+    const images = Array.isArray(value) ? value : (value && value.images) || [];
+    node.setAttribute('data-images', JSON.stringify(images));
+    const track = document.createElement('div');
+    track.className = 'content-carousel-track';
+    images.forEach((src) => {
+      if (typeof src !== 'string') return;
+      const slide = document.createElement('div');
+      slide.className = 'content-carousel-slide';
+      const image = document.createElement('img');
+      image.src = src;
+      image.alt = '';
+      slide.appendChild(image);
+      track.appendChild(slide);
+    });
+    node.appendChild(track);
+    const addButton = document.createElement('button');
+    addButton.type = 'button';
+    addButton.className = 'content-carousel-add';
+    addButton.textContent = '+ Görsel ekle';
+    node.appendChild(addButton);
+    return node;
+  }
+
+  static value(node) {
+    try {
+      const images = JSON.parse(node.getAttribute('data-images') || '[]');
+      return Array.isArray(images) ? images.filter((image) => typeof image === 'string') : [];
+    } catch {
+      return [];
+    }
+  }
+}
+Quill.register(ContentCarouselBlot);
 
 function initQuill(id) {
   if (quills[id]) return quills[id];
@@ -982,12 +1032,41 @@ function initQuill(id) {
         image() {
           activeImageEditor = this.quill;
           activeImageRange = activeImageEditor.getSelection(true);
+          activeCarouselTarget = null;
           document.getElementById('content-image-input').click();
+        },
+        contentCarousel() {
+          const editor = this.quill;
+          const range = editor.getSelection(true);
+          if (!range) return;
+          activeImageEditor = null;
+          activeImageRange = null;
+          activeCarouselTarget = null;
+          editor.insertEmbed(range.index, 'contentCarousel', { images: [] }, 'user');
+          editor.setSelection(range.index + 1, 0, 'silent');
         }
       }
     };
   }
   const q = new Quill('#' + id, { theme: 'snow', modules });
+  if (contentImageEditorIds.has(id)) {
+    const galleryButton = q.getModule('toolbar').container.querySelector('.ql-contentCarousel');
+    galleryButton.textContent = 'Slider';
+    galleryButton.title = 'Metne carousel ekle';
+    galleryButton.setAttribute('aria-label', 'Metne carousel ekle');
+    q.root.addEventListener('click', (event) => {
+      const target = event.target instanceof Element ? event.target.closest('.content-carousel-add') : null;
+      if (!target) return;
+      event.preventDefault();
+      const carousel = target.closest('.content-carousel');
+      const blot = carousel && Quill.find(carousel);
+      if (!blot) return;
+      activeImageEditor = null;
+      activeImageRange = null;
+      activeCarouselTarget = { editor: q, blot };
+      document.getElementById('content-image-input').click();
+    });
+  }
   quills[id] = q;
   return q;
 }
@@ -996,10 +1075,12 @@ async function uploadContentImage(input) {
   const file = input.files && input.files[0];
   const editor = activeImageEditor;
   const range = activeImageRange;
+  const carouselTarget = activeCarouselTarget;
   input.value = '';
-  if (!file || !editor || !range) {
+  if (!file || ((!editor || !range) && !carouselTarget)) {
     activeImageEditor = null;
     activeImageRange = null;
+    activeCarouselTarget = null;
     return;
   }
 
@@ -1014,8 +1095,20 @@ async function uploadContentImage(input) {
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
-    editor.insertEmbed(range.index, 'image', result.url, 'user');
-    editor.setSelection(range.index + 1, 0, 'silent');
+    if (carouselTarget) {
+      const index = carouselTarget.editor.getIndex(carouselTarget.blot);
+      const embed = index >= 0 && carouselTarget.editor.getContents(index, 1).ops[0];
+      const current = embed && embed.insert.contentCarousel;
+      if (!Array.isArray(current)) throw new Error('Carousel bulunamadı. Lütfen tekrar deneyin.');
+      carouselTarget.editor.deleteText(index, 1, 'user');
+      carouselTarget.editor.insertEmbed(index, 'contentCarousel', {
+        images: [...current, result.url]
+      }, 'user');
+      carouselTarget.editor.setSelection(index + 1, 0, 'silent');
+    } else {
+      editor.insertEmbed(range.index, 'image', result.url, 'user');
+      editor.setSelection(range.index + 1, 0, 'silent');
+    }
     hideLoading();
   } catch (error) {
     hideLoading();
@@ -1023,16 +1116,24 @@ async function uploadContentImage(input) {
   } finally {
     activeImageEditor = null;
     activeImageRange = null;
+    activeCarouselTarget = null;
   }
 }
 function setQuillContent(id, html) {
   const q = quills[id];
-  if (q) q.root.innerHTML = html || '';
+  if (!q) return;
+  if ((html || '').includes('class="content-carousel"')) {
+    q.clipboard.dangerouslyPasteHTML(html, 'silent');
+  } else {
+    q.root.innerHTML = html || '';
+  }
 }
 function getQuillHTML(id) {
   const q = quills[id];
   if (!q) return '';
-  const h = q.root.innerHTML;
+  const content = q.root.cloneNode(true);
+  content.querySelectorAll('.content-carousel-add').forEach((button) => button.remove());
+  const h = content.innerHTML;
   return (h === '<p><br></p>' || h === '') ? '' : h;
 }
 

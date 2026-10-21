@@ -458,12 +458,63 @@ function renderEtkinlik(d, navigate = true) {
 function setArticleContent(containerId, html) {
   const container = document.getElementById(containerId);
   container.innerHTML = linkifyHtmlContent(html);
+  initializeArticleCarousels(container);
   container.querySelectorAll('img').forEach((image) => {
     image.tabIndex = 0;
     image.setAttribute('role', 'button');
     image.setAttribute('aria-label', image.alt
       ? `Görseli tam boyutta görüntüle: ${image.alt}`
       : 'Görseli tam boyutta görüntüle');
+  });
+}
+
+function initializeArticleCarousels(container) {
+  container.querySelectorAll('.content-carousel').forEach((carousel) => {
+    const track = carousel.querySelector('.content-carousel-track');
+    const slides = track ? Array.from(track.querySelectorAll('.content-carousel-slide')) : [];
+    if (!track) return;
+    if (!slides.length) {
+      carousel.remove();
+      return;
+    }
+    if (slides.length < 2) return;
+
+    const controls = document.createElement('div');
+    controls.className = 'content-carousel-controls';
+    const previous = document.createElement('button');
+    previous.type = 'button';
+    previous.textContent = '‹';
+    previous.setAttribute('aria-label', 'Önceki görsel');
+    const status = document.createElement('span');
+    status.className = 'content-carousel-status';
+    status.setAttribute('aria-live', 'polite');
+    const next = document.createElement('button');
+    next.type = 'button';
+    next.textContent = '›';
+    next.setAttribute('aria-label', 'Sonraki görsel');
+    controls.append(previous, status, next);
+    carousel.appendChild(controls);
+
+    const currentIndex = () => Math.min(
+      slides.length - 1,
+      Math.max(0, Math.round(track.scrollLeft / (track.clientWidth || 1)))
+    );
+    const updateControls = () => {
+      const index = currentIndex();
+      status.textContent = `${index + 1} / ${slides.length}`;
+      previous.disabled = index === 0;
+      next.disabled = index === slides.length - 1;
+    };
+    previous.addEventListener('click', () => {
+      const index = Math.max(0, currentIndex() - 1);
+      track.scrollTo({ left: index * track.clientWidth, behavior: 'smooth' });
+    });
+    next.addEventListener('click', () => {
+      const index = Math.min(slides.length - 1, currentIndex() + 1);
+      track.scrollTo({ left: index * track.clientWidth, behavior: 'smooth' });
+    });
+    track.addEventListener('scroll', () => requestAnimationFrame(updateControls), { passive: true });
+    updateControls();
   });
 }
 
