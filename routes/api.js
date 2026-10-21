@@ -81,7 +81,7 @@ function validateForm(body, limits, requiredFields) {
 
 // ── Haberler ─────────────────────────────────────────────────
 router.get('/haberler', ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM haberler WHERE aktif=1 ORDER BY tarih DESC').all());
+  res.json(await db.prepare("SELECT * FROM haberler WHERE aktif=1 AND yayinda='E' AND delete_flag<>'E' ORDER BY tarih DESC").all());
 }));
 
 router.get('/haberler/id/:id', ah(async (req, res) => {
@@ -89,20 +89,20 @@ router.get('/haberler/id/:id', ah(async (req, res) => {
   if (!Number.isSafeInteger(id) || id <= 0) {
     return res.status(400).json({ error: 'Geçersiz haber kimliği.' });
   }
-  const row = await db.prepare('SELECT * FROM haberler WHERE id=? AND aktif=1').get(id);
+  const row = await db.prepare("SELECT * FROM haberler WHERE id=? AND aktif=1 AND yayinda='E' AND delete_flag<>'E'").get(id);
   if (!row) return res.status(404).json({ error: 'Haber bulunamadı.' });
   res.json(row);
 }));
 
 router.get('/haberler/:slug', ah(async (req, res) => {
-  const row = await db.prepare('SELECT * FROM haberler WHERE slug=? AND aktif=1').get(req.params.slug);
+  const row = await db.prepare("SELECT * FROM haberler WHERE slug=? AND aktif=1 AND yayinda='E' AND delete_flag<>'E'").get(req.params.slug);
   if (!row) return res.status(404).json({ error: 'Bulunamadı' });
   res.json(row);
 }));
 
 // ── Etkinlikler ──────────────────────────────────────────────
 router.get('/etkinlikler', ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM etkinlikler WHERE aktif=1 ORDER BY tarih DESC').all());
+  res.json(await db.prepare("SELECT * FROM etkinlikler WHERE aktif=1 AND yayinda='E' AND delete_flag<>'E' ORDER BY tarih DESC").all());
 }));
 
 router.get('/etkinlikler/id/:id', ah(async (req, res) => {
@@ -110,25 +110,25 @@ router.get('/etkinlikler/id/:id', ah(async (req, res) => {
   if (!Number.isSafeInteger(id) || id <= 0) {
     return res.status(400).json({ error: 'Geçersiz etkinlik kimliği.' });
   }
-  const row = await db.prepare('SELECT * FROM etkinlikler WHERE id=? AND aktif=1').get(id);
+  const row = await db.prepare("SELECT * FROM etkinlikler WHERE id=? AND aktif=1 AND yayinda='E' AND delete_flag<>'E'").get(id);
   if (!row) return res.status(404).json({ error: 'Etkinlik bulunamadı.' });
   res.json(row);
 }));
 
 router.get('/etkinlikler/:slug', ah(async (req, res) => {
-  const row = await db.prepare('SELECT * FROM etkinlikler WHERE slug=? AND aktif=1').get(req.params.slug);
+  const row = await db.prepare("SELECT * FROM etkinlikler WHERE slug=? AND aktif=1 AND yayinda='E' AND delete_flag<>'E'").get(req.params.slug);
   if (!row) return res.status(404).json({ error: 'Bulunamadı' });
   res.json(row);
 }));
 
 // ── Birimler ─────────────────────────────────────────────────
 router.get('/birimler', ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM birimler WHERE aktif=1 ORDER BY sira ASC').all());
+  res.json(await db.prepare("SELECT * FROM birimler WHERE aktif=1 AND delete_flag<>'E' ORDER BY sira ASC").all());
 }));
 
 // ── Yayınlar ─────────────────────────────────────────────────
 router.get('/yayinlar', ah(async (_req, res) => {
-  res.json(await db.prepare("SELECT * FROM yayinlar WHERE aktif=1 ORDER BY NULLIF(crdate, '') DESC NULLS LAST, id DESC").all());
+  res.json(await db.prepare("SELECT * FROM yayinlar WHERE aktif=1 AND delete_flag<>'E' ORDER BY NULLIF(crdate, '') DESC NULLS LAST, id DESC").all());
 }));
 
 // ── Ticker ───────────────────────────────────────────────────
@@ -146,7 +146,7 @@ router.get('/ticker', ah(async (_req, res) => {
         END AS yayin_tarihi,
         id AS kaynak_id
       FROM haberler
-      WHERE aktif = 1
+      WHERE aktif = 1 AND yayinda = 'E' AND delete_flag <> 'E'
       ORDER BY yayin_tarihi DESC, id DESC
       LIMIT 5
     ),
@@ -162,7 +162,7 @@ router.get('/ticker', ah(async (_req, res) => {
         END AS yayin_tarihi,
         id AS kaynak_id
       FROM etkinlikler
-      WHERE aktif = 1
+      WHERE aktif = 1 AND yayinda = 'E' AND delete_flag <> 'E'
       ORDER BY yayin_tarihi DESC, id DESC
       LIMIT 5
     )
@@ -227,7 +227,7 @@ router.get('/sabit-sayfalar/:kategori', ah(async (req, res) => {
 
 // ── Faaliyetler ──────────────────────────────────────────────
 router.get('/faaliyetler', ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM faaliyetler ORDER BY crdate DESC').all());
+  res.json(await db.prepare("SELECT * FROM faaliyetler WHERE yayinda='E' AND delete_flag<>'E' ORDER BY crdate DESC").all());
 }));
 
 router.get('/faaliyetler/id/:id', ah(async (req, res) => {
@@ -235,23 +235,23 @@ router.get('/faaliyetler/id/:id', ah(async (req, res) => {
   if (!Number.isSafeInteger(id) || id <= 0) {
     return res.status(400).json({ error: 'Geçersiz faaliyet kimliği.' });
   }
-  const row = await db.prepare('SELECT * FROM faaliyetler WHERE id=?').get(id);
+  const row = await db.prepare("SELECT * FROM faaliyetler WHERE id=? AND yayinda='E' AND delete_flag<>'E'").get(id);
   if (!row) return res.status(404).json({ error: 'Faaliyet bulunamadı.' });
   res.json(row);
 }));
 
 // ── Basında Todap ─────────────────────────────────────────────
 router.get('/basinda-todap', ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM basinda_todap ORDER BY crdate DESC').all());
+  res.json(await db.prepare("SELECT * FROM basinda_todap WHERE yayinda='E' AND delete_flag<>'E' ORDER BY crdate DESC").all());
 }));
 
 // ── Videolar ────────────────────────────────────────────
 router.get('/videos', ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM videos WHERE aktif=1 ORDER BY yayinlanma_tarihi DESC').all());
+  res.json(await db.prepare("SELECT * FROM videos WHERE aktif=1 AND delete_flag<>'E' ORDER BY yayinlanma_tarihi DESC").all());
 }));
 
 router.get('/videos/:id', ah(async (req, res) => {
-  const row = await db.prepare('SELECT * FROM videos WHERE id=? AND aktif=1').get(req.params.id);
+  const row = await db.prepare("SELECT * FROM videos WHERE id=? AND aktif=1 AND delete_flag<>'E'").get(req.params.id);
   if (!row) return res.status(404).json({ error: 'Bulunamadı.' });
   res.json(row);
 }));

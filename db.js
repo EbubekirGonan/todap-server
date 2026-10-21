@@ -109,6 +109,7 @@ function createAdapter(executor) {
           kategori TEXT DEFAULT 'Bildiri',
           renk TEXT DEFAULT '',
           keywords TEXT DEFAULT '',
+          yayinda TEXT NOT NULL DEFAULT 'E',
           aktif INTEGER DEFAULT 1,
           olusturuldu TIMESTAMP DEFAULT NOW()
         );
@@ -125,6 +126,7 @@ function createAdapter(executor) {
           ay TEXT DEFAULT '?',
           kategori TEXT DEFAULT 'Etkinlik',
           keywords TEXT DEFAULT '',
+          yayinda TEXT NOT NULL DEFAULT 'E',
           aktif INTEGER DEFAULT 1,
           olusturuldu TIMESTAMP DEFAULT NOW()
         );
@@ -196,6 +198,7 @@ function createAdapter(executor) {
           icerik TEXT DEFAULT '',
           keywords TEXT DEFAULT '',
           crdate TEXT DEFAULT '',
+          yayinda TEXT NOT NULL DEFAULT 'E',
           guncelleme TIMESTAMP DEFAULT NOW()
         );
 
@@ -206,6 +209,7 @@ function createAdapter(executor) {
           baglanti_adresi TEXT DEFAULT '',
           keywords TEXT DEFAULT '',
           crdate TEXT DEFAULT '',
+          yayinda TEXT NOT NULL DEFAULT 'E',
           guncelleme TIMESTAMP DEFAULT NOW()
         );
 
@@ -242,8 +246,22 @@ function createAdapter(executor) {
       `);
 
       await executor.query(`
+        ALTER TABLE haberler ADD COLUMN IF NOT EXISTS yayinda TEXT NOT NULL DEFAULT 'E';
+        ALTER TABLE etkinlikler ADD COLUMN IF NOT EXISTS yayinda TEXT NOT NULL DEFAULT 'E';
+        ALTER TABLE faaliyetler ADD COLUMN IF NOT EXISTS yayinda TEXT NOT NULL DEFAULT 'E';
+        ALTER TABLE basinda_todap ADD COLUMN IF NOT EXISTS yayinda TEXT NOT NULL DEFAULT 'E';
+
         ALTER TABLE yayinlar
         ADD COLUMN IF NOT EXISTS crdate TEXT DEFAULT '';
+
+        ALTER TABLE haberler ADD COLUMN IF NOT EXISTS delete_flag TEXT NOT NULL DEFAULT 'H';
+        ALTER TABLE etkinlikler ADD COLUMN IF NOT EXISTS delete_flag TEXT NOT NULL DEFAULT 'H';
+        ALTER TABLE birimler ADD COLUMN IF NOT EXISTS delete_flag TEXT NOT NULL DEFAULT 'H';
+        ALTER TABLE yayinlar ADD COLUMN IF NOT EXISTS delete_flag TEXT NOT NULL DEFAULT 'H';
+        ALTER TABLE ticker_items ADD COLUMN IF NOT EXISTS delete_flag TEXT NOT NULL DEFAULT 'H';
+        ALTER TABLE faaliyetler ADD COLUMN IF NOT EXISTS delete_flag TEXT NOT NULL DEFAULT 'H';
+        ALTER TABLE basinda_todap ADD COLUMN IF NOT EXISTS delete_flag TEXT NOT NULL DEFAULT 'H';
+        ALTER TABLE videos ADD COLUMN IF NOT EXISTS delete_flag TEXT NOT NULL DEFAULT 'H';
       `);
 
       const themeCount = await this.prepare('SELECT COUNT(*)::int AS c FROM theme_color_profiles').get();

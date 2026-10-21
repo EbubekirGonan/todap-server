@@ -69,6 +69,11 @@ function isUniqueError(err) {
   return /duplicate key|unique/i.test(String(err && err.message));
 }
 
+function getYayinda(body) {
+  const value = body.yayinda === undefined ? 'E' : body.yayinda;
+  return value === 'E' || value === 'H' ? value : null;
+}
+
 const loginAlertedIps = new Map();
 const loginLimit = Number(process.env.ADMIN_LOGIN_LIMIT || 10);
 
@@ -260,17 +265,19 @@ router.post('/theme-colors/activate/:id', auth, ah(async (req, res) => {
 
 // ── Haberler CRUD ────────────────────────────────────────────
 router.get('/haberler', auth, ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM haberler ORDER BY tarih DESC').all());
+  res.json(await db.prepare('SELECT * FROM haberler WHERE delete_flag<>\'E\' ORDER BY tarih DESC').all());
 }));
 
 router.post('/haberler', auth, ah(async (req, res) => {
   const { slug, baslik, ozet, ozet_icerik, detayli_icerik, tarih, gosterim_tarihi, kategori, renk, keywords } = req.body;
+  const yayinda = getYayinda(req.body);
   if (!slug || !baslik) return res.status(400).json({ error: 'slug ve baslik zorunlu.' });
+  if (yayinda === null) return res.status(400).json({ error: 'Yayında değeri E veya H olmalıdır.' });
   try {
     const r = await db.prepare(`
-      INSERT INTO haberler (slug,baslik,ozet,ozet_icerik,detayli_icerik,tarih,gosterim_tarihi,kategori,renk,keywords)
-      VALUES (?,?,?,?,?,?,?,?,?,?)
-    `).run(slug, baslik, ozet || '', ozet_icerik || '', detayli_icerik || '', tarih || '', gosterim_tarihi || '', kategori || 'Bildiri', renk || '', keywords || '');
+      INSERT INTO haberler (slug,baslik,ozet,ozet_icerik,detayli_icerik,tarih,gosterim_tarihi,kategori,renk,keywords,yayinda)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?)
+    `).run(slug, baslik, ozet || '', ozet_icerik || '', detayli_icerik || '', tarih || '', gosterim_tarihi || '', kategori || 'Bildiri', renk || '', keywords || '', yayinda);
     res.json({ id: r.lastInsertRowid });
   } catch (e) {
     if (isUniqueError(e)) return res.status(409).json({ error: 'Bu slug zaten kullanılıyor.' });
@@ -280,32 +287,36 @@ router.post('/haberler', auth, ah(async (req, res) => {
 
 router.put('/haberler/:id', auth, ah(async (req, res) => {
   const { baslik, ozet, ozet_icerik, detayli_icerik, tarih, gosterim_tarihi, kategori, renk, aktif, keywords } = req.body;
+  const yayinda = req.body.yayinda === undefined ? undefined : getYayinda(req.body);
+  if (yayinda === null) return res.status(400).json({ error: 'Yayında değeri E veya H olmalıdır.' });
   await db.prepare(`
-    UPDATE haberler SET baslik=?,ozet=?,ozet_icerik=?,detayli_icerik=?,tarih=?,gosterim_tarihi=?,kategori=?,renk=?,aktif=?,keywords=?
+    UPDATE haberler SET baslik=?,ozet=?,ozet_icerik=?,detayli_icerik=?,tarih=?,gosterim_tarihi=?,kategori=?,renk=?,aktif=?,keywords=?,yayinda=COALESCE(?,yayinda)
     WHERE id=?
   `).run(baslik, ozet || '', ozet_icerik || '', detayli_icerik || '', tarih || '', gosterim_tarihi || '', kategori || 'Bildiri', renk || '',
-    aktif !== undefined ? Number(aktif) : 1, keywords || '', req.params.id);
+    aktif !== undefined ? Number(aktif) : 1, keywords || '', yayinda, req.params.id);
   res.json({ ok: true });
 }));
 
 router.delete('/haberler/:id', auth, ah(async (req, res) => {
-  await db.prepare('DELETE FROM haberler WHERE id=?').run(req.params.id);
+  await db.prepare('UPDATE haberler SET delete_flag=\'E\' WHERE id=?').run(req.params.id);
   res.json({ ok: true });
 }));
 
 // ── Etkinlikler CRUD ─────────────────────────────────────────
 router.get('/etkinlikler', auth, ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM etkinlikler ORDER BY tarih DESC').all());
+  res.json(await db.prepare('SELECT * FROM etkinlikler WHERE delete_flag<>\'E\' ORDER BY tarih DESC').all());
 }));
 
 router.post('/etkinlikler', auth, ah(async (req, res) => {
   const { slug, baslik, ozet, icerik, tarih, gosterim_tarihi, gun, ay, kategori, keywords } = req.body;
+  const yayinda = getYayinda(req.body);
   if (!slug || !baslik) return res.status(400).json({ error: 'slug ve baslik zorunlu.' });
+  if (yayinda === null) return res.status(400).json({ error: 'Yayında değeri E veya H olmalıdır.' });
   try {
     const r = await db.prepare(`
-      INSERT INTO etkinlikler (slug,baslik,ozet,icerik,tarih,gosterim_tarihi,gun,ay,kategori,keywords)
-      VALUES (?,?,?,?,?,?,?,?,?,?)
-    `).run(slug, baslik, ozet || '', icerik || '', tarih || '', gosterim_tarihi || '', gun || '—', ay || '?', kategori || 'Etkinlik', keywords || '');
+      INSERT INTO etkinlikler (slug,baslik,ozet,icerik,tarih,gosterim_tarihi,gun,ay,kategori,keywords,yayinda)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?)
+    `).run(slug, baslik, ozet || '', icerik || '', tarih || '', gosterim_tarihi || '', gun || '—', ay || '?', kategori || 'Etkinlik', keywords || '', yayinda);
     res.json({ id: r.lastInsertRowid });
   } catch (e) {
     if (isUniqueError(e)) return res.status(409).json({ error: 'Bu slug zaten kullanılıyor.' });
@@ -315,22 +326,24 @@ router.post('/etkinlikler', auth, ah(async (req, res) => {
 
 router.put('/etkinlikler/:id', auth, ah(async (req, res) => {
   const { baslik, ozet, icerik, tarih, gosterim_tarihi, gun, ay, kategori, aktif, keywords } = req.body;
+  const yayinda = req.body.yayinda === undefined ? undefined : getYayinda(req.body);
+  if (yayinda === null) return res.status(400).json({ error: 'Yayında değeri E veya H olmalıdır.' });
   await db.prepare(`
-    UPDATE etkinlikler SET baslik=?,ozet=?,icerik=?,tarih=?,gosterim_tarihi=?,gun=?,ay=?,kategori=?,aktif=?,keywords=?
+    UPDATE etkinlikler SET baslik=?,ozet=?,icerik=?,tarih=?,gosterim_tarihi=?,gun=?,ay=?,kategori=?,aktif=?,keywords=?,yayinda=COALESCE(?,yayinda)
     WHERE id=?
   `).run(baslik, ozet || '', icerik || '', tarih || '', gosterim_tarihi || '', gun || '—', ay || '?', kategori || 'Etkinlik',
-    aktif !== undefined ? Number(aktif) : 1, keywords || '', req.params.id);
+    aktif !== undefined ? Number(aktif) : 1, keywords || '', yayinda, req.params.id);
   res.json({ ok: true });
 }));
 
 router.delete('/etkinlikler/:id', auth, ah(async (req, res) => {
-  await db.prepare('DELETE FROM etkinlikler WHERE id=?').run(req.params.id);
+  await db.prepare('UPDATE etkinlikler SET delete_flag=\'E\' WHERE id=?').run(req.params.id);
   res.json({ ok: true });
 }));
 
 // ── Birimler CRUD ────────────────────────────────────────────
 router.get('/birimler', auth, ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM birimler ORDER BY sira ASC').all());
+  res.json(await db.prepare('SELECT * FROM birimler WHERE delete_flag<>\'E\' ORDER BY sira ASC').all());
 }));
 
 router.post('/birimler', auth, ah(async (req, res) => {
@@ -349,13 +362,13 @@ router.put('/birimler/:id', auth, ah(async (req, res) => {
 }));
 
 router.delete('/birimler/:id', auth, ah(async (req, res) => {
-  await db.prepare('DELETE FROM birimler WHERE id=?').run(req.params.id);
+  await db.prepare('UPDATE birimler SET delete_flag=\'E\' WHERE id=?').run(req.params.id);
   res.json({ ok: true });
 }));
 
 // ── Yayınlar CRUD ────────────────────────────────────────────
 router.get('/yayinlar', auth, ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM yayinlar').all());
+  res.json(await db.prepare('SELECT * FROM yayinlar WHERE delete_flag<>\'E\'').all());
 }));
 
 router.post('/yayinlar', auth, ah(async (req, res) => {
@@ -374,7 +387,7 @@ router.put('/yayinlar/:id', auth, ah(async (req, res) => {
 }));
 
 router.delete('/yayinlar/:id', auth, ah(async (req, res) => {
-  await db.prepare('DELETE FROM yayinlar WHERE id=?').run(req.params.id);
+  await db.prepare('UPDATE yayinlar SET delete_flag=\'E\' WHERE id=?').run(req.params.id);
   res.json({ ok: true });
 }));
 
@@ -399,7 +412,7 @@ router.post('/yayinlar/pdf', auth, uploadYayinPdf, ah(async (req, res) => {
 
 // ── Ticker CRUD ──────────────────────────────────────────────
 router.get('/ticker', auth, ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM ticker_items ORDER BY sira ASC').all());
+  res.json(await db.prepare('SELECT * FROM ticker_items WHERE delete_flag<>\'E\' ORDER BY sira ASC').all());
 }));
 
 router.post('/ticker', auth, ah(async (req, res) => {
@@ -418,7 +431,7 @@ router.put('/ticker/:id', auth, ah(async (req, res) => {
 }));
 
 router.delete('/ticker/:id', auth, ah(async (req, res) => {
-  await db.prepare('DELETE FROM ticker_items WHERE id=?').run(req.params.id);
+  await db.prepare('UPDATE ticker_items SET delete_flag=\'E\' WHERE id=?').run(req.params.id);
   res.json({ ok: true });
 }));
 
@@ -461,59 +474,67 @@ router.post('/sabit-sayfalar', auth, ah(async (req, res) => {
 
 // ── Faaliyetler CRUD ─────────────────────────────────────────
 router.get('/faaliyetler', auth, ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM faaliyetler ORDER BY crdate DESC').all());
+  res.json(await db.prepare('SELECT * FROM faaliyetler WHERE delete_flag<>\'E\' ORDER BY crdate DESC').all());
 }));
 
 router.post('/faaliyetler', auth, ah(async (req, res) => {
   const { baslik, ozet, icerik, crdate, keywords } = req.body;
+  const yayinda = getYayinda(req.body);
   if (!baslik) return res.status(400).json({ error: 'baslik zorunlu.' });
-  const r = await db.prepare('INSERT INTO faaliyetler (baslik,ozet,icerik,crdate,keywords) VALUES (?,?,?,?,?)')
-    .run(String(baslik).slice(0, 500), String(ozet || '').slice(0, 1000), String(icerik || ''), String(crdate || new Date().toISOString().slice(0, 10)), String(keywords || ''));
+  if (yayinda === null) return res.status(400).json({ error: 'Yayında değeri E veya H olmalıdır.' });
+  const r = await db.prepare('INSERT INTO faaliyetler (baslik,ozet,icerik,crdate,keywords,yayinda) VALUES (?,?,?,?,?,?)')
+    .run(String(baslik).slice(0, 500), String(ozet || '').slice(0, 1000), String(icerik || ''), String(crdate || new Date().toISOString().slice(0, 10)), String(keywords || ''), yayinda);
   res.json({ id: r.lastInsertRowid });
 }));
 
 router.put('/faaliyetler/:id', auth, ah(async (req, res) => {
   const { baslik, ozet, icerik, crdate, keywords } = req.body;
+  const yayinda = req.body.yayinda === undefined ? undefined : getYayinda(req.body);
   if (!baslik) return res.status(400).json({ error: 'baslik zorunlu.' });
-  await db.prepare('UPDATE faaliyetler SET baslik=?,ozet=?,icerik=?,crdate=?,keywords=?,guncelleme=NOW() WHERE id=?')
-    .run(String(baslik).slice(0, 500), String(ozet || '').slice(0, 1000), String(icerik || ''), String(crdate || ''), String(keywords || ''), req.params.id);
+  if (yayinda === null) return res.status(400).json({ error: 'Yayında değeri E veya H olmalıdır.' });
+  await db.prepare('UPDATE faaliyetler SET baslik=?,ozet=?,icerik=?,crdate=?,keywords=?,yayinda=COALESCE(?,yayinda),guncelleme=NOW() WHERE id=?')
+    .run(String(baslik).slice(0, 500), String(ozet || '').slice(0, 1000), String(icerik || ''), String(crdate || ''), String(keywords || ''), yayinda, req.params.id);
   res.json({ ok: true });
 }));
 
 router.delete('/faaliyetler/:id', auth, ah(async (req, res) => {
-  await db.prepare('DELETE FROM faaliyetler WHERE id=?').run(req.params.id);
+  await db.prepare('UPDATE faaliyetler SET delete_flag=\'E\' WHERE id=?').run(req.params.id);
   res.json({ ok: true });
 }));
 
 // ── Basında Todap CRUD ────────────────────────────────────────
 router.get('/basinda-todap', auth, ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM basinda_todap ORDER BY crdate DESC').all());
+  res.json(await db.prepare('SELECT * FROM basinda_todap WHERE delete_flag<>\'E\' ORDER BY crdate DESC').all());
 }));
 
 router.post('/basinda-todap', auth, ah(async (req, res) => {
   const { baslik, adres_ismi, baglanti_adresi, crdate, keywords } = req.body;
+  const yayinda = getYayinda(req.body);
   if (!baslik) return res.status(400).json({ error: 'baslik zorunlu.' });
-  const r = await db.prepare('INSERT INTO basinda_todap (baslik,adres_ismi,baglanti_adresi,crdate,keywords) VALUES (?,?,?,?,?)')
-    .run(String(baslik).slice(0, 500), String(adres_ismi || ''), String(baglanti_adresi || ''), String(crdate || new Date().toISOString().slice(0, 10)), String(keywords || ''));
+  if (yayinda === null) return res.status(400).json({ error: 'Yayında değeri E veya H olmalıdır.' });
+  const r = await db.prepare('INSERT INTO basinda_todap (baslik,adres_ismi,baglanti_adresi,crdate,keywords,yayinda) VALUES (?,?,?,?,?,?)')
+    .run(String(baslik).slice(0, 500), String(adres_ismi || ''), String(baglanti_adresi || ''), String(crdate || new Date().toISOString().slice(0, 10)), String(keywords || ''), yayinda);
   res.json({ id: r.lastInsertRowid });
 }));
 
 router.put('/basinda-todap/:id', auth, ah(async (req, res) => {
   const { baslik, adres_ismi, baglanti_adresi, crdate, keywords } = req.body;
+  const yayinda = req.body.yayinda === undefined ? undefined : getYayinda(req.body);
   if (!baslik) return res.status(400).json({ error: 'baslik zorunlu.' });
-  await db.prepare('UPDATE basinda_todap SET baslik=?,adres_ismi=?,baglanti_adresi=?,crdate=?,keywords=?,guncelleme=NOW() WHERE id=?')
-    .run(String(baslik).slice(0, 500), String(adres_ismi || ''), String(baglanti_adresi || ''), String(crdate || ''), String(keywords || ''), req.params.id);
+  if (yayinda === null) return res.status(400).json({ error: 'Yayında değeri E veya H olmalıdır.' });
+  await db.prepare('UPDATE basinda_todap SET baslik=?,adres_ismi=?,baglanti_adresi=?,crdate=?,keywords=?,yayinda=COALESCE(?,yayinda),guncelleme=NOW() WHERE id=?')
+    .run(String(baslik).slice(0, 500), String(adres_ismi || ''), String(baglanti_adresi || ''), String(crdate || ''), String(keywords || ''), yayinda, req.params.id);
   res.json({ ok: true });
 }));
 
 router.delete('/basinda-todap/:id', auth, ah(async (req, res) => {
-  await db.prepare('DELETE FROM basinda_todap WHERE id=?').run(req.params.id);
+  await db.prepare('UPDATE basinda_todap SET delete_flag=\'E\' WHERE id=?').run(req.params.id);
   res.json({ ok: true });
 }));
 
 // ── Videos CRUD ─────────────────────────────────────────
 router.get('/videos', auth, ah(async (_req, res) => {
-  res.json(await db.prepare('SELECT * FROM videos ORDER BY yayinlanma_tarihi DESC').all());
+  res.json(await db.prepare('SELECT * FROM videos WHERE delete_flag<>\'E\' ORDER BY yayinlanma_tarihi DESC').all());
 }));
 
 router.post('/videos', auth, ah(async (req, res) => {
@@ -550,7 +571,7 @@ router.put('/videos/:id', auth, ah(async (req, res) => {
 }));
 
 router.delete('/videos/:id', auth, ah(async (req, res) => {
-  await db.prepare('DELETE FROM videos WHERE id=?').run(req.params.id);
+  await db.prepare('UPDATE videos SET delete_flag=\'E\' WHERE id=?').run(req.params.id);
   res.json({ ok: true });
 }));
 
