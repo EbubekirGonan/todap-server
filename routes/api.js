@@ -204,7 +204,7 @@ router.post('/iletisim', contactFormLimiter, ah(async (req, res) => {
 
 // ── Üyelik Başvurusu ─────────────────────────────────────────
 router.post('/uyelik', membershipFormLimiter, ah(async (req, res) => {
-  const validation = validateForm(req.body, membershipFormLimits, ['ad', 'soyad', 'eposta', 'meslek', 'sehir', 'haberdar_olma_yeri_secim']);
+  const validation = validateForm(req.body, membershipFormLimits, ['ad', 'soyad', 'eposta', 'meslek', 'sehir']);
   if (validation.error) {
     return res.status(400).json({ error: validation.error });
   }
