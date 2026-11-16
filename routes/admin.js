@@ -475,7 +475,7 @@ router.get('/basvurular', auth, ah(async (_req, res) => {
 }));
 
 router.get('/basvurular/export', auth, ah(async (_req, res) => {
-  const rows = await db.prepare('SELECT id, ad, soyad, eposta, telefon, meslek, alan, sehir, neden, olusturuldu FROM basvurular ORDER BY olusturuldu DESC').all();
+  const rows = await db.prepare('SELECT id, ad, soyad, eposta, telefon, meslek, alan, sehir, neden, haberdar_olma_yeri, olusturuldu FROM basvurular ORDER BY olusturuldu DESC').all();
   sendCsvExport(res, 'uyelik-basvurulari.csv', [
     { header: 'ID', key: 'id' },
     { header: 'Ad', key: 'ad' },
@@ -486,6 +486,7 @@ router.get('/basvurular/export', auth, ah(async (_req, res) => {
     { header: 'Çalışma Alanı', key: 'alan' },
     { header: 'Şehir', key: 'sehir' },
     { header: 'Başvuru Nedeni', key: 'neden' },
+    { header: 'TODAP\'tan Nasıl Haberdar Oldu', key: 'haberdar_olma_yeri' },
     { header: 'Tarih', key: 'olusturuldu' }
   ], rows);
 }));

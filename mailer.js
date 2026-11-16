@@ -94,7 +94,8 @@ async function sendMembershipNotification(payload) {
       'Meslek / Unvan': payload.meslek || '—',
       'Calisma Alani': payload.alan || '—',
       Sehir: payload.sehir || '—',
-      Neden: payload.neden || '—'
+      Neden: payload.neden || '—',
+      'TODAP\'tan nasıl haberdar oldu': payload.haberdar_olma_yeri || '—'
     }
   });
 }

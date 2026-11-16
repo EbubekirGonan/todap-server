@@ -623,6 +623,26 @@ footer{background:var(--surface);padding:3.5rem 2.5rem 2rem;border-top:1px solid
         <div class="fg"><label>Çalışma Alanı</label><input type="text" name="alan" placeholder="Klinik, eğitim..."/></div>
         <div class="fg"><label>Şehir</label><input type="text" name="sehir" required placeholder="İstanbul"/></div>
       </div>
+      <div class="fg">
+        <label for="uyelik-haberdar-secim">TODAP'tan nasıl haberdar oldunuz?</label>
+        <select id="uyelik-haberdar-secim" name="haberdar_olma_yeri_secim" required onchange="toggleHaberdarDiger(this.value)">
+          <option value="">Seçiniz</option>
+          <option value="Instagram">Instagram</option>
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="X (Twitter)">X (Twitter)</option>
+          <option value="Google / internet araması">Google / internet araması</option>
+          <option value="TODAP web sitesi">TODAP web sitesi</option>
+          <option value="Meslektaş / arkadaş önerisi">Meslektaş / arkadaş önerisi</option>
+          <option value="Üniversite / akademik çevre">Üniversite / akademik çevre</option>
+          <option value="TODAP etkinliği / toplantısı">TODAP etkinliği / toplantısı</option>
+          <option value="Basın / haber">Basın / haber</option>
+          <option value="__diger__">Diğer (lütfen belirtiniz)</option>
+        </select>
+      </div>
+      <div class="fg" id="uyelik-haberdar-diger" style="display:none">
+        <label for="uyelik-haberdar-diger-input">Diğer yanıtınız</label>
+        <input id="uyelik-haberdar-diger-input" type="text" name="haberdar_olma_yeri_diger" maxlength="300" placeholder="Lütfen belirtiniz..." disabled/>
+      </div>
       <div class="fg"><label>Neden üye olmak istiyorsunuz?</label><textarea name="neden" placeholder="Kısaca belirtiniz..."></textarea></div>
       <p id="u-ok-error" class="form-error" role="alert" aria-live="polite"></p>
       <button type="submit" class="fs2">Başvuruyu Gönder</button>

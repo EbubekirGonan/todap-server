@@ -908,7 +908,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
         </div>
         <div class="list-table">
           <table>
-            <thead><tr><th>Ad Soyad</th><th>E-posta</th><th>Telefon</th><th>Meslek / Şehir</th><th>Neden</th><th>Tarih</th></tr></thead>
+            <thead><tr><th>Ad Soyad</th><th>E-posta</th><th>Telefon</th><th>Meslek / Şehir</th><th>Neden</th><th>TODAP'tan Nasıl Haberdar Oldu</th><th>Tarih</th></tr></thead>
             <tbody id="basvuru-tbody"></tbody>
           </table>
         </div>
@@ -2277,7 +2277,7 @@ function renderBasvurular(b) {
   document.getElementById('basvuru-count').textContent = `${b.length} başvuru`;
   const tbody = document.getElementById('basvuru-tbody');
   if (!b.length) {
-    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">Henüz başvuru yok.</div></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">Henüz başvuru yok.</div></div></td></tr>';
     return;
   }
   tbody.innerHTML = b.map(x => `
@@ -2287,6 +2287,7 @@ function renderBasvurular(b) {
       <td style="font-size:12px;color:var(--text-muted)">${esc(x.telefon || '—')}</td>
       <td style="font-size:12px;color:var(--text-muted)">${esc(x.meslek || '—')} / ${esc(x.sehir || '—')}</td>
       <td style="max-width:380px;white-space:pre-wrap;word-break:break-word">${esc(x.neden || '—')}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${esc(x.haberdar_olma_yeri || '—')}</td>
       <td class="td-date">${esc(x.olusturuldu || '')}</td>
     </tr>`).join('');
 }

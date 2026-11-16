@@ -179,6 +179,7 @@ function createAdapter(executor) {
           alan TEXT,
           sehir TEXT,
           neden TEXT,
+          haberdar_olma_yeri TEXT DEFAULT '',
           olusturuldu TIMESTAMP DEFAULT NOW()
         );
 
@@ -253,6 +254,8 @@ function createAdapter(executor) {
 
         ALTER TABLE yayinlar
         ADD COLUMN IF NOT EXISTS crdate TEXT DEFAULT '';
+        ALTER TABLE basvurular
+        ADD COLUMN IF NOT EXISTS haberdar_olma_yeri TEXT DEFAULT '';
 
         ALTER TABLE haberler ADD COLUMN IF NOT EXISTS delete_flag TEXT NOT NULL DEFAULT 'H';
         ALTER TABLE etkinlikler ADD COLUMN IF NOT EXISTS delete_flag TEXT NOT NULL DEFAULT 'H';

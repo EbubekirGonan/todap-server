@@ -35,7 +35,9 @@ const membershipFormLimits = {
   meslek: 100,
   alan: 200,
   sehir: 100,
-  neden: 2000
+  neden: 2000,
+  haberdar_olma_yeri_secim: 100,
+  haberdar_olma_yeri_diger: 300
 };
 const formFieldLabels = {
   isim: 'İsim',
@@ -48,7 +50,9 @@ const formFieldLabels = {
   meslek: 'Meslek / unvan',
   alan: 'Çalışma alanı',
   sehir: 'Şehir',
-  neden: 'Açıklama'
+  neden: 'Açıklama',
+  haberdar_olma_yeri_secim: 'TODAP\'tan nasıl haberdar olduğunuz',
+  haberdar_olma_yeri_diger: 'Diğer yanıtı'
 };
 
 function validateForm(body, limits, requiredFields) {
@@ -200,17 +204,23 @@ router.post('/iletisim', contactFormLimiter, ah(async (req, res) => {
 
 // ── Üyelik Başvurusu ─────────────────────────────────────────
 router.post('/uyelik', membershipFormLimiter, ah(async (req, res) => {
-  const validation = validateForm(req.body, membershipFormLimits, ['ad', 'soyad', 'eposta', 'meslek', 'sehir']);
+  const validation = validateForm(req.body, membershipFormLimits, ['ad', 'soyad', 'eposta', 'meslek', 'sehir', 'haberdar_olma_yeri_secim']);
   if (validation.error) {
     return res.status(400).json({ error: validation.error });
   }
-  const { ad, soyad, eposta, telefon, meslek, alan, sehir, neden } = validation.values;
-  await db.prepare(`INSERT INTO basvurular (ad,soyad,eposta,telefon,meslek,alan,sehir,neden)
-              VALUES (?,?,?,?,?,?,?,?)`)
-    .run(ad, soyad, eposta, telefon, meslek, alan, sehir, neden);
+  const { ad, soyad, eposta, telefon, meslek, alan, sehir, neden, haberdar_olma_yeri_secim, haberdar_olma_yeri_diger } = validation.values;
+  if (haberdar_olma_yeri_secim === '__diger__' && !haberdar_olma_yeri_diger) {
+    return res.status(400).json({ error: 'Lütfen TODAP\'tan nasıl haberdar olduğunuzu belirtin.' });
+  }
+  const haberdar_olma_yeri = haberdar_olma_yeri_secim === '__diger__'
+    ? haberdar_olma_yeri_diger
+    : haberdar_olma_yeri_secim;
+  await db.prepare(`INSERT INTO basvurular (ad,soyad,eposta,telefon,meslek,alan,sehir,neden,haberdar_olma_yeri)
+              VALUES (?,?,?,?,?,?,?,?,?)`)
+    .run(ad, soyad, eposta, telefon, meslek, alan, sehir, neden, haberdar_olma_yeri);
 
   try {
-    await sendMembershipNotification({ ad, soyad, eposta, telefon, meslek, alan, sehir, neden });
+    await sendMembershipNotification({ ad, soyad, eposta, telefon, meslek, alan, sehir, neden, haberdar_olma_yeri });
   } catch (err) {
     console.error('Uyelik e-postasi gonderilemedi:', err.message);
   }

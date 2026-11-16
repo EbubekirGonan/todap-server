@@ -955,6 +955,18 @@ function buildYayinlar() {
 }
 
 // ── Form Gönderimi ───────────────────────────────────────────
+function toggleHaberdarDiger(value) {
+  const container = document.getElementById('uyelik-haberdar-diger');
+  const input = document.getElementById('uyelik-haberdar-diger-input');
+  if (!container || !input) return;
+
+  const isOther = value === '__diger__';
+  container.style.display = isOther ? '' : 'none';
+  input.disabled = !isOther;
+  input.required = isOther;
+  if (!isOther) input.value = '';
+}
+
 async function formOK(e, successId) {
   e.preventDefault();
   const form   = e.target;
@@ -1012,6 +1024,8 @@ function resubmitForm(formId, successId) {
   if (!form || !success) return;
 
   form.reset();
+  const referralSelect = form.elements.namedItem('haberdar_olma_yeri_secim');
+  if (referralSelect) toggleHaberdarDiger(referralSelect.value);
   form.style.display = '';
   success.style.display = 'none';
   const resubmit = document.getElementById(`${successId}-resubmit`);
