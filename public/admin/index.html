@@ -890,6 +890,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
       <div class="page" id="page-mesajlar">
         <div class="list-toolbar">
           <span style="font-size:12px;color:var(--text-muted)" id="mesaj-count"></span>
+          <button class="btn btn-secondary btn-sm" onclick="exportExcel('mesajlar')">Excel'e Aktar (.csv)</button>
         </div>
         <div class="list-table">
           <table>
@@ -903,6 +904,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--text);font-size:14px
       <div class="page" id="page-basvurular">
         <div class="list-toolbar">
           <span style="font-size:12px;color:var(--text-muted)" id="basvuru-count"></span>
+          <button class="btn btn-secondary btn-sm" onclick="exportExcel('basvurular')">Excel'e Aktar (.csv)</button>
         </div>
         <div class="list-table">
           <table>
@@ -1198,6 +1200,29 @@ async function afetch(url) {
     throw new Error(msg || `HTTP ${r.status} — ${url}`);
   }
   return r.json();
+}
+
+async function exportExcel(type) {
+  try {
+    const response = await fetch(`/api/admin/${type}/export`);
+    if (!response.ok) {
+      let message;
+      try { message = (await response.json()).error; } catch { message = null; }
+      throw new Error(message || `Dışa aktarma başarısız (HTTP ${response.status}).`);
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = type === 'mesajlar' ? 'mesajlar.csv' : 'uyelik-basvurulari.csv';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    showToast(error.message || 'Excel dosyası indirilemedi.', 'error');
+  }
 }
 
 async function init() {

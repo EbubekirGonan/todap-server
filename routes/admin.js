@@ -65,6 +65,24 @@ function ah(fn) {
   });
 }
 
+function csvField(value) {
+  const text = value instanceof Date ? value.toISOString() : String(value ?? '');
+  const safeText = /^[\t\r\n=+\-@]/.test(text) || /^[\u0000-\u0020]+[=+\-@]/.test(text)
+    ? `'${text}`
+    : text;
+  return `"${safeText.replace(/"/g, '""')}"`;
+}
+
+function sendCsvExport(res, filename, columns, rows) {
+  const csv = [
+    columns.map(column => csvField(column.header)).join(';'),
+    ...rows.map(row => columns.map(column => csvField(row[column.key])).join(';'))
+  ].join('\r\n');
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.send(`\uFEFF${csv}`);
+}
+
 function isUniqueError(err) {
   return /duplicate key|unique/i.test(String(err && err.message));
 }
@@ -440,8 +458,36 @@ router.get('/mesajlar', auth, ah(async (_req, res) => {
   res.json(await db.prepare('SELECT * FROM mesajlar ORDER BY olusturuldu DESC').all());
 }));
 
+router.get('/mesajlar/export', auth, ah(async (_req, res) => {
+  const rows = await db.prepare('SELECT id, isim, eposta, konu, mesaj, olusturuldu FROM mesajlar ORDER BY olusturuldu DESC').all();
+  sendCsvExport(res, 'mesajlar.csv', [
+    { header: 'ID', key: 'id' },
+    { header: 'Gönderen', key: 'isim' },
+    { header: 'E-posta', key: 'eposta' },
+    { header: 'Konu', key: 'konu' },
+    { header: 'Mesaj', key: 'mesaj' },
+    { header: 'Tarih', key: 'olusturuldu' }
+  ], rows);
+}));
+
 router.get('/basvurular', auth, ah(async (_req, res) => {
   res.json(await db.prepare('SELECT * FROM basvurular ORDER BY olusturuldu DESC').all());
+}));
+
+router.get('/basvurular/export', auth, ah(async (_req, res) => {
+  const rows = await db.prepare('SELECT id, ad, soyad, eposta, telefon, meslek, alan, sehir, neden, olusturuldu FROM basvurular ORDER BY olusturuldu DESC').all();
+  sendCsvExport(res, 'uyelik-basvurulari.csv', [
+    { header: 'ID', key: 'id' },
+    { header: 'Ad', key: 'ad' },
+    { header: 'Soyad', key: 'soyad' },
+    { header: 'E-posta', key: 'eposta' },
+    { header: 'Telefon', key: 'telefon' },
+    { header: 'Meslek', key: 'meslek' },
+    { header: 'Çalışma Alanı', key: 'alan' },
+    { header: 'Şehir', key: 'sehir' },
+    { header: 'Başvuru Nedeni', key: 'neden' },
+    { header: 'Tarih', key: 'olusturuldu' }
+  ], rows);
 }));
 
 // ── Sabit Sayfalar CRUD ────────────────────────────────
